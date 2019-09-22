@@ -145,7 +145,7 @@ class WizardImportFatturapa(orm.TransientModel):
                 DatiAnagrafici.IdFiscaleIVA.IdPaese,
                 DatiAnagrafici.IdFiscaleIVA.IdCodice
             )
-        partner_ids = partner_model
+        partner_ids = []
         if vat:
             partner_ids = partner_model.search(
                 cr, uid, [('vat', '=', vat)], context=context)
