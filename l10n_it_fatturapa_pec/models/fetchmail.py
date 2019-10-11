@@ -174,7 +174,7 @@ class Fetchmail(orm.Model):
                 if error_raised:
                     server.pec_error_count += 1
                     max_retry = self.pool['ir.config_parameter'].get_param(
-                        'fetchmail.pec.max.retry')
+                        cr, uid, 'fetchmail.pec.max.retry')
                     if server.pec_error_count > int(max_retry):
                         # Setting to draft prevents new e-invoices to
                         # be sent via PEC.
