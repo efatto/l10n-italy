@@ -113,14 +113,6 @@ class res_partner(orm.Model):
                     ) % partner.name)
         return True
 
-    _constraints = [
-        (_check_ftpa_partner_data, 'Some customer infos are needed.', [
-            'is_pa', 'ipa_code', 'codice_destinatario', 'company_type',
-            'electronic_invoice_subjected', 'vat', 'fiscalcode', 'lastname',
-            'firstname', 'customer', 'street', 'zip', 'city',
-            'country_id']),
-    ]
-
     def onchange_country_id_e_inv(self, cr, uid, ids, country_id,
                                   codice_destinatario, context=None):
         res = {'value': {}}
@@ -131,3 +123,13 @@ class res_partner(orm.Model):
             else:
                 res = {'value': {'codice_destinatario': 'XXXXXXX'}}
         return res
+
+    _constraints = [
+        (_check_ftpa_partner_data, 'Some customer infos are needed.', [
+            'is_pa', 'ipa_code', 'codice_destinatario', 'company_type',
+            'electronic_invoice_subjected', 'vat', 'fiscalcode', 'lastname',
+            'firstname', 'customer', 'street', 'zip', 'city',
+            'country_id']),
+    ]
+
+
