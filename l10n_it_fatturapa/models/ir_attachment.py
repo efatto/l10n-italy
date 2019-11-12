@@ -44,7 +44,8 @@ class Attachment(orm.Model):
                 file_is_pem = False
         except Exception as e:
             raise except_osv(_('Error' ),
-                             _('An error with command "openssl asn1parse" occurred: %s') % e.args)
+                             _('An error with command "openssl asn1parse" occurred: %s'
+                               ) % (e.args or ' '))
         return file_is_pem
 
     def parse_pem_2_der(self, pem_file, tmp_der_file):
