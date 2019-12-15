@@ -28,7 +28,7 @@ class FatturaPAAttachmentIn(models.Model):
              "any discount and including tax charged to the buyer/ordered"
     )
     registered = fields.Boolean(
-        "Registered", compute="_compute_registered", store=True)
+        "Registered", compute="_compute_registered")
 
     e_invoice_validation_error = fields.Boolean(
         compute='_compute_e_invoice_validation_error')
