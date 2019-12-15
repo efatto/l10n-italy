@@ -136,15 +136,15 @@ class AccountInvoice(models.Model):
     withholding_tax_amount = fields.Float(
         compute='_amount_withholding_tax',
         digits=dp.get_precision('Account'), string='Withholding tax Amount',
-        store=True, readonly=True)
+        readonly=True)
     amount_net_pay = fields.Float(
         compute='_amount_withholding_tax',
         digits_compute=dp.get_precision('Account'), string='Net To Pay',
-        store=True, readonly=True)
+        readonly=True)
     amount_net_pay_residual = fields.Float(
         compute='_amount_withholding_tax',
         digits=dp.get_precision('Account'), string='Residual Net To Pay',
-        store=True, readonly=True)
+        readonly=True)
 
     @api.model
     def create(self, vals):
