@@ -23,7 +23,9 @@ import base64
 from openerp.osv import fields, orm
 from openerp.tools.translate import _
 from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
+import logging
 
+logger = logging.getLogger(__name__)
 
 class FatturaPAAttachmentIn(orm.Model):
     _name = "fatturapa.attachment.in"
@@ -35,29 +37,41 @@ class FatturaPAAttachmentIn(orm.Model):
     def _compute_xml_data(self, cr, uid, ids, name, unknow_none, context={}):
         ret = {}
         for att in self.browse(cr, uid, ids, context):
-            fatt = self.pool.get('wizard.import.fatturapa').get_invoice_obj(cr, uid, att)
-            cedentePrestatore = fatt.FatturaElettronicaHeader.CedentePrestatore
-            partner_id = self.pool.get('wizard.import.fatturapa').getCedPrest(
-                cr, uid,
-                cedentePrestatore)
-            vals = {
-                'xml_supplier_id': partner_id,
-                'invoices_number': len(fatt.FatturaElettronicaBody),
-                'invoices_total': 0,
+            try:
+                fatt = self.pool.get('wizard.import.fatturapa').get_invoice_obj(cr, uid, att)
+            except Exception as e:
+                logger.error('XML file not readable. Error: "%s".' % e)
+                tmp_vals = {
+                    'xml_supplier_id': False,
+                    'invoices_number': 1,
+                    'invoices_total': 0,
+                    'invoices_date': False,
                 }
-            invoices_total = 0
-            invoices_date = []
-            for invoice_body in fatt.FatturaElettronicaBody:
-                invoices_total += float(
-                    invoice_body.DatiGenerali.DatiGeneraliDocumento.ImportoTotaleDocumento or 0
-                )
-                invoice_date = invoice_body.DatiGenerali.DatiGeneraliDocumento.Data.\
-                    strftime(DEFAULT_SERVER_DATE_FORMAT)
-                if invoice_date not in invoices_date:
-                    invoices_date.append(invoice_date)
-            vals['invoices_total'] = invoices_total
-            vals['invoices_date'] = ' '.join(invoices_date)
-            ret[att.id] = vals.get(name, False)
+                ret[att.id] = tmp_vals.get(name, False)
+                fatt = False
+            if fatt:
+                cedentePrestatore = fatt.FatturaElettronicaHeader.CedentePrestatore
+                partner_id = self.pool.get('wizard.import.fatturapa').getCedPrest(
+                    cr, uid,
+                    cedentePrestatore)
+                vals = {
+                    'xml_supplier_id': partner_id,
+                    'invoices_number': len(fatt.FatturaElettronicaBody),
+                    'invoices_total': 0,
+                    }
+                invoices_total = 0
+                invoices_date = []
+                for invoice_body in fatt.FatturaElettronicaBody:
+                    invoices_total += float(
+                        invoice_body.DatiGenerali.DatiGeneraliDocumento.ImportoTotaleDocumento or 0
+                    )
+                    invoice_date = invoice_body.DatiGenerali.DatiGeneraliDocumento.Data.\
+                        strftime(DEFAULT_SERVER_DATE_FORMAT)
+                    if invoice_date not in invoices_date:
+                        invoices_date.append(invoice_date)
+                vals['invoices_total'] = invoices_total
+                vals['invoices_date'] = ' '.join(invoices_date)
+                ret[att.id] = vals.get(name, False)
         return ret
 
     def _search_is_registered(self, cr, uid, obj, name, args, context=None):

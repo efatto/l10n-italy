@@ -99,7 +99,7 @@ class Attachment(orm.Model):
             raise except_osv(_('Error' ),
                              _('Signed Xml file %s') % e.args)
         if not os.path.isfile(xml_file):
-            raise except_osv(_('Error' ),
+            raise except_osv(_('Error'),
                              _('Signed Xml file not decryptable'))
         return xml_file
 
