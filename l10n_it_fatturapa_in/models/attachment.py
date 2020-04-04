@@ -36,18 +36,19 @@ class FatturaPAAttachmentIn(orm.Model):
 
     def _compute_xml_data(self, cr, uid, ids, name, unknow_none, context={}):
         ret = {}
+        tmp_vals = {
+            'xml_supplier_id': False,
+            'invoices_number': 1,
+            'invoices_total': 0,
+            'invoices_date': False,
+        }
         for att in self.browse(cr, uid, ids, context):
             try:
                 fatt = self.pool.get('wizard.import.fatturapa').get_invoice_obj(cr, uid, att)
             except Exception as e:
                 logger.error('XML file not readable. Error: "%s".' % e)
-                tmp_vals = {
-                    'xml_supplier_id': False,
-                    'invoices_number': 1,
-                    'invoices_total': 0,
-                    'invoices_date': False,
-                }
-                ret[att.id] = tmp_vals.get(name, False)
+                # ret[att.id] = tmp_vals.get(name, False)
+                ret[att.id] = tmp_vals
                 fatt = False
             if fatt:
                 cedentePrestatore = fatt.FatturaElettronicaHeader.CedentePrestatore
@@ -71,7 +72,8 @@ class FatturaPAAttachmentIn(orm.Model):
                         invoices_date.append(invoice_date)
                 vals['invoices_total'] = invoices_total
                 vals['invoices_date'] = ' '.join(invoices_date)
-                ret[att.id] = vals.get(name, False)
+                # ret[att.id] = vals.get(name, False)
+                ret[att.id] = vals
         return ret
 
     def _search_is_registered(self, cr, uid, obj, name, args, context=None):
@@ -104,17 +106,20 @@ class FatturaPAAttachmentIn(orm.Model):
                                            string="Supplier", 
                                            relation="res.partner",
                                            type="many2one",
+                                           multi="_xml_info",
                                            store=True,),
         'invoices_number': fields.function(_compute_xml_data, 
                                            method=True, 
                                            string="Invoices number", 
                                            type="integer",
+                                           multi="_xml_info",
                                            store=True,),
         'invoices_total': fields.function(_compute_xml_data, 
-                                          method=True,
-                                          string="Invoices total",
-                                          type="float",
-                                          store=True,
+                                           method=True,
+                                           string="Invoices total",
+                                           type="float",
+                                           multi="_xml_info",
+                                           store=True,
                                           help="Se indicato dal fornitore, Importo totale del documento al "
                  "netto dell'eventuale sconto e comprensivo di imposta a debito "
                  "del cessionario / committente"),
@@ -124,6 +129,7 @@ class FatturaPAAttachmentIn(orm.Model):
                                          method=True,
                                          string="Invoices date",
                                          type="char",
+                                         multi="_xml_info",
                                          store=True, ),
     }
 
