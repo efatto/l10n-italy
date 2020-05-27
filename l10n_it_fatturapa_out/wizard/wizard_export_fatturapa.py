@@ -763,13 +763,15 @@ class WizardExportFatturapa(orm.TransientModel):
                 if line.product_id.default_code:
                     CodiceArticolo = CodiceArticoloType(
                         CodiceTipo='ODOO',
-                        CodiceValore=line.product_id.default_code
+                        CodiceValore=line.product_id.default_code.encode(
+                            'ascii', 'ignore').decode('ascii')[:35]
                     )
                     DettaglioLinea.CodiceArticolo.append(CodiceArticolo)
                 if line.product_id.ean13:
                     CodiceArticolo = CodiceArticoloType(
                         CodiceTipo='EAN',
-                        CodiceValore=line.product_id.ean13
+                        CodiceValore=line.product_id.ean13.encode(
+                            'ascii', 'ignore').decode('ascii')[:35]
                     )
                     DettaglioLinea.CodiceArticolo.append(CodiceArticolo)
             line_no += 1
