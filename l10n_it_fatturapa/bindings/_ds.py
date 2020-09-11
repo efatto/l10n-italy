@@ -1,7 +1,7 @@
 # flake8: noqa`
 # -*- coding: utf-8 -*-
 # PyXB bindings for NM:f1c343a882e7a65fb879f4ee813309f8231f28c8
-# Generated 2020-10-28 07:43:42.046485 by PyXB version 1.2.5 using Python 2.7.15.final.0
+# Generated 2020-10-28 07:43:42.046485 by PyXB version 1.2.6 using Python 2.7.15.final.0
 # Namespace http://www.w3.org/2000/09/xmldsig# [xmlns:ds]
 
 from __future__ import unicode_literals

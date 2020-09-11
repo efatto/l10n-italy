@@ -743,7 +743,7 @@ class WizardExportFatturapa(orm.TransientModel):
         prezzo_unitario = self._get_prezzo_unitario(cr, uid, line)
         DettaglioLinea = DettaglioLineeType(
             NumeroLinea=str(line_no),
-            Descrizione=unidecode(line.name.replace('\n', ' '), 1000),
+            Descrizione=unidecode(line.name.replace('\n', ' '))[:1000],
             PrezzoUnitario='{prezzo:.{precision}f}'.format(
                 prezzo=prezzo_unitario, precision=price_precision),
             Quantita='{qta:.{precision}f}'.format(
