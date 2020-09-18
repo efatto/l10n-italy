@@ -423,7 +423,7 @@ class account_invoice(orm.Model):
     # _position = ['2.1', '2.2', '2.3', '2.4', '2.5']
     _inherit = "account.invoice"
     _columns = {
-        'protocol_number': fields.char('Protocol Number', size=64),
+        'protocol_number': fields.char('Protocol Number', size=64, copy=False),
         # 1.2 -- partner_id
         #  1.3
         'tax_representative_id': fields.many2one(
@@ -456,7 +456,7 @@ class account_invoice(orm.Model):
         #  2.1.1.7
         'welfare_fund_ids': fields.one2many(
             'welfare.fund.data.line', 'invoice_id',
-            'Welfare Fund'
+            'Welfare Fund', copy=False
         ),
         #  2.1.1.8
         'discount_rise_price_ids': fields.one2many(
@@ -466,57 +466,57 @@ class account_invoice(orm.Model):
         #  2.1.2 - 2.1.6
         'related_documents': fields.one2many(
             'fatturapa.related_document_type', 'invoice_id',
-            'Related Documents'
+            'Related Documents', copy=False
         ),
         #  2.1.7
         'activity_progress_ids': fields.one2many(
             'faturapa.activity.progress', 'invoice_id',
-            'Fase of Activity Progress'
+            'Fase of Activity Progress', copy=False
         ),
         #  2.1.8
         'ftpa_related_ddts': fields.one2many(
             'fatturapa.related_ddt', 'invoice_id',
-            'Related DdT'
+            'Related DdT', copy=False
         ),
         #  2.1.9
         'carrier': fields.many2one(  # nb carrier_id is already used
-            'res.partner', string="Carrier"),
-        'transport_vehicle': fields.char('Vehicle', size=80),
-        'transport_reason': fields.char('Reason', size=80),
-        'number_items': fields.integer('number of items'),
-        'description': fields.char('Description', size=100),
-        'unit_weight': fields.char('Weight unit', size=10),
-        'gross_weight': fields.float('Gross Weight'),
-        'net_weight': fields.float('Net Weight'),
-        'pickup_datetime': fields.datetime('Pick up'),
-        'transport_date': fields.date('Transport Date'),
-        'delivery_address': fields.text('Delivery Address'),
-        'delivery_datetime': fields.datetime('Delivery Date Time'),
+            'res.partner', string="Carrier", copy=False),
+        'transport_vehicle': fields.char('Vehicle', size=80, copy=False),
+        'transport_reason': fields.char('Reason', size=80, copy=False),
+        'number_items': fields.integer('number of items', copy=False),
+        'description': fields.char('Description', size=100, copy=False),
+        'unit_weight': fields.char('Weight unit', size=10, copy=False),
+        'gross_weight': fields.float('Gross Weight', copy=False),
+        'net_weight': fields.float('Net Weight', copy=False),
+        'pickup_datetime': fields.datetime('Pick up', copy=False),
+        'transport_date': fields.date('Transport Date', copy=False),
+        'delivery_address': fields.text('Delivery Address', copy=False),
+        'delivery_datetime': fields.datetime('Delivery Date Time', copy=False),
         
         
         'ftpa_incoterms': fields.char(string="Incoterms", copy=False),
 
         #  2.1.10
-        'related_invoice_code': fields.char('Related invoice code'),
-        'related_invoice_date': fields.date('Related invoice date'),
+        'related_invoice_code': fields.char('Related invoice code', copy=False),
+        'related_invoice_date': fields.date('Related invoice date', copy=False),
         #  2.2.1 invoice lines
         #  2.2.2
         'fatturapa_summary_ids': fields.one2many(
             'faturapa.summary.data', 'invoice_id',
-            'FatturaPA Summary   Datas'
+            'FatturaPA Summary   Datas', copy=False
         ),
         #  2.3
-        'Vehicle_registration': fields.date('Veicole Registration'),
-        'total_travel': fields.char('Travel in hours or Km', size=15),
+        'Vehicle_registration': fields.date('Veicole Registration', copy=False),
+        'total_travel': fields.char('Travel in hours or Km', size=15, copy=False),
         #  2.4
         'fatturapa_payments': fields.one2many(
             'fatturapa.payment.data', 'invoice_id',
-            'FatturaPA Payment Datas'
+            'FatturaPA Payment Datas', copy=False
         ),
         #  2.5
         'fatturapa_doc_attachments': fields.one2many(
             'fatturapa.attachments', 'invoice_id',
-            'FatturaPA attachments'
+            'FatturaPA attachments', copy=False
         ),
 
     'efatt_stabile_organizzazione_indirizzo': fields.char(

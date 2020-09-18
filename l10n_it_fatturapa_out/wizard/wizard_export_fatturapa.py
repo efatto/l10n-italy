@@ -711,6 +711,8 @@ class WizardExportFatturapa(orm.TransientModel):
         body.DatiBeniServizi = DatiBeniServiziType()
         # TipoCessionePrestazione not handled
 
+        # TODO CodiceArticolo
+
         line_no = 1
         price_precision = self.pool['decimal.precision'].precision_get(cr, uid, 
             'Product Price')

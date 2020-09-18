@@ -437,7 +437,9 @@ class WizardImportFatturapa(orm.TransientModel):
             retLine['invoice_line_tax_id'] = [(6, 0, [account_tax_ids[0]])]
         if line.PrezzoUnitario:
             retLine['price_unit'] = float(line.PrezzoUnitario)
-        if line.Quantita:
+        if line.Quantita is None:
+            retLine['quantity'] = 1.0
+        else:
             retLine['quantity'] = float(line.Quantita)
         if line.TipoCessionePrestazione:
             retLine['service_type'] = line.TipoCessionePrestazione
@@ -448,7 +450,8 @@ class WizardImportFatturapa(orm.TransientModel):
         if line.DataFinePeriodo:
             retLine['service_end'] = line.DataFinePeriodo
         if (
-            line.PrezzoTotale and line.PrezzoUnitario and line.Quantita and
+            float(line.PrezzoTotale) and float(line.PrezzoUnitario) and
+            line.Quantita and float(line.Quantita) and  # Quantita not required
             line.ScontoMaggiorazione
         ):
             retLine['discount'] = self._computeDiscount(
