@@ -26,32 +26,32 @@ class AccountTax(orm.Model):
     _inherit = 'account.tax'
     _columns = {
         'non_taxable_nature': fields.selection([
-            ('N1', 'excluding ex Art. 15'),
-            ('N2', 'not subject'),
-            ('N2.1', 'not subject ex Artt. from 7 to 7-septies of DPR 633/72'),
-            ('N2.2', 'not subject – other'),
-            ('N3', 'not taxable'),
-            ('N3.1', 'not taxable – export'),
-            ('N3.2', 'not taxable – intercommunity cession'),
-            ('N3.3', 'not taxable – cession to San Marino'),
-            ('N3.4', 'not taxable – operation similar to export cession'),
-            ('N3.5', 'not taxable – following declarations of intent'),
-            ('N3.6', 'not taxable – other operations that do not contribute '
+            ('N1', '[N1] excluding ex Art. 15'),
+            ('N2', '[N2] not subject'),
+            ('N2.1', '[N2.1] not subject ex Artt. from 7 to 7-septies of DPR 633/72'),
+            ('N2.2', '[N2.2] not subject – other'),
+            ('N3', '[N3] not taxable'),
+            ('N3.1', '[N3.1] not taxable – export'),
+            ('N3.2', '[N3.2] not taxable – intercommunity cession'),
+            ('N3.3', '[N3.3] not taxable – cession to San Marino'),
+            ('N3.4', '[N3.4] not taxable – operation similar to export cession'),
+            ('N3.5', '[N3.5] not taxable – following declarations of intent'),
+            ('N3.6', '[N3.6] not taxable – other operations that do not contribute '
                      'to the formation of the ceiling'),
-            ('N4', 'exempt'),
-            ('N5', 'margin regime'),
-            ('N6', 'reverse charge'),
-            ('N6.1', 'reverse charge – disposal of scrap and other recycled '
+            ('N4', '[N4] exempt'),
+            ('N5', '[N5] margin regime'),
+            ('N6', '[N6] reverse charge'),
+            ('N6.1', '[N6.1] reverse charge – disposal of scrap and other recycled '
                      'materials'),
-            ('N6.2', 'reverse charge – supply of gold and pure silver'),
-            ('N6.3', 'reverse charge – subcontracting in the construction sector'),
-            ('N6.4', 'reverse charge – sale of buildings'),
-            ('N6.5', 'reverse charge – transfer of cell phones'),
-            ('N6.6', 'reverse charge – sale of electronic products'),
-            ('N6.7', 'reverse charge – construction sector and related sectors'),
-            ('N6.8', 'reverse charge – energy sector operations'),
-            ('N6.9', 'reverse charge – other cases'),
-            ('N7', 'VAT paid in another EU country')
+            ('N6.2', '[N6.2] reverse charge – supply of gold and pure silver'),
+            ('N6.3', '[N6.3] reverse charge – subcontracting in the construction sector'),
+            ('N6.4', '[N6.4] reverse charge – sale of buildings'),
+            ('N6.5', '[N6.5] reverse charge – transfer of cell phones'),
+            ('N6.6', '[N6.6] reverse charge – sale of electronic products'),
+            ('N6.7', '[N6.7] reverse charge – construction sector and related sectors'),
+            ('N6.8', '[N6.8] reverse charge – energy sector operations'),
+            ('N6.9', '[N6.9] reverse charge – other cases'),
+            ('N7', '[N7] VAT paid in another EU country')
             ], string="Non taxable nature"),
         'payability': fields.selection([
             ('I', 'Immediate payability'),
