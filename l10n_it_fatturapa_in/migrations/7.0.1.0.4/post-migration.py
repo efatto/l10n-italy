@@ -30,6 +30,6 @@ def migrate(cr, version):
                 ai.write_date,
                 ai.write_uid
             FROM account_invoice ai
-            WHERE ai.ftpa_withholding_type_legacy7 IS NOT NULL;
+            WHERE ai.ftpa_withholding_rate_legacy7 IS NOT NULL;
             """
         )
