@@ -144,27 +144,28 @@ class MailThread(orm.AbstractModel):
                             message.get('Message-Id'))
                     )
                     if fetchmail_server.e_inv_notify_partner_ids:
-                        self.env['mail.mail'].create({
-                            'subject': _(
-                                "PEC message [%s] not processed"
-                            ) % message.get('Subject'),
-                            'body_html': _(
-                                "<p>"
-                                "PEC message with Message-Id %s has been read "
-                                "but not processed, as not related to an "
-                                "e-invoice.</p>"
-                                "<p>Please check PEC mailbox %s, at server %s,"
-                                " with user %s</p>"
-                            ) % (
-                                message.get('Message-Id'),
-                                fetchmail_server.name, fetchmail_server.server,
-                                fetchmail_server.user
-                            ),
-                            'recipient_ids': [(
-                                6, 0,
-                                fetchmail_server.e_inv_notify_partner_ids.ids
-                            )]
-                        })
+                        self.pool['mail.mail'].create(
+                            cr, uid, {
+                                'subject': _(
+                                    "PEC message [%s] not processed"
+                                ) % message.get('Subject'),
+                                'body_html': _(
+                                    "<p>"
+                                    "PEC message with Message-Id %s has been read "
+                                    "but not processed, as not related to an "
+                                    "e-invoice.</p>"
+                                    "<p>Please check PEC mailbox %s, at server %s,"
+                                    " with user %s</p>"
+                                ) % (
+                                    message.get('Message-Id'),
+                                    fetchmail_server.name, fetchmail_server.server,
+                                    fetchmail_server.user
+                                ),
+                                'recipient_ids': [(
+                                    6, 0,
+                                    fetchmail_server.e_inv_notify_partner_ids.ids
+                                )]
+                            }, context=context)
                         _logger.info(
                             'Notifying partners %s about message with '
                             'Message-Id: %s' % (
