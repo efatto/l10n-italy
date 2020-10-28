@@ -144,7 +144,7 @@
             <field name="inherit_id" ref="techplus_l10n_it_withholding_tax.invoice_supplier_form"></field>
             <field name="arch" type="xml">
                 <field name="has_withholding" position="before">
-                    <field attrs="{'invisible': [('1', '=', 1)]}" name="ftpa_withholding_ids" readonly="1"/>
+                    <field attrs="{'invisible': 1}" name="ftpa_withholding_ids" readonly="1"/>
                 </field>
 
             </field>
