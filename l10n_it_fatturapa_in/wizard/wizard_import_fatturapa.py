@@ -981,9 +981,7 @@ class WizardImportFatturapa(orm.TransientModel):
             DatiGeneraliDocumento.DatiRitenuta
         if Withholdings:
             invoice_data['ftpa_withholding_ids'] = []
-            invoice_data['withholding_amount'] = 0
             for Withholding in Withholdings:
-                invoice_data['withholding_amount'] += Withholding.ImportoRitenuta
                 invoice_data['ftpa_withholding_ids'].append((
                     0, 0, {
                         'name': Withholding.TipoRitenuta,
