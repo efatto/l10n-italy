@@ -144,9 +144,7 @@
             <field name="inherit_id" ref="techplus_l10n_it_withholding_tax.invoice_supplier_form"></field>
             <field name="arch" type="xml">
                 <field name="has_withholding" position="before">
-                    <field attrs="{'invisible': [('has_withholding', '=', False)]}" name="ftpa_withholding_type" readonly="1"></field>
-                    <field attrs="{'invisible': [('has_withholding', '=', False)]}" name="ftpa_withholding_rate" readonly="1"></field>
-                    <field attrs="{'invisible': [('has_withholding', '=', False)]}" name="ftpa_withholding_payment_reason" readonly="1"></field>
+                    <field attrs="{'invisible': [('has_withholding', '=', False)]}" name="ftpa_withholding_ids" readonly="1"/>
                 </field>
 
             </field>
@@ -370,7 +368,16 @@
                                         </tree>
                                     </field>
                                 </group>
-
+                                <group string="Withholding">
+                                    <field name="ftpa_withholding_ids" nolabel="1" readonly="1">
+                                        <tree editable="bottom" string="Withholding Details">
+                                            <field name="name"/>
+                                            <field name="amount"/>
+                                            <field name="reason"/>
+                                            <field name="rate"/>
+                                        </tree>
+                                    </field>
+                                </group>
 			                    <group string="Payments">
 			                        <field name="fatturapa_payments" nolabel="1" readonly="1">
 			                            <tree string="Payments">

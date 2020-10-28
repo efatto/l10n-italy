@@ -977,15 +977,21 @@ class WizardImportFatturapa(orm.TransientModel):
         }
         invoice_data['e_invoice_line_ids'] = [(6, 0, e_invoice_line_ids)]
         # 2.1.1.5
-        Withholding = FatturaBody.DatiGenerali.\
+        Withholdings = FatturaBody.DatiGenerali.\
             DatiGeneraliDocumento.DatiRitenuta
-        if Withholding:
-            invoice_data['withholding_amount'] = Withholding.ImportoRitenuta
-            invoice_data['ftpa_withholding_type'] = Withholding.TipoRitenuta
-            invoice_data['ftpa_withholding_rate'] = float(
-                Withholding.AliquotaRitenuta)/100
-            invoice_data['ftpa_withholding_payment_reason'] = Withholding.\
-                CausalePagamento
+        if Withholdings:
+            invoice_data['ftpa_withholding_ids'] = []
+            invoice_data['withholding_amount'] = 0
+            for Withholding in Withholdings:
+                invoice_data['withholding_amount'] += Withholding.ImportoRitenuta
+                invoice_data['ftpa_withholding_ids'].append((
+                    0, 0, {
+                        'name': Withholding.TipoRitenuta,
+                        'amount': Withholding.ImportoRitenuta,
+                        'rate': float(Withholding.AliquotaRitenuta)/100,
+                        'reason': Withholding.CausalePagamento,
+                    })
+                )
         # 2.1.1.6
         Stamps = FatturaBody.DatiGenerali.\
             DatiGeneraliDocumento.DatiBollo

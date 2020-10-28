@@ -221,6 +221,32 @@ class welfare_fund_data_line(orm.Model):
     }
 
 
+class WithholdingDataLine(orm.Model):
+    _name = "withholding.data.line"
+    _description = 'E-invoice Withholding Data'
+
+    _columns = {
+        'name': fields.selection(
+            selection=[
+                ('RT01', 'Natural Person'),
+                ('RT02', 'Legal Person'),
+                ('RT03', 'INPS'),
+                ('RT04', 'ENASARCO'),
+                ('RT05', 'ENPAM'),
+                ('RT06', 'OTHER'),
+            ],
+            string='Withholding Type'
+        ),
+        'amount': fields.float('Withholding amount'),
+        'rate': fields.float('Withholding rate'),
+        'reason': fields.char('Withholding reason'),
+        'invoice_id': fields.many2one(
+            'account.invoice', 'Related Invoice',
+            ondelete='cascade', index=True
+        ),
+    }
+
+
 class discount_rise_price(orm.Model):
     # _position = ['2.1.1.8', '2.2.1.10']
     _name = "discount.rise.price"
@@ -440,16 +466,20 @@ class account_invoice(orm.Model):
             'fatturapa.document_type', string="Document Type"),
         #  2.1.1.5
         #  2.1.1.5.1
-        'ftpa_withholding_type': fields.selection(
-            [('RT01', 'Natural Person'), ('RT02', 'Legal Person')],
-            'Withholding type'
-        ),
+        # 'ftpa_withholding_type': fields.selection(
+        #     [('RT01', 'Natural Person'), ('RT02', 'Legal Person')],
+        #     'Withholding type'
+        # ),
         #  2.1.1.5.2 withholding_amount in module
         #  2.1.1.5.3
-        'ftpa_withholding_rate': fields.float('Withholding rate'),
+        # 'ftpa_withholding_rate': fields.float('Withholding rate'),
+        'ftpa_withholding_ids': fields.one2many(
+            'withholding.data.line', 'invoice_id',
+            'Withholding', copy=False
+        ),
         #  2.1.1.5.4
-        'ftpa_withholding_payment_reason': fields.char(
-            'Withholding reason', size=2),
+        # 'ftpa_withholding_payment_reason': fields.char(
+        #     'Withholding reason', size=2),
         #  2.1.1.6
         'virtual_stamp': fields.boolean('Virtual Stamp'),
         'stamp_amount': fields.float('Stamp Amount'),
