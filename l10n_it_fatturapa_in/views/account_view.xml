@@ -138,6 +138,18 @@
             </field>
         </record>
         <!-- Extend purchase invoice  -->
+        <record id="view_invoice_form_fatturapa_in" model="ir.ui.view">
+            <field name="name">account.invoice.fatturapa_in</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="techplus_l10n_it_withholding_tax.invoice_supplier_form"></field>
+            <field name="arch" type="xml">
+                <field name="has_withholding" position="before">
+                    <field attrs="{'invisible': [('1', '=', 1)]}" name="ftpa_withholding_ids" readonly="1"/>
+                </field>
+
+            </field>
+        </record>
+        <!-- Extend purchase invoice  -->
         <record id="view_invoice_form_fatturapa_in_ext" model="ir.ui.view">
             <field name="name">account.invoice.fatturapa_in_ext</field>
             <field name="model">account.invoice</field>
