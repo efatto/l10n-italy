@@ -89,28 +89,3 @@ class TestReverseCharge(ReverseChargeCommon, FatturaPACommon):
         xml_content = base64.decodebytes(attachment.datas)
         self.check_content(
             xml_content, 'IT10538570960_00002.xml', "l10n_it_fatturapa_out_rc")
-
-    def test_intra_EU_customer(self):
-        self.set_sequence_journal_selfinvoice(15, '2020-12-01')
-        self.set_bill_sequence(25, '2020-12-01')
-        self.supplier_intraEU.property_payment_term_id = self.term_15_30.id
-        invoice = self.invoice_model.create({
-            'partner_id': self.supplier_intraEU.id,
-            'account_id': self.customer_invoice_account,
-            'type': 'out_invoice',
-            'date_invoice': '2020-12-01',
-            'reference': 'EU-CUSTOMER-REF'
-        })
-
-        invoice_line_vals = {
-            'name': 'Invoice for sample product',
-            'account_id': self.sale_invoice_line_account,
-            'invoice_id': invoice.id,
-            'product_id': self.sample_product.id,
-            'price_unit': 100,
-            'invoice_line_tax_ids': [(4, self.tax_22vi.id, 0)]}
-        invoice_line = self.invoice_line_model.create(invoice_line_vals)
-        invoice_line.onchange_invoice_line_tax_id()
-        invoice.compute_taxes()
-        invoice.action_invoice_open()
-        self.assertFalse(invoice.rc_self_invoice_id)
