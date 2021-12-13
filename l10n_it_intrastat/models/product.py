@@ -21,6 +21,7 @@ class ProductCategory(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    intrastat_hs_coce = fields.Char()
     intrastat_type = fields.Selection(
         [
             ('good', 'Goods'),
