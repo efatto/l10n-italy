@@ -1,6 +1,6 @@
 {
     'name': 'ITA - Intrastat',
-    'version': '11.0.1.0.0',
+    'version': '11.0.1.0.1',
     'category': 'Account',
     'summary': 'Riclassificazione merci e servizi per dichiarazioni Intrastat',
     'author': 'Openforce'
