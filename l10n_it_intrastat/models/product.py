@@ -25,6 +25,7 @@ class ProductCategory(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    intrastat_hs_code = fields.Char()
     intrastat_code_id = fields.Many2one(
         comodel_name='report.intrastat.code',
         string="Intrastat Code")
