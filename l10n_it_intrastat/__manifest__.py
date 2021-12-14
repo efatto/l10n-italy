@@ -31,6 +31,7 @@
         'views/account.xml',
         'views/config.xml',
     ],
+    'post_init_hook': 'post_init_hook',
     'demo': [
         'demo/product_demo.xml'
     ]
