@@ -22,7 +22,7 @@ def post_init_hook(cr, registry):
                     template.default_code,
                 ))
             else:
-                template.intrastat_code_id = intrastat_code_id[0]
+                template.intrastat_code_id = intrastat_code_ids[0]
                 _logger.info(
                     'Updated intrastat code from %s to %s for product template %s' % (
                         template.intrastat_hs_code,
