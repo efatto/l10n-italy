@@ -13,7 +13,7 @@ def post_init_hook(cr, registry):
             ('intrastat_hs_code', '!=', False),
         ])
         for template in product_templates:
-            intrastat_code_ids = self.env['report.intrastat.code'].search([
+            intrastat_code_ids = env['report.intrastat.code'].search([
                 ('name', '=', template.intrastat_hs_code)
             ])
             if not intrastat_code_ids:
