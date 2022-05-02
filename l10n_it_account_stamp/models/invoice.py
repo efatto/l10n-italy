@@ -42,7 +42,7 @@ class AccountInvoice(models.Model):
             self.tax_stamp = False
 
     def _get_stamp_product(self, inv):
-        stamp_product_id = self.env.user.with_context(
+        stamp_product_id = inv.with_context(
             lang=inv.partner_id.lang).company_id.tax_stamp_product_id
         if not stamp_product_id:
             raise exceptions.Warning(
