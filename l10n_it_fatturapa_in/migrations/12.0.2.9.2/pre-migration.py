@@ -9,14 +9,14 @@ def migrate(env, version):
         return
     if not openupgrade.column_exists(cr, 'fatturapa_attachment_in', 'is_self_invoice'):
         openupgrade.logged_query(
-            cr,
+            env.cr,
             """
         ALTER TABLE fatturapa_attachment_in
             ADD COLUMN IF NOT EXISTS is_self_invoice BOOLEAN
         """,
         )
         openupgrade.logged_query(
-            cr,
+            env.cr,
             """
         UPDATE fatturapa_attachment_in
             SET is_self_invoice = false
