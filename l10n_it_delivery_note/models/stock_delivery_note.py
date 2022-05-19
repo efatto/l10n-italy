@@ -221,11 +221,11 @@ class StockDeliveryNote(models.Model):
 
     @api.multi
     @api.depends('name', 'partner_id',
-                 'partner_ref', 'partner_id.display_name')
+                 'partner_ref', 'partner_id.name')
     def _compute_display_name(self):
         for note in self:
             if not note.name:
-                partner_name = note.partner_id.display_name
+                partner_name = note.partner_id.name or note.partner_id.display_name
                 create_date = note.create_date.strftime(DATETIME_FORMAT)
                 name = "{} - {}".format(partner_name, create_date)
 
