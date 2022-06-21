@@ -1,15 +1,18 @@
+# -*- coding: utf-8 -*-
 # Copyright 2022 Sergio Corato <https://github.com/sergiocorato>
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 import base64
 
-from odoo import fields
-from odoo.addons.l10n_it_fatturapa_out.tests.fatturapa_common import (FatturaPACommon)
+from openerp import fields
+from openerp.addons.l10n_it_fatturapa_out.tests.fatturapa_common import (
+    FatturaPACommon
+)
 
 
 class TestInvoiceOss(FatturaPACommon):
     def setUp(self):
-        super().setUp()
+        super(TestInvoiceOss, self).setUp()
 
         self.today_date = fields.Date.today()
         self.env.user.company_id.fatturapa_art73 = False
@@ -52,12 +55,12 @@ class TestInvoiceOss(FatturaPACommon):
     def getAttachment(self, name, module_name=None):
         if module_name is None:
             module_name = 'l10n_it_fatturapa_out_oss'
-        return super().getAttachment(name, module_name)
+        return super(TestInvoiceOss, self).getAttachment(name, module_name)
 
     def getFile(self, filename, module_name=None):
         if module_name is None:
             module_name = 'l10n_it_fatturapa_out_oss'
-        return super().getFile(filename, module_name)
+        return super(TestInvoiceOss, self).getFile(filename, module_name)
 
     def _create_invoice(self, date):
         payment_term = self.env.ref('account.account_payment_term')
