@@ -24,7 +24,7 @@
                 <!--</field>-->
                 <xpath expr="//notebook" position="inside">
                     <page string="Related Documents"
-                          attrs="{'invisible': [('electronic_invoice_subjected', '=', False)]}">
+                          attrs="{'invisible': [('fatturapa_attachment_out_id', '=', False)]}">
                         <group string="Related Documents">
                             <field name="related_documents" nolabel="1">
                                 <tree editable="bottom" string="Related Documents">
@@ -52,7 +52,7 @@
                         </group>
                     </page>
                     <page string="Electronic Invoice"
-                          attrs="{'invisible': [('electronic_invoice_subjected', '=', False)]}">
+                          attrs="{'invisible': [('fatturapa_attachment_out_id', '=', False)]}">
                         <group>
                             <group string="Results">
                                 <field name="fatturapa_attachment_out_id"/>
@@ -62,7 +62,7 @@
                         </group>
                     </page>
                 <page string="Electronic Invoice Attachments"
-                          attrs="{'invisible': [('electronic_invoice_subjected', '=', False)]}">
+                          attrs="{'invisible': [('fatturapa_attachment_out_id', '=', False)]}">
                         <group string="Attachments">
                             <field name="fatturapa_doc_attachments" nolabel="1">
                                 <tree string="Attachments">
