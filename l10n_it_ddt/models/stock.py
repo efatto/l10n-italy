@@ -68,6 +68,8 @@ class StockPicking(models.Model):
             else:
                 return self.partner_id
         else:
+            if self.partner_id:
+                return self.partner_id
             return self.location_dest_id.partner_id
 
     @api.multi
