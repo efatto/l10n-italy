@@ -42,7 +42,6 @@ class AccountMove(models.Model):
                     ).format(move.name_get()[0][-1])
                 )
 
-    @api.multi
     def button_cancel(self):
         res = super().button_cancel()
         if self:
@@ -55,7 +54,6 @@ class AccountMove(models.Model):
             dep_lines.filtered(lambda l: not l.asset_accounting_info_ids).unlink()
         return res
 
-    @api.multi
     @api.depends(
         "asset_accounting_info_ids",
         "asset_accounting_info_ids.asset_id",
@@ -75,9 +73,10 @@ class AccountMove(models.Model):
                 }
             )
 
-    @api.multi
     def _compute_hide_link_asset_button(self):
-        valid_account_ids = self.get_valid_accounts()
+        valid_account_ids = (
+            self.get_valid_accounts()
+        )  # todo verificare che venga fatto solo su invoice_line_ids
         if not valid_account_ids:
             self.update({"hide_link_asset_button": True})
         else:
@@ -85,17 +84,23 @@ class AccountMove(models.Model):
                 move.hide_link_asset_button = (
                     not any(
                         [
-                            l.account_id.id in valid_account_ids.ids
-                            for l in move.line_ids
+                            line.account_id.id in valid_account_ids.ids
+                            for line in move.line_ids
                         ]
                     )
                     or move.state != "posted"
                 )
 
-    @api.multi
     def open_wizard_manage_asset(self):
         self.ensure_one()
-        lines = self.line_ids.filtered(lambda l: not l.asset_accounting_info_ids)
+        if self.invoice_line_ids:
+            lines = self.invoice_line_ids.filtered(
+                lambda line: not line.asset_accounting_info_ids
+            )
+        else:
+            lines = self.line_ids.filtered(
+                lambda line: not line.asset_accounting_info_ids
+            )
         if not lines:
             raise ValidationError(_("Every line is already linked to an asset."))
 
@@ -105,11 +110,12 @@ class AccountMove(models.Model):
         ctx.update(
             {
                 "default_company_id": self.company_id.id,
-                "default_dismiss_date": self.date or fields.Date.today(),
+                "default_dismiss_date": self.invoice_date or self.invoice_date_due,
                 "default_move_ids": [(6, 0, self.ids)],
                 "default_move_line_ids": [(6, 0, lines.ids)],
-                "default_purchase_date": self.date or fields.Date.today(),
+                "default_purchase_date": self.invoice_date or self.invoice_date_due,
                 "move_ids": self.ids,
+                # "default_move_type": "entry", # todo verificare
             }
         )
         act.update({"context": ctx})

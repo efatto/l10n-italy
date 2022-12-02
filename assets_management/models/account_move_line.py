@@ -36,7 +36,6 @@ class AccountMoveLine(models.Model):
                     ).format(move_line.name_get()[0][-1])
                 )
 
-    @api.multi
     @api.depends(
         "asset_accounting_info_ids",
         "asset_accounting_info_ids.asset_id",
@@ -59,9 +58,37 @@ class AccountMoveLine(models.Model):
     def get_asset_purchase_amount(self, currency=None):
         purchase_amount = 0
         for line in self:
-            purchase_amount += line.currency_id.compute(
-                line.debit - line.credit, currency
+            purchase_amount += line.currency_id._convert(
+                line.debit - line.credit,
+                currency,
+                line.company_id,
+                line.date,
             )
+            if line.tax_ids:  # todo verificare che funzioni
+                # Get taxes
+                discount = line.price_unit * (line.discount or 0.0) / 100
+                price_unit = line.price_unit - discount
+                line_currency = line.currency_id
+                qty = line.quantity
+                product = line.product_id
+                partner = line.move_id.partner_id
+                taxes = (
+                    line.tax_ids.compute_all(
+                        price_unit, line_currency, qty, product, partner
+                    ).get("taxes")
+                    or []
+                )
+                # Add non-deductible taxes
+                for tax_dict in taxes:
+                    if not (
+                        tax_dict.get("account_id") or tax_dict.get("refund_account_id")
+                    ) and tax_dict.get("amount"):
+                        purchase_amount += line.currency_id._convert(
+                            tax_dict.get("amount"),
+                            currency,
+                            line.company_id,
+                            line.date,
+                        )
 
         return purchase_amount
 
