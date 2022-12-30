@@ -159,7 +159,7 @@ class FatturaPAAttachmentIn(models.Model):
             }
             AttachModel.create(_attach_dict)
 
-    @api.depends('ir_attachment_id.datas')
+    @api.depends("ir_attachment_id.datas")
     def _compute_linked_invoice_id_xml(self):
         for att in self:
             if isinstance(att.id, int):
@@ -175,8 +175,9 @@ class FatturaPAAttachmentIn(models.Model):
                             and len(invoice_body.DatiGenerali.DatiFattureCollegate) == 1
                         ):
                             att.linked_invoice_id_xml = (
-                                invoice_body.DatiGenerali.DatiFattureCollegate[0].
-                                IdDocumento
+                                invoice_body.DatiGenerali.DatiFattureCollegate[
+                                    0
+                                ].IdDocumento
                             )
 
     def ftpa_preview(self):

@@ -98,7 +98,9 @@ class AccountMove(models.Model):
                 _("Partner %s, Country is not set.") % rc_suppliers.display_name
             )
         if not rc_suppliers.zip:
-            raise UserError(_("Partner %s, ZIP is not set.") % rc_suppliers.display_name)
+            raise UserError(
+                _("Partner %s, ZIP is not set.") % rc_suppliers.display_name
+            )
         # --- preventive checks related to set CedentePrestatore.DatiAnagrafici --- #
         fiscal_document_type_codes = invoices_with_rc.mapped(
             "fiscal_document_type_id.code"

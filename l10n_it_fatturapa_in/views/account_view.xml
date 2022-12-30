@@ -54,7 +54,7 @@
                             <field name="registered" />
                             <field name="invoices_total" />
                             <field name="invoices_date" />
-                            <field name="linked_invoice_id_xml"/>
+                            <field name="linked_invoice_id_xml" />
                         </group>
                     </group>
                     <notebook>

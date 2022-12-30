@@ -66,13 +66,6 @@ class AccountMove(models.Model):
         else:
             move_type = "out_refund"
 
-        supplier = self.partner_id
-        original_invoice = self.search([
-            ("rc_self_purchase_invoice_id", "=", self.id)
-        ], limit=1)
-        if original_invoice:
-            supplier = original_invoice.partner_id
-
         narration = _(
             "Reverse charge self invoice.\n"
             "Supplier: %s\n"
@@ -113,9 +106,9 @@ class AccountMove(models.Model):
         rc_purchase_invoices = self.mapped("rc_purchase_invoice_id")
         supplier_invoices = self.env["account.move"]
         for rc_purchase_invoice in rc_purchase_invoices:
-            current_supplier_invoices = self.search([
-                ("rc_self_purchase_invoice_id", "=", rc_purchase_invoice.id)
-            ])
+            current_supplier_invoices = self.search(
+                [("rc_self_purchase_invoice_id", "=", rc_purchase_invoice.id)]
+            )
             if current_supplier_invoices:
                 supplier_invoices |= current_supplier_invoices
             else:
@@ -236,12 +229,11 @@ class AccountMove(models.Model):
                     )
                 mapped_taxes = rc_type.map_tax(
                     line_tax_ids,
-                    'purchase_tax_id',
-                    'sale_tax_id',
+                    "purchase_tax_id",
+                    "sale_tax_id",
                 )
                 if line_tax_ids and mapped_taxes:
-                    rc_invoice_line['tax_ids'] = [
-                        (6, False, mapped_taxes.ids)]
+                    rc_invoice_line["tax_ids"] = [(6, False, mapped_taxes.ids)]
                 rc_invoice_line["account_id"] = rc_type.transitory_account_id.id
                 rc_invoice_lines.append([0, False, rc_invoice_line])
         if rc_invoice_lines:
@@ -299,8 +291,8 @@ class AccountMove(models.Model):
             line_tax_ids = inv_line.tax_ids
             mapped_taxes = rc_type.map_tax(
                 line_tax_ids,
-                'original_purchase_tax_id',
-                'purchase_tax_id',
+                "original_purchase_tax_id",
+                "purchase_tax_id",
             )
             if line_tax_ids and mapped_taxes:
                 inv_line.tax_ids = [
