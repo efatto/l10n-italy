@@ -38,7 +38,7 @@ class ResCompany(models.Model):
         ],
         string="Preview Format Style",
         required=True,
-        default="Foglio_di_stile_fatturaordinaria_v1.2.2.xsl",
+        default="FoglioStileAssoSoftware.xsl",
     )
 
 
