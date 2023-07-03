@@ -256,7 +256,8 @@ class MigrateL10nItDdt(EasyCommand):
                 'name': record.ddt_number,
                 'partner_sender_id': record.company_id.id,
                 'partner_id': record.partner_id.id,
-                'partner_shipping_id': record.partner_shipping_id.id,
+                'partner_shipping_id':
+                    record.partner_shipping_id.id or record.partner_id.id,
                 'type_id': self._document_types[record.ddt_type_id].id,
                 'date': record.date,
                 'carrier_id': record.carrier_id.id,
@@ -276,13 +277,21 @@ class MigrateL10nItDdt(EasyCommand):
                     record.weight_manual_uom_id.id or
                     self._default_weight_uom.id,
                 'goods_appearance_id':
-                    self._goods_descriptions[record.goods_description_id].id,
+                    self._goods_descriptions[record.goods_description_id].id if
+                    record.goods_description_id and record.goods_description_id
+                    in self._goods_descriptions else False,
                 'transport_reason_id':
-                    self._transportation_reasons[record.transportation_reason_id].id,
+                    self._transportation_reasons[record.transportation_reason_id].id if
+                    record.transportation_reason_id and record.transportation_reason_id
+                    in self._transportation_reasons else False,
                 'transport_condition_id':
-                    self._carriage_conditions[record.carriage_condition_id].id,
+                    self._carriage_conditions[record.carriage_condition_id].id if
+                    record.carriage_condition_id and record.carriage_condition_id
+                    in self._carriage_conditions else False,
                 'transport_method_id':
-                    self._transportation_methods[record.transportation_method_id].id,
+                    self._transportation_methods[record.transportation_method_id].id if
+                    record.transportation_method_id and record.transportation_method_id
+                    in self._transportation_methods else False,
                 'picking_ids': [(4, p.id) for p in record.picking_ids],
                 'invoice_ids':
                     [(4, record.invoice_id.id)] if record.invoice_id else [],
@@ -296,7 +305,12 @@ class MigrateL10nItDdt(EasyCommand):
 
         documents = Document.search([], order='id ASC')
         for document in documents:
-            DeliveryNote.create(vals_getter(document))
+            if len(set(document.picking_ids.mapped('picking_type_code'))) > 1:
+                _logger.info(
+                    "DDT %s with ID %s ignored because it has multiple picking type" %
+                    (document.name, document.id)
+                )
+                continue
 
         _logger.info("Documents data successfully migrated.")
 
