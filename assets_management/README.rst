@@ -88,7 +88,8 @@ Contributors
 
   * Simone Rubino <simone.rubino@aion-tech.it>
 
-Base icon made by `surang <https://www.flaticon.com/authors/surang>`_ from `www.flaticon.com <https://www.flaticon.com/>`_.
+Base icon made by `surang <https://www.flaticon.com/authors/surang>`__
+from `www.flaticon.com <http://www.flaticon.com>`__.
 
 Maintainers
 ~~~~~~~~~~~
