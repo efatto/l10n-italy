@@ -87,7 +87,8 @@ class Migrate_L10n_It_Ddt(EasyCommand):
             ))
 
         old_sequence = self.env.ref('l10n_it_ddt.seq_ddt')
-        old_sequence_max = max(old_sequence.mapped('date_range_ids.number_next_actual'))
+        old_sequence_max = max(
+            old_sequence.mapped('date_range_ids.number_next_actual') or [False])
         if old_sequence_max == 1:
             raise UserError(_(
                 "It seems that there are no documents to migrate. "
