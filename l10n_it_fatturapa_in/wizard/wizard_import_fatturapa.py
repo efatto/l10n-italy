@@ -296,8 +296,21 @@ class WizardImportFatturapa(models.TransientModel):
                 vals["lastname"] = DatiAnagrafici.Anagrafica.Cognome
             if DatiAnagrafici.Anagrafica.Denominazione:
                 vals["name"] = DatiAnagrafici.Anagrafica.Denominazione
-
-            return partner_model.create(vals).id
+            partner = partner_model.create(vals)
+            if not partner.name:
+                if vals.get("name"):
+                    _logger.info("partner id %s without name" % partner.id)
+                    partner.name = vals["name"]
+                elif vals.get("firstname"):
+                    _logger.info("partner id %s without name" % partner.id)
+                    partner.firstname = vals["firstname"]
+                elif vals.get("lastname"):
+                    _logger.info("partner id %s without name" % partner.id)
+                    partner.lastname = vals["lastname"]
+                else:
+                    partner.name = "n.d.1"
+                    _logger.info("partner id %s without name" % partner.id)
+            return partner.id
 
     def getCedPrest(self, cedPrest):
         partner_model = self.env["res.partner"]

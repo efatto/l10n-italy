@@ -202,6 +202,10 @@ class FatturaPAAttachmentIn(models.Model):
                 from_attachment=att
             )
             partner_id = wiz_obj.getCedPrest(cedentePrestatore)
+            partner = self.env["res.partner"].browse(partner_id)
+            if not partner.name:
+                _logger.info("Missing name for partner id %s" % partner.id)
+                partner.name = "n.d."
             att.xml_supplier_id = partner_id
             inconsistencies = wiz_obj.env.context.get("inconsistencies", False)
             att.inconsistencies = inconsistencies
