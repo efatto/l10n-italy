@@ -714,7 +714,9 @@ class TestInvoiceDueCost(riba_common.TestRibaCommon):
         invoice = invoice_form.save()
         invoice.action_post()
 
-        to_issue_action = self.env.ref("l10n_it_riba.action_riba_to_issue")
+        to_issue_action = self.env.ref(
+            "l10n_it_ricevute_bancarie.action_riba_da_emettere"
+        )
         to_issue_records = self.env[to_issue_action.res_model].search(
             safe_eval.safe_eval(to_issue_action.domain)
         )
@@ -734,7 +736,9 @@ class TestInvoiceDueCost(riba_common.TestRibaCommon):
         slip.confirm()
         self.assertEqual(slip.state, "accepted")
 
-        credit_wizard_action = self.env.ref("l10n_it_riba.riba_credit_action")
+        credit_wizard_action = self.env.ref(
+            "l10n_it_ricevute_bancarie.riba_accreditation_action"
+        )
         credit_wizard = (
             self.env[credit_wizard_action["res_model"]]
             .with_context(active_id=slip.id)
@@ -745,7 +749,7 @@ class TestInvoiceDueCost(riba_common.TestRibaCommon):
             )
         )
         credit_wizard.create_move()
-        self.assertEqual(slip.state, "credited")
+        self.assertEqual(slip.state, "accredited")
 
         # Act
         payment_wizard_action = slip.settle_all_line()
@@ -785,3 +789,26 @@ class TestInvoiceDueCost(riba_common.TestRibaCommon):
         # Assert: only the bank account of current company is found
         self.assertIn(current_bank_account, bank_accounts)
         self.assertNotIn(other_bank_account, bank_accounts)
+
+    def test_supplier_to_bill_company_bank_account(self):
+        """A supplier has a company bank account,
+        it is propagated to its vendor bill."""
+        # Arrange
+        bank_account = self.company_bank
+        payment_term = self.payment_term1
+        supplier = self.partner
+        supplier.property_supplier_payment_term_id = payment_term
+        supplier.property_riba_supplier_company_bank_id = bank_account
+        self.assertTrue(payment_term.riba)
+
+        # Act: Create the vendor bill
+        bill = self.env["account.move"].create(
+            {
+                "move_type": "in_invoice",
+                "partner_id": supplier.id,
+                "invoice_payment_term_id": payment_term.id,
+            }
+        )
+
+        # Assert
+        self.assertEqual(bill.riba_supplier_company_bank_id, bank_account)
