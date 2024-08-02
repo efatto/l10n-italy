@@ -283,6 +283,16 @@ class AccountMove(models.Model):
     def get_due_cost_line_ids(self):
         return self.invoice_line_ids.filtered(lambda line: line.due_cost_line).ids
 
+    def action_riba_payment_date(self):
+        return {
+            "type": "ir.actions.act_window",
+            "name": "RiBa Payment Date",
+            "res_model": "riba.payment.date",
+            "view_mode": "form",
+            "target": "new",
+            "context": self.env.context,
+        }
+
 
 # se slip_line_ids == None allora non è stata emessa
 class AccountMoveLine(models.Model):
