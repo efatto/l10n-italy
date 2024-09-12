@@ -46,7 +46,7 @@ class SdiChannel(models.Model):
     #                 _("The channel %s with pec server %s already exists")
     #                 % (channel.name, channel.pec_server_id.name)
     #             )
-
+    #
     # @api.constrains("email_exchange_system")
     # def check_email_validity(self):
     #     if self.env.context.get("skip_check_email_validity"):
@@ -57,7 +57,7 @@ class SdiChannel(models.Model):
     #             raise exceptions.ValidationError(
     #                 _("Email %s is not valid") % channel.email_exchange_system
     #             )
-
+    #
     # def check_first_pec_sending(self):
     #     if not self.first_invoice_sent:
     #         sdi_address = self.env["ir.config_parameter"].get_param(
@@ -72,7 +72,7 @@ class SdiChannel(models.Model):
     #                     "address indicated by SDI after the first sending"
     #                 )
     #             )
-
+    #
     # def update_after_first_pec_sending(self):
     #     if not self.first_invoice_sent:
     #         self.first_invoice_sent = True
