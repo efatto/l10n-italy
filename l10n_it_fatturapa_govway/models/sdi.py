@@ -1,7 +1,6 @@
-import json
+from urllib.parse import urlencode, urljoin
 
 import requests
-from requests import Timeout, TooManyRedirects
 
 from odoo import _, fields, models
 from odoo.exceptions import UserError
@@ -89,35 +88,37 @@ class SdiChannel(models.Model):
             company = att.company_id
             vat = company.vat.split("IT")[1]
             url = (
-                f"{self.govway_url}govway/sdi/out/xml2soap/{vat}"
-                f"/CentroServiziFatturaPA/SdIRiceviFile/v1"
-            )  # SoggettoSDI
+                "govway/sdi/out/xml2soap/Pretecno"
+                "/CentroServiziFatturaPA/SdIRiceviFile/v1"
+            )
+            url = urljoin(self.govway_url, url)
             params = {
                 "Versione": 1,  # VersioneFatturaPA
-                "TipoFile": "application/xml",  # P7M: application/pkcs7-mime
+                "TipoFile": "XML",  # P7M: application/pkcs7-mime
                 "IdPaese": "IT",
                 "IdCodice": vat,
             }
             try:
                 response = requests.get(
-                    url=url, params=params, timeout=60
+                    url=url, params=urlencode(params), timeout=60
                 )  # , headers=headers)
-                response_data = json.loads(response.text)
-                status = response_data.get("status")
-                if status and status.get("error_code", False):
+                if response.status_code != 200:
+                    # response_data = json.loads(response.text)
+                    # status = response_data.get("status")
+                    # if status and status.get("error_code", False):
                     raise Exception(
                         _(
                             "Failed to fetch from CoinMarketCap with error code: "
                             "%s and error message: %s"
                         )
-                        % (status.get("error_code"), status.get("error_message"))
+                        % (response.status_code, response.text)
                     )
-            except (ConnectionError, Timeout, TooManyRedirects) as e:
+            except Exception as e:
                 raise UserError(
                     _("GovWay server not available for %s. Please configure it.")
                     % str(e)
                 )
-            return response_data.get("data", {})
+            return {}  # response_data.get("data", {})
         #   mail_message = self.env["mail.message"].create(
         #         {
         #             "model": att._name,
