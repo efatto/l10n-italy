@@ -62,9 +62,11 @@ class FatturaPAGovWay(Controller):
     @route(
         ["/fatturapa/govway/ricevi_notifica"],
         type="http",
-        auth="user",
+        auth="public",
         methods=["POST"],
         website=True,
+        # cors="*",
+        csrf=False,
     )
     def ricevi_notifica(self, *args, **post):
         # headers:
@@ -78,11 +80,10 @@ class FatturaPAGovWay(Controller):
         transaction_id = request.httprequest.headers.get("GovWay-Transaction-ID", "")
 
         _logger.info(
-            "ricevi_notifica(): {} {} {}".format(
-                identificativo_sdi, sdi_nomefile, transaction_id
-            )
+            f"ricevi_notifica(): {identificativo_sdi} {sdi_nomefile} {transaction_id}"
         )
-        _logger.debug("ricevi_notifica(): args={}".format(repr(args)))
-        _logger.debug("ricevi_notifica(): post={}".format(repr(post)))
-        # request.env["sdi.channel"].sdi_channel_model.receive_notification(
-        # { sdi_nomefile: post })
+        data = request.httprequest.data
+        _logger.debug(f"ricevi_notifica(): args={repr(args)}")
+        _logger.debug(f"ricevi_notifica(): post={repr(post)}")
+        request.env["sdi.channel"].sudo().receive_notification({sdi_nomefile: data})
+        return request.make_response("OK")
