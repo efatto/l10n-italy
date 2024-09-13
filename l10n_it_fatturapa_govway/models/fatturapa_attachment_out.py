@@ -37,9 +37,9 @@ class FatturaPAAttachmentOut(models.Model):
         fatturapa_attachment_out.write(
             {
                 "state": "sender_error",
-                "last_sdi_response": "SdI ID: {}; "
-                "Message ID: {}; Receipt date: {}; "
-                "Error: {}".format(id_sdi, message_id, receipt_dt, error_str),
+                "last_sdi_response": f"SdI ID: {id_sdi}; "
+                f"Message ID: {message_id}; Receipt date: {receipt_dt}; "
+                f"Error: {error_str}",
             }
         )
 
@@ -86,10 +86,8 @@ class FatturaPAAttachmentOut(models.Model):
                 fatturapa_attachment_out.write(
                     {
                         "state": state,
-                        "last_sdi_response": "SdI ID: {}; "
-                        "Message ID: {}; Response: {}; ".format(
-                            id_sdi, message_id, esito.text
-                        ),
+                        "last_sdi_response": f"SdI ID: {id_sdi}; "
+                        f"Message ID: {message_id}; Response: {esito.text}; ",
                     }
                 )
 
@@ -101,11 +99,9 @@ class FatturaPAAttachmentOut(models.Model):
             fatturapa_attachment_out.write(
                 {
                     "state": "validated",
-                    "last_sdi_response": "SdI ID: {}; "
-                    "Message ID: {}; Receipt date: {}; "
-                    "Description: {}".format(
-                        id_sdi, message_id, receipt_dt, description.text
-                    ),
+                    "last_sdi_response": f"SdI ID: {id_sdi}; "
+                    f"Message ID: {message_id}; Receipt date: {receipt_dt}; "
+                    f"Description: {description.text}",
                 }
             )
 

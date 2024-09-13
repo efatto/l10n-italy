@@ -1,4 +1,5 @@
-from urllib.parse import urlencode, urljoin
+import base64
+from urllib.parse import urljoin
 
 import requests
 
@@ -15,6 +16,8 @@ class SdiChannel(models.Model):
     govway_url = fields.Char(
         string="GovWay URL",
     )
+    govway_user = fields.Char(string="GovWay User")
+    govway_password = fields.Char(string="GovWay Password")
 
     # @api.constrains("fetch_pec_server_id")
     # def check_fetch_pec_server_id(self):
@@ -93,16 +96,21 @@ class SdiChannel(models.Model):
             )
             url = urljoin(self.govway_url, url)
             params = {
-                "Versione": 1,  # VersioneFatturaPA
+                "Versione": "FPR12",  # VersioneFatturaPA
                 "TipoFile": "XML",  # P7M: application/pkcs7-mime
                 "IdPaese": "IT",
                 "IdCodice": vat,
             }
             try:
-                response = requests.get(
-                    url=url, params=urlencode(params), timeout=60
-                )  # , headers=headers)
-                if response.status_code != 200:
+                response = requests.post(
+                    url=url,
+                    data=base64.b64decode(att.datas),
+                    params=params,
+                    timeout=60,
+                    auth=(self.govway_user, self.govway_password),
+                    headers={"Content-Type": "application/octet-stream"},
+                )
+                if not response.ok:
                     # response_data = json.loads(response.text)
                     # status = response_data.get("status")
                     # if status and status.get("error_code", False):
@@ -118,7 +126,7 @@ class SdiChannel(models.Model):
                     _("GovWay server not available for %s. Please configure it.")
                     % str(e)
                 )
-            return {}  # response_data.get("data", {})
+            return {"result": "ok"}  # response_data.get("data", {})
         #   mail_message = self.env["mail.message"].create(
         #         {
         #             "model": att._name,
