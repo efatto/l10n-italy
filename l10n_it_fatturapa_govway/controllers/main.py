@@ -87,7 +87,5 @@ class FatturaPAGovWay(Controller):
             f"ricevi_notifica(): {identificativo_sdi} {sdi_nomefile} {transaction_id}"
         )
         data = request.httprequest.data
-        _logger.debug(f"ricevi_notifica(): args={repr(args)}")
-        _logger.debug(f"ricevi_notifica(): post={repr(post)}")
         request.env["sdi.channel"].sudo().receive_notification({sdi_nomefile: data})
         return request.make_response("OK")

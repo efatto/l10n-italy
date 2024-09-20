@@ -100,6 +100,7 @@ class SdiChannel(models.Model):
                 "TipoFile": "XML",  # P7M: application/pkcs7-mime
                 "IdPaese": "IT",
                 "IdCodice": vat,
+                "NomeFile": att.name,
             }
             try:
                 response = requests.post(
