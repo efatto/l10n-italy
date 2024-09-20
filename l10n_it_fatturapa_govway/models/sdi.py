@@ -59,28 +59,6 @@ class SdiChannel(models.Model):
     #             raise exceptions.ValidationError(
     #                 _("Email %s is not valid") % channel.email_exchange_system
     #             )
-    #
-    # def check_first_pec_sending(self):
-    #     if not self.first_invoice_sent:
-    #         sdi_address = self.env["ir.config_parameter"].get_param(
-    #             "sdi.pec.first.address",
-    #         )
-    #         self.email_exchange_system = sdi_address
-    #     else:
-    #         if not self.email_exchange_system:
-    #             raise exceptions.UserError(
-    #                 _(
-    #                     "SDI PEC address not set. Please update it with the "
-    #                     "address indicated by SDI after the first sending"
-    #                 )
-    #             )
-    #
-    # def update_after_first_pec_sending(self):
-    #     if not self.first_invoice_sent:
-    #         self.first_invoice_sent = True
-    #         self.with_context(
-    #             skip_check_email_validity=True
-    #         ).email_exchange_system = False
 
     def send_via_govway(self, attachment_out_ids):
         if not self.govway_url:
@@ -126,26 +104,11 @@ class SdiChannel(models.Model):
                 )
             att.state = "sent"
             att.sending_date = fields.Datetime.now()
-            att.sending_user = user.id
+            att.sending_user = self.env.user.id
             msg = _(
                 "XML file for FatturaPA %s sent to Exchange System to "
                 "the GovWay system %s."
-            ) % (
-                att.name, self.govway_url
-            )
+            ) % (att.name, self.govway_url)
             att.message_post(body=msg)
-            # mail_message = self.env["mail.message"].create(
-            #     {
-            #         "model": att._name,
-            #         "res_id": att.id,
-            #         "subject": att.name,
-            #         "body": "XML file for FatturaPA {} sent to Exchange System to "
-            #         "the GovWay system {}.".format(
-            #             att.name, self.govway_url
-            #         ),
-            #         "attachment_ids": [(6, 0, att.ir_attachment_id.ids)],
-            #     }
-            # )
 
-
-        return {"result": "ok"}  # response_data.get("data", {})
+        return {"result": "ok"}
