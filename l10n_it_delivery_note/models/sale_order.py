@@ -101,7 +101,10 @@ class SaleOrder(models.Model):
 
             inv_lines = all_invoice_lines.filtered(
                 lambda line, s=sol: s in line.sale_line_ids
+                and not line.delivery_note_line_id
             ).with_context(check_move_validity=False)
+            if not inv_lines:
+                continue
             inv_line = inv_lines[0]  # safety guard
             inv_line.write(
                 {
@@ -147,7 +150,7 @@ class SaleOrder(models.Model):
                 move_id._onchange_invoice_line_ids()
             dn_lines.write(
                 {
-                    "invoice_status": DOMAIN_INVOICE_STATUSES[2],
+                    "invoice_status": "invoiced",
                 }
             )
             for dn in dn_lines.mapped("delivery_note_id"):

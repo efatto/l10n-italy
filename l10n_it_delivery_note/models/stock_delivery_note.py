@@ -339,17 +339,13 @@ class StockDeliveryNote(models.Model):
     def _compute_invoice_status(self):
         for note in self:
             lines = note.line_ids.filtered(lambda l: l.sale_line_id)
-            invoice_status = DOMAIN_INVOICE_STATUSES[0]
+            invoice_status = "no"
             if lines:
-                if all(
-                    line.invoice_status == DOMAIN_INVOICE_STATUSES[2] for line in lines
-                ):
-                    note.state = DOMAIN_DELIVERY_NOTE_STATES[2]
-                    invoice_status = DOMAIN_INVOICE_STATUSES[2]
-                elif any(
-                    line.invoice_status == DOMAIN_INVOICE_STATUSES[1] for line in lines
-                ):
-                    invoice_status = DOMAIN_INVOICE_STATUSES[1]
+                if all(line.invoice_status == "invoiced" for line in lines):
+                    note.state = "invoiced"
+                    invoice_status = "invoiced"
+                elif any(line.invoice_status == "to invoice" for line in lines):
+                    invoice_status = "to invoice"
             note.invoice_status = invoice_status
 
     @api.depends("line_ids.currency_id")
