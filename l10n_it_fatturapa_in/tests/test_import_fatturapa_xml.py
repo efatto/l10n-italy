@@ -1,3 +1,6 @@
+#  Copyright 2024 Simone Rubino - Aion Tech
+#  License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
+
 from datetime import date
 
 from psycopg2 import IntegrityError
@@ -52,7 +55,7 @@ class TestFatturaPAXMLValidation(FatturapaCommon):
         welfare_found = False
         for line in invoice.invoice_line_ids:
             if line.product_id.id == self.service.id:
-                self.assertEqual(line.price_unit, 3)
+                self.assertAlmostEqual(line.price_unit, 3)
                 welfare_found = True
         self.assertTrue(welfare_found)
         self.assertTrue(len(invoice.e_invoice_line_ids) == 1)
@@ -135,7 +138,7 @@ class TestFatturaPAXMLValidation(FatturapaCommon):
         self.assertEqual(invoice.invoice_line_ids[1].tax_ids[0].name, "22% e-bill")
         self.assertEqual(invoice.invoice_line_ids[0].tax_ids[0].amount, 22)
         self.assertEqual(invoice.invoice_line_ids[1].tax_ids[0].amount, 22)
-        self.assertEqual(invoice.invoice_line_ids[1].price_unit, 2)
+        self.assertAlmostEqual(invoice.invoice_line_ids[1].price_unit, 2)
         self.assertTrue(len(invoice.e_invoice_line_ids) == 2)
         for e_line in invoice.e_invoice_line_ids:
             self.assertTrue(e_line.line_number in (1, 2))
@@ -173,13 +176,13 @@ class TestFatturaPAXMLValidation(FatturapaCommon):
     def test_06_import_except(self):
         # File not exist Exception
         self.assertRaises(Exception, self.run_wizard, "test6_Exception", "")
-        # fake Signed file is passed , generate orm_exception
-        self.assertRaises(
-            UserError,
-            self.run_wizard,
-            "test6_orm_exception",
-            "IT05979361218_fake.xml.p7m",
-        )
+
+        # fake Signed file is passed , generate parsing error
+        with mute_logger("odoo.addons.l10n_it_fatturapa_in.models.attachment"):
+            attachment = self.create_attachment(
+                "test6_orm_exception", "IT05979361218_fake.xml.p7m"
+            )
+        self.assertIn("Invalid xml", attachment.e_invoice_parsing_error)
 
     def test_07_xml_import(self):
         # 2 lines with quantity != 1 and discounts
@@ -218,9 +221,9 @@ class TestFatturaPAXMLValidation(FatturapaCommon):
 
     def test_08_xml_import_no_account(self):
         """Check that a useful error message is raised when
-        the credit account is missing in purchase journal."""
+        the credit account is missing in journal."""
         company = self.env.company
-        journal = self.wizard_model.get_purchase_journal(company)
+        journal = self.wizard_model.get_journal(company)
         journal_account = journal.default_account_id
         journal.default_account_id = False
 
@@ -445,6 +448,7 @@ class TestFatturaPAXMLValidation(FatturapaCommon):
         self.assertTrue(len(invoices) == 2)
         for invoice in invoices:
             self.assertTrue(len(invoice.invoice_line_ids) == 0)
+            self.assertTrue(invoice.move_type == "in_invoice")
         # allow following tests to reuse the same XML file
         invoices[0].ref = invoices[0].payment_reference = "14165"
         invoices[1].ref = invoices[1].payment_reference = "14166"
@@ -648,10 +652,10 @@ class TestFatturaPAXMLValidation(FatturapaCommon):
         invoice = self.invoice_model.browse(invoice_id)
         self.assertEqual(invoice.move_type, "in_refund")
         self.assertEqual(invoice.amount_total, 18.3)
-        self.assertEqual(invoice.invoice_line_ids[0].price_unit, 2.0)
+        self.assertAlmostEqual(invoice.invoice_line_ids[0].price_unit, 2.0)
         self.assertEqual(invoice.invoice_line_ids[0].quantity, 10.0)
         self.assertEqual(invoice.invoice_line_ids[0].price_subtotal, 20.0)
-        self.assertEqual(invoice.invoice_line_ids[1].price_unit, -1.0)
+        self.assertAlmostEqual(invoice.invoice_line_ids[1].price_unit, -1.0)
         self.assertEqual(invoice.invoice_line_ids[1].quantity, 5.0)
         self.assertEqual(invoice.invoice_line_ids[1].price_subtotal, -5.0)
 
@@ -662,7 +666,7 @@ class TestFatturaPAXMLValidation(FatturapaCommon):
         invoice = self.invoice_model.browse(invoice_id)
         self.assertEqual(invoice.move_type, "in_refund")
         self.assertEqual(round(invoice.amount_total, 2), 24.4)
-        self.assertEqual(invoice.invoice_line_ids[0].price_unit, 2.0)
+        self.assertAlmostEqual(invoice.invoice_line_ids[0].price_unit, 2.0)
         self.assertEqual(invoice.invoice_line_ids[0].quantity, 10.0)
         self.assertEqual(invoice.invoice_line_ids[0].price_subtotal, 20.0)
         self.assertEqual(invoice.e_invoice_amount_untaxed, -20.0)
@@ -815,10 +819,10 @@ class TestFatturaPAXMLValidation(FatturapaCommon):
         invoice_id = res.get("domain")[0][2][0]
         invoice = self.invoice_model.browse(invoice_id)
         self.assertEqual(invoice.amount_total, 18.07)
-        self.assertEqual(invoice.invoice_line_ids[0].price_unit, 18.07)
+        self.assertAlmostEqual(invoice.invoice_line_ids[0].price_unit, 18.07)
         self.assertEqual(invoice.invoice_line_ids[0].quantity, 1.0)
         self.assertEqual(invoice.invoice_line_ids[0].price_subtotal, 18.07)
-        self.assertEqual(invoice.invoice_line_ids[1].price_unit, 16.60)
+        self.assertAlmostEqual(invoice.invoice_line_ids[1].price_unit, 16.60)
         self.assertEqual(invoice.invoice_line_ids[1].quantity, 1.0)
         self.assertEqual(invoice.invoice_line_ids[1].price_subtotal, 0.0)
 
@@ -895,6 +899,51 @@ class TestFatturaPAXMLValidation(FatturapaCommon):
         invoice = self.invoice_model.browse(invoice_ids)
         self.assertTrue(invoice.fatturapa_attachment_in_id.is_self_invoice)
 
+    def test_52_12_xml_import(self):
+        """
+        Check that an XML with syntax error is created,
+        but it shows a parsing error.
+        """
+        with mute_logger("odoo.addons.l10n_it_fatturapa_in.models.attachment"):
+            attachment = self.create_attachment(
+                "test52_12",
+                "ZGEXQROO37831_anonimizzata.xml",
+            )
+        self.assertIn(
+            "Impossible to parse XML for test52_12:",
+            attachment.e_invoice_parsing_error or "",
+        )
+
+    def test_52_xml_import(self):
+        # we test partner creation, too
+        # make sure a partner with the same vat is already in the DB
+        for partner in self.env["res.partner"].search([("vat", "=", "IT02780790107")]):
+            # references from aml may prevent partner unlinking
+            self.env["account.move.line"].search(
+                [("partner_id", "=", partner.id)]
+            ).unlink()
+            self.env["account.move"].search([("partner_id", "=", partner.id)]).unlink()
+            partner.unlink()
+
+        res = self.run_wizard("test52", "IT02780790107_11009.xml")
+        invoice_ids = res.get("domain")[0][2]
+        invoice = self.invoice_model.browse(invoice_ids)
+
+        self.assertEqual(len(invoice.e_invoice_line_ids), 1)
+        self.assertEqual(invoice.e_invoice_line_ids[0].tax_kind, "N4")
+
+        self.assertEqual(len(invoice.invoice_line_ids), 1)
+        self.assertEqual(len(invoice.invoice_line_ids[0].tax_ids), 1)
+        self.assertEqual(invoice.invoice_line_ids[0].price_unit, 272.23)
+        kind = self.env.ref("l10n_it_account_tax_kind.n4")
+        self.assertEqual(invoice.invoice_line_ids[0].tax_ids[0].kind_id, kind)
+
+        self.assertEqual(invoice.amount_total, 272.23)
+
+        self.assertTrue(invoice.partner_id)
+        self.assertEqual(invoice.partner_id.firstname, "Mario")
+        self.assertEqual(invoice.partner_id.lastname, "Rossi")
+
     def test_53_xml_import(self):
         """
         Check that VAT of non-IT partner is not checked.
@@ -938,6 +987,21 @@ class TestFatturaPAXMLValidation(FatturapaCommon):
                 not_valid_vat=not_valid_vat,
             ),
         )
+
+    def test_54_xml_import(self):
+        """
+        Test: Negative invoice (TD01) is correctly imported,
+        converted all values to positive and set move_type to in_refund
+        """
+        res = self.run_wizard("test54", "IT02098391200_FPR16.xml")
+        invoice_id = res.get("domain")[0][2][0]
+        invoice = self.invoice_model.browse(invoice_id)
+        self.assertEqual(invoice.amount_untaxed, 1.5)
+        self.assertEqual(invoice.amount_total, 1.83)
+        self.assertEqual(invoice.invoice_line_ids[0].price_unit, 0.15)
+        self.assertEqual(invoice.invoice_line_ids[0].quantity, 10.0)
+        self.assertEqual(invoice.invoice_line_ids[0].price_subtotal, 1.5)
+        self.assertEqual(invoice.move_type, "in_refund")
 
     def test_01_xml_link(self):
         """
@@ -1009,6 +1073,15 @@ class TestFatturaPAXMLValidation(FatturapaCommon):
         # allow following tests to reuse the same XML file
         orig_invoice.ref = orig_invoice.payment_reference = "14021"
 
+    def test_01_xml_preview(self):
+        res = self.run_wizard("test_preview", "IT05979361218_001.xml")
+        invoice_id = res.get("domain")[0][2][0]
+        invoice = self.invoice_model.browse(invoice_id)
+        preview_action = invoice.fatturapa_attachment_in_id.ftpa_preview()
+        self.assertEqual(
+            preview_action["url"], invoice.fatturapa_attachment_in_id.ftpa_preview_link
+        )
+
     def test_01_xml_zero_quantity_line(self):
         res = self.run_wizard("test_zeroq_01", "IT05979361218_q0.xml")
         invoice_id = res.get("domain")[0][2][0]
@@ -1027,9 +1100,9 @@ class TestFatturaPAXMLValidation(FatturapaCommon):
         self.assertEqual(invoice.amount_total, 204.16)
         self.assertEqual(len(invoice.invoice_line_ids), 2)
 
-        self.assertEqual(invoice.invoice_line_ids[0].price_unit, 164.46)
+        self.assertAlmostEqual(invoice.invoice_line_ids[0].price_unit, 164.46)
         self.assertEqual(invoice.invoice_line_ids[0].quantity, 1.0)
-        self.assertEqual(invoice.invoice_line_ids[1].price_unit, 3.52)
+        self.assertAlmostEqual(invoice.invoice_line_ids[1].price_unit, 3.52)
         self.assertEqual(invoice.invoice_line_ids[1].quantity, 1.0)
 
     def test_e_invoice_field_compute(self):
@@ -1049,6 +1122,35 @@ class TestFatturaPAXMLValidation(FatturapaCommon):
         self.assertFalse(attach.xml_supplier_id)
         self.assertTrue(attach.inconsistencies)
 
+    def test_access_other_user_e_invoice(self):
+        """A user can see the e-invoice files created by other users."""
+        # Arrange
+        access_right_group_xmlid = "base.group_erp_manager"
+        user = self.env.user
+        user.groups_id -= self.env.ref("base.group_system")
+        user.groups_id -= self.env.ref(access_right_group_xmlid)
+        other_user = self.env["res.users"].create(
+            {
+                "name": "Other User",
+                "login": "other.user@example.org",
+                "groups_id": [(6, 0, user.groups_id.ids)],
+            }
+        )
+        # pre-condition
+        self.assertFalse(user.has_group(access_right_group_xmlid))
+        self.assertNotEqual(user, other_user)
+
+        # Act
+        with self.with_user(other_user.login):
+            import_action = self.run_wizard(
+                "access_other_user_e_invoice", "IT01234567890_FPR03.xml"
+            )
+
+        # Assert
+        invoices = self.env[import_action["res_model"]].search(import_action["domain"])
+        e_invoice = invoices.fatturapa_attachment_in_id
+        self.assertTrue(e_invoice.ir_attachment_id.read())
+
 
 class TestFatturaPAEnasarco(FatturapaCommon):
     def setUp(self):
@@ -1057,111 +1159,10 @@ class TestFatturaPAEnasarco(FatturapaCommon):
         self.invoice_model = self.env["account.move"]
 
     def test_01_xml_import_enasarco(self):
-        account_payable = self.env["account.account"].create(
-            {
-                "name": "Test WH tax",
-                "code": "whtaxpay2",
-                "user_type_id": self.env.ref("account.data_account_type_payable").id,
-                "reconcile": True,
-            }
-        )
-        account_receivable = self.env["account.account"].create(
-            {
-                "name": "Test WH tax",
-                "code": "whtaxrec2",
-                "user_type_id": self.env.ref("account.data_account_type_receivable").id,
-                "reconcile": True,
-            }
-        )
-        misc_journal = self.env["account.journal"].search([("code", "=", "MISC")])
-        self.env["withholding.tax"].create(
-            {
-                "name": "Enasarco",
-                "code": "TC07",
-                "account_receivable_id": account_receivable.id,
-                "account_payable_id": account_payable.id,
-                "journal_id": misc_journal.id,
-                "payment_term": self.env.ref("account.account_payment_term_advance").id,
-                "wt_types": "enasarco",
-                "payment_reason_id": self.env.ref("l10n_it_payment_reason.r").id,
-                "rate_ids": [
-                    (
-                        0,
-                        0,
-                        {
-                            "tax": 1.57,
-                            "base": 1.0,
-                        },
-                    )
-                ],
-            }
-        )
-        self.env["withholding.tax"].create(
-            {
-                "name": "Enasarco 8,50",
-                "code": "TC07",
-                "account_receivable_id": account_receivable.id,
-                "account_payable_id": account_payable.id,
-                "journal_id": misc_journal.id,
-                "payment_term": self.env.ref("account.account_payment_term_advance").id,
-                "wt_types": "enasarco",
-                "payment_reason_id": self.env.ref("l10n_it_payment_reason.r").id,
-                "rate_ids": [
-                    (
-                        0,
-                        0,
-                        {
-                            "tax": 8.5,
-                            "base": 1.0,
-                        },
-                    )
-                ],
-            }
-        )
-        self.env["withholding.tax"].create(
-            {
-                "name": "1040/3",
-                "code": "1040",
-                "account_receivable_id": account_receivable.id,
-                "account_payable_id": account_payable.id,
-                "journal_id": misc_journal.id,
-                "payment_term": self.env.ref("account.account_payment_term_advance").id,
-                "wt_types": "ritenuta",
-                "payment_reason_id": self.env.ref("l10n_it_payment_reason.a").id,
-                "rate_ids": [
-                    (
-                        0,
-                        0,
-                        {
-                            "tax": 11.50,
-                            "base": 1.0,
-                        },
-                    )
-                ],
-            }
-        )
-        self.env["withholding.tax"].create(
-            {
-                "name": "1040 R",
-                "code": "1040R",
-                "account_receivable_id": account_receivable.id,
-                "account_payable_id": account_payable.id,
-                "journal_id": misc_journal.id,
-                "payment_term": self.env.ref("account.account_payment_term_advance").id,
-                "wt_types": "ritenuta",
-                "payment_reason_id": self.env.ref("l10n_it_payment_reason.r").id,
-                "rate_ids": [
-                    (
-                        0,
-                        0,
-                        {
-                            "tax": 11.50,
-                            "base": 1.0,
-                        },
-                    )
-                ],
-            }
-        )
+        self.create_wt_enasarco_157_r()
+        self.create_wt_enasarco_85_r()
+        self.create_wt_enasarco_115_a()
+        self.create_wt_115_r()
         # case with ENASARCO only in DatiCassaPrevidenziale and not in DatiRitenuta.
         # This should not happen, but it is valid for SDI
         res = self.run_wizard("test01", "IT05979361218_014.xml")

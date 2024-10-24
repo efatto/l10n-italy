@@ -137,6 +137,16 @@ class RibaList(models.Model):
             "context": self.env.context,
         }
 
+    def action_riba_due_date_settlement(self):
+        return {
+            "type": "ir.actions.act_window",
+            "name": "C/O Due Date Settlement",
+            "res_model": "riba.due.date.settlement",
+            "view_mode": "form",
+            "target": "new",
+            "context": self.env.context,
+        }
+
     def unlink(self):
         for riba_list in self:
             if riba_list.state not in ("draft", "cancel"):
@@ -237,7 +247,7 @@ class RibaListLine(models.Model):
                     )
                 if not line.invoice_number:
                     line.invoice_number = str(
-                        move_line.move_line_id.move_id.move_id.name
+                        move_line.move_line_id.move_id.name
                         if move_line.move_line_id.move_id.display_name == "/"
                         else move_line.move_line_id.move_id.display_name
                     )
@@ -245,7 +255,7 @@ class RibaListLine(models.Model):
                     line.invoice_number = "{}, {}".format(
                         line.invoice_number,
                         str(
-                            move_line.move_line_id.move_id.move_id.name
+                            move_line.move_line_id.move_id.name
                             if move_line.move_line_id.move_id.display_name == "/"
                             else move_line.move_line_id.move_id.display_name
                         ),
@@ -374,8 +384,8 @@ class RibaListLine(models.Model):
             total_credit = 0.0
             move = move_model.create(
                 {
-                    "ref": "C/O {} - Line {}".format(
-                        line.distinta_id.name, line.sequence
+                    "ref": "{} C/O {} - Line {}".format(
+                        line.invoice_number, line.distinta_id.name, line.sequence
                     ),
                     "journal_id": journal.id,
                     "date": line.distinta_id.registration_date,
@@ -423,8 +433,9 @@ class RibaListLine(models.Model):
                 to_be_reconciled |= riba_move_line.move_line_id
             move_line_model.with_context({"check_move_validity": False}).create(
                 {
-                    "name": "C/O %s-%s Ref. %s - %s"
+                    "name": "%s C/O %s-%s Ref. %s - %s"
                     % (
+                        line.invoice_number,
                         line.distinta_id.name,
                         line.sequence,
                         riba_move_line_name,

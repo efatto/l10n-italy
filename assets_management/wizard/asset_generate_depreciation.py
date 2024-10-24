@@ -8,15 +8,16 @@ from odoo import api, fields, models
 class WizardAssetsGenerateDepreciations(models.TransientModel):
     _name = "wizard.asset.generate.depreciation"
     _description = "Generate Asset Depreciations"
+    _check_company_auto = True
 
     @api.model
     def get_default_company_id(self):
-        return self.env.user.company_id
+        return self.env.company
 
     @api.model
     def get_default_date_dep(self):
         fiscal_year = self.env["account.fiscal.year"].get_fiscal_year_by_date(
-            fields.Date.today(), company=self.env.user.company_id, miss_raise=False
+            fields.Date.today(), company=self.env.company, miss_raise=False
         )
         if fiscal_year:
             return fiscal_year.date_to
@@ -29,17 +30,21 @@ class WizardAssetsGenerateDepreciations(models.TransientModel):
     asset_ids = fields.Many2many(
         "asset.asset",
         string="Assets",
+        check_company=True,
     )
 
     category_ids = fields.Many2many(
         "asset.category",
         string="Categories",
+        check_company=True,
     )
 
     company_id = fields.Many2one(
         "res.company",
         default=get_default_company_id,
         string="Company",
+        readonly=True,
+        check_company=True,
     )
 
     date_dep = fields.Date(
@@ -53,6 +58,7 @@ class WizardAssetsGenerateDepreciations(models.TransientModel):
         default=get_default_type_ids,
         required=True,
         string="Depreciation Types",
+        check_company=True,
     )
 
     def do_generate(self):
@@ -63,9 +69,17 @@ class WizardAssetsGenerateDepreciations(models.TransientModel):
         """
         self.ensure_one()
         # Add depreciation date in context just in case
-        deps = self.get_depreciations().with_context(dep_date=self.date_dep)
-        dep_lines = deps.generate_depreciation_lines(self.date_dep)
-        deps.post_generate_depreciation_lines(dep_lines)
+        deps = self.env["asset.depreciation"]
+        all_deps = self.with_context(dep_date=self.date_dep).get_depreciations()
+        for dep in all_deps:
+            if (
+                not dep.last_depreciation_date
+                or dep.last_depreciation_date < self.date_dep
+            ):
+                deps |= dep
+        if deps:
+            dep_lines = deps.generate_depreciation_lines(self.date_dep)
+            deps.post_generate_depreciation_lines(dep_lines)
         if self._context.get("reload_window"):
             return {"type": "ir.actions.client", "tag": "reload"}
 

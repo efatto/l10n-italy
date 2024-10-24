@@ -6,6 +6,7 @@
 import base64
 import os
 
+from odoo.exceptions import UserError
 from odoo.tools import config
 
 from . import riba_common
@@ -31,7 +32,7 @@ class TestInvoiceDueCost(riba_common.TestRibaCommon):
             self.invoice.invoice_line_ids[2].product_id.id, self.service_due_cost.id
         )
         # ---- Test Cost line is equal to 10.00
-        self.assertEqual(
+        self.assertAlmostEqual(
             (
                 self.invoice.invoice_line_ids[1].price_unit
                 + self.invoice.invoice_line_ids[2].price_unit
@@ -525,3 +526,41 @@ class TestInvoiceDueCost(riba_common.TestRibaCommon):
         riba_txt = base64.decodebytes(wizard_riba_export.riba_txt)
         self.assertTrue(b"CIG: 7987210EG5 CUP: H71N17000690124" in riba_txt)
         self.assertTrue(b"CIG: 7987210EG5 CUP: H71N17000690125" in riba_txt)
+
+    def test_riba_presentation(self):
+        total_amount = 200000
+        wizard_riba_issue = self.env["presentation.riba.issue"].create(
+            {"presentation_amount": total_amount}
+        )
+        domain = wizard_riba_issue.action_presentation_riba()["domain"]
+        total_issue_amount = sum(
+            self.env["account.move.line"].search(domain).mapped("amount_residual")
+        )
+        self.assertTrue(total_amount - total_issue_amount >= 0)
+
+    def test_riba_bank_multicompany(self):
+        with self.assertRaises(UserError) as ue:
+            self.env["riba.configuration"].create(
+                {
+                    "name": "Subject To Collection",
+                    "type": "incasso",
+                    "bank_id": self.company2_bank.id,
+                }
+            )
+        exc_message = ue.exception.args[0]
+        self.assertIn(self.env.company.name, exc_message)
+        self.assertIn(self.company2_bank.acc_number, exc_message)
+
+    def test_riba_inv_no_bank(self):
+        """
+        Test that a riba invoice without a bank defined
+        cannot be confirmed (e.g. via the list view)
+        """
+        self.invoice.company_id.due_cost_service_id = self.service_due_cost.id
+        self.invoice.riba_partner_bank_id = False
+        with self.assertRaises(UserError) as err:
+            self.invoice.action_post()
+        err_msg = err.exception.args[0]
+        self.assertIn("Cannot post invoices", err_msg)
+        self.assertIn(self.invoice.partner_id.display_name, err_msg)
+        self.assertIn(str(self.invoice.amount_total), err_msg)

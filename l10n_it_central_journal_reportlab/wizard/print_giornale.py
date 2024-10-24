@@ -113,15 +113,15 @@ class WizardGiornaleReportlab(models.TransientModel):
             self.date_move_line_from = date_start
             self.date_move_line_from_view = date_start
             self.date_move_line_to = date_end
-            if self.daterange_id.progressive_line_number != 0:
-                self.start_row = self.daterange_id.progressive_line_number + 1
-            else:
+            if self.daterange_id.progressive_line_number:
                 self.start_row = self.daterange_id.progressive_line_number
             self.progressive_debit2 = self.daterange_id.progressive_debit
             self.progressive_credit = self.daterange_id.progressive_credit
 
             if self.last_def_date_print == self.daterange_id.date_end:
                 self.date_move_line_from_view = self.last_def_date_print
+            if self.daterange_id.progressive_page_number:
+                self.fiscal_page_base = self.daterange_id.progressive_page_number
 
     def get_grupped_line_reportlab_ids(self):
         wizard = self
@@ -143,7 +143,9 @@ class WizardGiornaleReportlab(models.TransientModel):
                 LEFT JOIN account_move am ON (am.id = aml.move_id)
                 LEFT JOIN account_account aa ON (aa.id = aml.account_id)
             WHERE
-                aml.date >= %(date_from)s
+                aa.code IS NOT NULL
+                AND aa.name IS NOT NULL
+                AND aml.date >= %(date_from)s
                 AND aml.date <= %(date_to)s
                 AND am.state in %(target_type)s
                 AND aml.journal_id in %(journal_ids)s
@@ -195,28 +197,29 @@ class WizardGiornaleReportlab(models.TransientModel):
         move_line_ids = flatten(res)
         return move_line_ids
 
-    def _get_move_name_reportlab(self, line):
-        return " - ".join(filter(None, [line.move_id.ref, line.move_id.name]))
-
     def _get_account_name_reportlab(self, line):
         return " - ".join(filter(None, [line.account_id.code, line.account_id.name]))
 
     def get_template_header_report_giornale(self, report, height_available):
         report.setFont("Helvetica-Bold", 12)
         height_available -= gap
-        report.drawString(margin_left, height_available, self.env.user.company_id.name)
+        report.drawString(
+            margin_left,
+            height_available,
+            self.company_id.name + _(" - Account Central Journal"),
+        )
         report.setFont("Helvetica", 10)
         text = ""
-        if self.env.user.company_id.street:
-            text += self.env.user.company_id.street
-        if self.env.user.company_id.zip:
-            text += " " + self.env.user.company_id.zip
-        if self.env.user.company_id.city:
-            text += " - " + self.env.user.company_id.city
-        if self.env.user.company_id.state_id.code:
-            text += " - " + self.env.user.company_id.state_id.code
-        if self.env.user.company_id.vat:
-            text += " IVA: " + self.env.user.company_id.vat
+        if self.company_id.street:
+            text += self.company_id.street
+        if self.company_id.zip:
+            text += " " + self.company_id.zip
+        if self.company_id.city:
+            text += " - " + self.company_id.city
+        if self.company_id.state_id.code:
+            text += " - " + self.company_id.state_id.code
+        if self.company_id.vat:
+            text += " IVA: " + self.company_id.vat
         height_available -= gap_text
         report.drawString(margin_left, height_available, text)
         return height_available
@@ -225,6 +228,7 @@ class WizardGiornaleReportlab(models.TransientModel):
         page_num = report.getPageNumber() + self.fiscal_page_base
         page_text = _("Page: %s / %s" % (self.year_footer, page_num))
         report.drawString(margin_left, margin_bottom + 12, page_text)
+        return page_num
 
     def get_styles_report_giornale_line(self):
         style_header = ParagraphStyle("style_header")
@@ -270,7 +274,7 @@ class WizardGiornaleReportlab(models.TransientModel):
         }
 
     def get_colwidths_report_giornale(self, width_available):
-        colwidths = [32, 35, 130, 130, 130, 50, 50]
+        colwidths = [32, 40, 50, 120, 130, 100, 50, 50]
         total = sum(colwidths)
         return [c / total * width_available for c in colwidths]
 
@@ -284,7 +288,8 @@ class WizardGiornaleReportlab(models.TransientModel):
             [
                 Paragraph(_("Row"), style_header),
                 Paragraph(_("Date"), style_header),
-                Paragraph(_("Account Move"), style_header),
+                Paragraph(_("Ref"), style_header),
+                Paragraph(_("Number"), style_header),
                 Paragraph(_("Account"), style_header),
                 Paragraph(_("Name"), style_header),
                 Paragraph(_("Debit"), style_header_number),
@@ -299,6 +304,7 @@ class WizardGiornaleReportlab(models.TransientModel):
 
         initial_balance_data = [
             [
+                "",
                 "",
                 "",
                 "",
@@ -363,7 +369,7 @@ class WizardGiornaleReportlab(models.TransientModel):
                     tables.append(
                         Table(line_data, colWidths=colwidths, style=style_table)
                     )
-        return tables, list_balance
+        return tables, list_balance, start_row
 
     def get_final_tables_report_giornale(
         self, move_line_ids, tables, start_row, width_available
@@ -386,7 +392,8 @@ class WizardGiornaleReportlab(models.TransientModel):
             start_row += 1
             row = Paragraph(str(start_row), style_name)
             date = Paragraph(format_date(self.env, line.date), style_name)
-            move_name = self._get_move_name_reportlab(line)
+            ref = Paragraph(str(line.ref or ""), style_name)
+            move_name = line.move_id.name or ""
             move = Paragraph(move_name, style_name)
             account_name = self._get_account_name_reportlab(line)
             account = Paragraph(account_name, style_name)
@@ -397,7 +404,7 @@ class WizardGiornaleReportlab(models.TransientModel):
             debit = Paragraph(formatLang(self.env, line.debit), style_number)
             credit = Paragraph(formatLang(self.env, line.credit), style_number)
             list_balance.append((line.debit, line.credit))
-            line_data = [[row, date, move, account, name, debit, credit]]
+            line_data = [[row, date, ref, move, account, name, debit, credit]]
             if previous_move_name != move_name:
                 previous_move_name = move_name
                 tables.append(
@@ -405,7 +412,7 @@ class WizardGiornaleReportlab(models.TransientModel):
                 )
             else:
                 tables.append(Table(line_data, colWidths=colwidths, style=style_table))
-        return tables, list_balance
+        return tables, list_balance, start_row
 
     def get_balance_data_report_giornale(self, tot_debit, tot_credit, final=False):
         style_name = self.get_styles_report_giornale_line()["style_name"]
@@ -418,6 +425,7 @@ class WizardGiornaleReportlab(models.TransientModel):
 
         balance_data = [
             [
+                "",
                 "",
                 "",
                 "",
@@ -457,14 +465,18 @@ class WizardGiornaleReportlab(models.TransientModel):
             list_grupped_line = self.get_grupped_line_reportlab_ids()
             if not list_grupped_line:
                 raise UserError(_("No documents found in the current selection"))
-            final_tables, list_balance = self.get_grupped_final_tables_report_giornale(
+            (
+                final_tables,
+                list_balance,
+                end_row,
+            ) = self.get_grupped_final_tables_report_giornale(
                 list_grupped_line, tables, start_row, width_available
             )
         else:
             move_line_ids = self.get_line_reportlab_ids()
             if not move_line_ids:
                 raise UserError(_("No documents found in the current selection"))
-            final_tables, list_balance = self.get_final_tables_report_giornale(
+            final_tables, list_balance, end_row = self.get_final_tables_report_giornale(
                 move_line_ids, tables, start_row, width_available
             )
 
@@ -541,14 +553,14 @@ class WizardGiornaleReportlab(models.TransientModel):
             header_table.drawOn(report, margin_left, height_available)
             height_available -= header_table_height + final_balance_table_height
             final_balance_table.drawOn(report, margin_left, height_available)
-        self.get_template_footer_report_giornale(report)
+        page_num = self.get_template_footer_report_giornale(report)
         report.showPage()
         report.save()
 
         file_base64 = base64.b64encode(pdf_bytes.getvalue())
         self.write({"report_giornale": file_base64})
 
-        return start_row, tot_debit, tot_credit
+        return end_row, tot_debit, tot_credit, page_num
 
     def print_giornale_reportlab(self):
         self.create_report_giornale_reportlab()
@@ -569,7 +581,12 @@ class WizardGiornaleReportlab(models.TransientModel):
         }
 
     def print_giornale_reportlab_final(self):
-        end_row, end_debit, end_credit = self.create_report_giornale_reportlab()
+        (
+            end_row,
+            end_debit,
+            end_credit,
+            end_page,
+        ) = self.create_report_giornale_reportlab()
 
         if (
             not self.company_id.period_lock_date
@@ -579,11 +596,13 @@ class WizardGiornaleReportlab(models.TransientModel):
 
         daterange_vals = {
             "date_last_print": self.date_move_line_to,
+            "progressive_page_number": end_page,
             "progressive_line_number": end_row,
             "progressive_debit": end_debit,
             "progressive_credit": end_credit,
         }
         self.daterange_id.write(daterange_vals)
+        self.on_change_daterange_reportlab()
 
         model_data_obj = self.env["ir.model.data"]
         view_rec = model_data_obj.get_object_reference(

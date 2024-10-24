@@ -1,5 +1,7 @@
 # Copyright 2014 Davide Corio
 # Copyright 2016-2018 Lorenzo Battistini - Agile Business Group
+# Copyright 2024 Simone Rubino - Aion Tech
+# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
@@ -7,17 +9,14 @@ from odoo.exceptions import UserError
 
 class FatturaPAAttachment(models.Model):
     _name = "fatturapa.attachment.out"
-    _description = "E-invoice Export File"
+    _description = "Electronic Invoice"
     _inherits = {"ir.attachment": "ir_attachment_id"}
-    _inherit = ["mail.thread"]
+    _inherit = [
+        "fatturapa.attachment",
+        "l10n_it_fatturapa.attachment.e_invoice.link",
+    ]
     _order = "id desc"
 
-    ir_attachment_id = fields.Many2one(
-        "ir.attachment", "Attachment", required=True, ondelete="cascade"
-    )
-    att_name = fields.Char(
-        string="E-invoice file name", related="ir_attachment_id.name", store=True
-    )
     out_invoice_ids = fields.One2many(
         "account.move",
         "fatturapa_attachment_out_id",
@@ -49,6 +48,11 @@ class FatturaPAAttachment(models.Model):
         string="State",
         default="ready",
         tracking=True,
+    )
+    sending_user = fields.Many2one(
+        comodel_name="res.users",
+        string="Sending User",
+        readonly=True,
     )
     sending_date = fields.Datetime("Sent Date", readonly=True)
     delivered_date = fields.Datetime("Delivered Date", readonly=True)
@@ -117,9 +121,6 @@ class FatturaPAAttachment(models.Model):
                 # has caused a break, this means all the invoices have at least
                 # one attachment having is_pdf_invoice_print = True
                 attachment_out.has_pdf_invoice_print = True
-
-    def ftpa_preview(self):
-        return self.env["ir.attachment"].ftpa_preview(self)
 
     def reset_to_ready(self):
         for attachment_out in self:

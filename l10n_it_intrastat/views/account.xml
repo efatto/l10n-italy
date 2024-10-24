@@ -101,6 +101,7 @@
                             attrs="{'invisible': [('invoice_type', 'in', ['in_invoice', 'in_refund'])]}"
                         />
                                <field name="weight_kg" />
+                               <field name="show_weight" />
                                <field name="additional_units" />
                                <field name="additional_units_uom" />
                            </group>
@@ -139,9 +140,9 @@
                             name="country_destination_id"
                             attrs="{
                                    'invisible': [
-                                       ('statement_section', 'not in', ['sale_s1'])],
+                                       ('statement_section', 'not in', ['sale_s1', 'sale_s2'])],
                                    'required': [
-                                       ('statement_section', 'in', ['sale_s1'])]}"
+                                       ('statement_section', 'in', ['sale_s1', 'sale_s2'])]}"
                         />
                            </group>
 

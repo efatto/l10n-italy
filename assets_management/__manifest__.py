@@ -1,14 +1,15 @@
 # Author(s): Silvio Gregorini (silviogregorini@openforce.it)
 # Copyright 2019 Openforce Srls Unipersonale (www.openforce.it)
+# Copyright 2024 Simone Rubino - Aion Tech
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 {
     "name": "ITA - Gestione Cespiti",
-    "version": "14.0.1.0.0",
+    "version": "14.0.1.5.2",
     "category": "Localization/Italy",
     "summary": "Gestione Cespiti",
     "author": "Openforce, Odoo Community Association (OCA)",
-    "website": "https://github.com/OCA/l10n-italy" "/tree/12.0/assets_management",
+    "website": "https://github.com/OCA/l10n-italy",
     "license": "AGPL-3",
     "depends": [
         "account",
@@ -17,8 +18,8 @@
         "mail",
     ],
     "data": [
-        "security/ir.model.access.csv",
         "security/res_groups.xml",
+        "security/ir.model.access.csv",
         "security/rules.xml",
         "data/ir_cron.xml",
         "data/asset_data.xml",

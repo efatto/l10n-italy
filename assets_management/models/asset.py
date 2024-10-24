@@ -11,10 +11,11 @@ class Asset(models.Model):
     _description = "Assets"
     _inherit = ["mail.thread", "mail.activity.mixin", "portal.mixin"]
     _order = "purchase_date desc, name asc"
+    _check_company_auto = True
 
     @api.model
     def get_default_company_id(self):
-        return self.env.user.company_id
+        return self.env.company
 
     asset_accounting_info_ids = fields.One2many(
         "asset.accounting.info", "asset_id", string="Accounting Info"
@@ -24,6 +25,7 @@ class Asset(models.Model):
         "asset.category",
         required=True,
         string="Category",
+        check_company=True,
     )
 
     code = fields.Char(
@@ -37,6 +39,7 @@ class Asset(models.Model):
         required=True,
         string="Company",
         tracking=True,
+        readonly=True,
     )
 
     currency_id = fields.Many2one(
@@ -45,12 +48,17 @@ class Asset(models.Model):
         string="Currency",
     )
 
-    customer_id = fields.Many2one("res.partner", string="Customer")
+    customer_id = fields.Many2one(
+        "res.partner",
+        string="Customer",
+        check_company=True,
+    )
 
     depreciation_ids = fields.One2many(
         "asset.depreciation",
         "asset_id",
         string="Depreciations",
+        check_company=True,
     )
 
     name = fields.Char(
@@ -70,7 +78,11 @@ class Asset(models.Model):
         tracking=True,
     )
 
-    purchase_move_id = fields.Many2one("account.move", string="Purchase Move")
+    purchase_move_id = fields.Many2one(
+        "account.move",
+        string="Purchase Move",
+        check_company=True,
+    )
 
     sale_amount = fields.Monetary(
         string="Sale Value",
@@ -78,9 +90,16 @@ class Asset(models.Model):
 
     sale_date = fields.Date(string="Sale Date")
 
-    sale_move_id = fields.Many2one("account.move", string="Sale Move")
+    dismiss_date = fields.Date()
+
+    sale_move_id = fields.Many2one(
+        "account.move",
+        string="Sale Move",
+        check_company=True,
+    )
 
     sold = fields.Boolean(string="Sold")
+    dismissed = fields.Boolean(string="Dismissed")
 
     state = fields.Selection(
         [
@@ -94,7 +113,11 @@ class Asset(models.Model):
         string="State",
     )
 
-    supplier_id = fields.Many2one("res.partner", string="Supplier")
+    supplier_id = fields.Many2one(
+        "res.partner",
+        string="Supplier",
+        check_company=True,
+    )
 
     supplier_ref = fields.Char(string="Supplier Ref.")
 
@@ -121,17 +144,7 @@ class Asset(models.Model):
         return super().write(vals)
 
     def unlink(self):
-        if self.mapped("asset_accounting_info_ids"):
-            assets = self.filtered("asset_accounting_info_ids")
-            name_list = "\n".join([a[-1] for a in assets.name_get()])
-            raise ValidationError(
-                _(
-                    "The assets you are trying to delete are currently linked"
-                    " to accounting info. Please remove them if necessary"
-                    " before removing these assets:\n"
-                )
-                + name_list
-            )
+        self.mapped("asset_accounting_info_ids").unlink()
         self.mapped("depreciation_ids").unlink()
         return super().unlink()
 
@@ -182,6 +195,7 @@ class Asset(models.Model):
     def onchange_company_currency(self):
         if self.company_id:
             self.currency_id = self.company_id.currency_id
+            self.category_id = False
 
     @api.onchange("purchase_amount")
     def onchange_purchase_amount(self):

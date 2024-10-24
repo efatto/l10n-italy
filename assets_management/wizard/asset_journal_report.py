@@ -10,6 +10,7 @@ from odoo import api, fields, models
 class WizardAssetJournalReport(models.TransientModel):
     _name = "wizard.asset.journal.report"
     _description = "Wizard Asset Journal Report"
+    _check_company_auto = True
 
     @api.model
     def get_asset_order_fname_selection(self):
@@ -26,11 +27,16 @@ class WizardAssetJournalReport(models.TransientModel):
 
     @api.model
     def get_default_category_ids(self):
-        return self.env["asset.category"].search([("print_by_default", "=", True)])
+        return self.env["asset.category"].search(
+            [
+                ("print_by_default", "=", True),
+                ("company_id", "=", self.get_default_company_id().id),
+            ]
+        )
 
     @api.model
     def get_default_company_id(self):
-        return self.env.user.company_id
+        return self.env.company
 
     @api.model
     def get_default_date(self):
@@ -43,10 +49,17 @@ class WizardAssetJournalReport(models.TransientModel):
     @api.model
     def get_default_type_ids(self):
         return self.env["asset.depreciation.type"].search(
-            [("print_by_default", "=", True)]
+            [
+                ("print_by_default", "=", True),
+                ("company_id", "=", self.get_default_company_id().id),
+            ]
         )
 
-    asset_ids = fields.Many2many("asset.asset", string="Assets")
+    asset_ids = fields.Many2many(
+        "asset.asset",
+        string="Assets",
+        check_company=True,
+    )
 
     asset_order_fname = fields.Selection(
         get_asset_order_fname_selection,
@@ -56,11 +69,18 @@ class WizardAssetJournalReport(models.TransientModel):
     )
 
     category_ids = fields.Many2many(
-        "asset.category", default=get_default_category_ids, string="Categories"
+        "asset.category",
+        default=get_default_category_ids,
+        string="Categories",
+        check_company=True,
     )
 
     company_id = fields.Many2one(
-        "res.company", default=get_default_company_id, required=True, string="Company"
+        "res.company",
+        default=get_default_company_id,
+        readonly=True,
+        required=True,
+        string="Company",
     )
 
     date = fields.Date(
@@ -71,6 +91,12 @@ class WizardAssetJournalReport(models.TransientModel):
     show_totals = fields.Boolean(default=True, string="Show Totals")
 
     show_category_totals = fields.Boolean(default=True, string="Show Category Totals")
+    show_sold_assets = fields.Boolean(
+        help="By default, only unsold or assets sold in the selected year are printed."
+        "\nBy selecting this flag, the report will show all assets, ignoring the sold "
+        "check."
+    )
+    show_dismissed_assets = fields.Boolean()
 
     report_footer_year = fields.Char(
         default=get_default_report_footer_year, string="Report Footer Year"
@@ -80,6 +106,7 @@ class WizardAssetJournalReport(models.TransientModel):
         "asset.depreciation.type",
         default=get_default_type_ids,
         string="Depreciation Types",
+        check_company=True,
     )
 
     @api.onchange("category_ids", "company_id", "date", "type_ids")
@@ -152,6 +179,8 @@ class WizardAssetJournalReport(models.TransientModel):
             "date": self.date,
             "show_totals": self.show_totals,
             "show_category_totals": self.show_category_totals,
+            "show_sold_assets": self.show_sold_assets,
+            "show_dismissed_assets": self.show_dismissed_assets,
             "report_footer_year": self.report_footer_year,
             "type_ids": [(6, 0, self.type_ids.ids)],
         }

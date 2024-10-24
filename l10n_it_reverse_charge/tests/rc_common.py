@@ -1,10 +1,13 @@
+from odoo.tests import tagged
+
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 
+@tagged("post_install", "-at_install")
 class ReverseChargeCommon(AccountTestInvoicingCommon):
     @classmethod
     def setUpClass(cls, chart_template_ref=None):
-        super(ReverseChargeCommon, cls).setUpClass(chart_template_ref)
+        super().setUpClass(chart_template_ref=chart_template_ref)
         cls.invoice_model = cls.env["account.move"].with_context(
             default_move_type="in_invoice"
         )
@@ -150,9 +153,8 @@ class ReverseChargeCommon(AccountTestInvoicingCommon):
         cls.journal_reconciliation = journal_model.create(
             {
                 "name": "RC reconciliation",
-                "type": "bank",
+                "type": "general",
                 "code": "SLFRC",
-                "default_account_id": cls.account_selfinvoice.id,
             }
         )
 
@@ -184,7 +186,7 @@ class ReverseChargeCommon(AccountTestInvoicingCommon):
                 "method": "selfinvoice",
                 "partner_type": "other",
                 "with_supplier_self_invoice": True,
-                "partner_id": cls.env.ref("base.main_partner").id,
+                "partner_id": cls.env.company.partner_id.id,
                 "journal_id": cls.journal_selfinvoice_extra.id,
                 "supplier_journal_id": cls.journal_cee_extra.id,
                 "payment_journal_id": cls.journal_reconciliation.id,
@@ -217,6 +219,7 @@ class ReverseChargeCommon(AccountTestInvoicingCommon):
         cls.rc_type_tax_eeu = rc_type_tax_model.create(
             {
                 "rc_type_id": cls.rc_type_eeu.id,
+                "original_purchase_tax_id": cls.tax_0_pur.id,
                 "purchase_tax_id": cls.tax_22ae.id,
                 "sale_tax_id": cls.tax_22ve.id,
             }

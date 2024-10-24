@@ -55,6 +55,10 @@ class RibaIssue(models.TransientModel):
         # group by partner and due date
         grouped_lines = {}
         move_lines = move_line_obj.search([("id", "in", self._context["active_ids"])])
+        if any(line.parent_state != "posted" for line in move_lines):
+            raise exceptions.UserError(
+                _("It is possible to issue C/O for posted move only!")
+            )
         do_group_riba = True
         if (
             len(
@@ -136,17 +140,8 @@ class RibaIssue(models.TransientModel):
             countme += 1
 
         # ----- show slip form
-        mod_obj = self.env["ir.model.data"]
-        act_obj = self.env["ir.actions.act_window"]
-        action = mod_obj.get_object_reference(
-            "l10n_it_ricevute_bancarie", "distinta_riba_action"
+        action_vals = self.env["ir.actions.act_window"]._for_xml_id(
+            "l10n_it_ricevute_bancarie.distinta_riba_action"
         )
-        view = mod_obj.get_object_reference(
-            "l10n_it_ricevute_bancarie", "view_riba_distinta_form"
-        )
-        action_id = action and action[1] or False
-        action = act_obj.browse(action_id)
-        action_vals = action.read()[0]
-        action_vals["views"] = [(view and view[1] or False, "form")]
         action_vals["res_id"] = rd_id
         return action_vals

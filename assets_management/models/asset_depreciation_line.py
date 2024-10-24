@@ -10,13 +10,17 @@ class AssetDepreciationLine(models.Model):
     _name = "asset.depreciation.line"
     _description = "Assets Depreciations Lines"
     _order = "date asc, name asc"
+    _check_company_auto = True
 
     amount = fields.Monetary(
         string="Amount",
     )
 
     asset_accounting_info_ids = fields.One2many(
-        "asset.accounting.info", "dep_line_id", string="Accounting Info"
+        "asset.accounting.info",
+        "dep_line_id",
+        string="Accounting Info",
+        check_company=True,
     )
 
     asset_id = fields.Many2one(
@@ -63,7 +67,9 @@ class AssetDepreciationLine(models.Model):
     )
 
     depreciation_line_type_id = fields.Many2one(
-        "asset.depreciation.line.type", string="Depreciation Type"
+        "asset.depreciation.line.type",
+        string="Depreciation Type",
+        check_company=True,
     )
 
     depreciation_nr = fields.Integer(
@@ -84,7 +90,11 @@ class AssetDepreciationLine(models.Model):
         string="Force Dep. Num",
     )
 
-    move_id = fields.Many2one("account.move", string="Move")
+    move_id = fields.Many2one(
+        "account.move",
+        string="Move",
+        check_company=True,
+    )
 
     move_type = fields.Selection(
         [
@@ -145,17 +155,6 @@ class AssetDepreciationLine(models.Model):
         return res
 
     def unlink(self):
-        if self.mapped("asset_accounting_info_ids"):
-            lines = self.filtered("asset_accounting_info_ids")
-            name_list = "\n".join([line[-1] for line in lines.name_get()])
-            raise ValidationError(
-                _(
-                    "The lines you you are trying to delete are currently"
-                    " linked to accounting info. Please remove them if"
-                    " necessary before removing these lines:\n"
-                )
-                + name_list
-            )
         if any([m.state != "draft" for m in self.mapped("move_id")]):
             lines = self.filtered(
                 lambda line: line.move_id and line.move_id.state != "draft"
@@ -168,6 +167,7 @@ class AssetDepreciationLine(models.Model):
                 )
                 + name_list
             )
+        self.mapped("asset_accounting_info_ids").unlink()
         self.mapped("move_id").unlink()
         return super().unlink()
 
@@ -227,11 +227,12 @@ class AssetDepreciationLine(models.Model):
         return self.asset_accounting_info_ids
 
     def get_balances_grouped(self):
-        """Groups balances of line in `self` by line.move_type"""
-        balances_grouped = {}
+        """Groups balances of line in `self` by line.move_type, adding all
+        possible type to ensure values are computed always."""
+        balances_grouped = {
+            x: 0 for x in dict(self._fields["move_type"].selection).keys()
+        }
         for line in self:
-            if line.move_type not in balances_grouped:
-                balances_grouped[line.move_type] = 0
             balances_grouped[line.move_type] += line.balance
         return balances_grouped
 

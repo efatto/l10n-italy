@@ -2,11 +2,12 @@
 # Copyright 2015-2016 Lorenzo Battistini - Agile Business Group
 # Copyright 2018 Sergio Zanchetta (Associazione PNLUG - Gruppo Odoo)
 # Copyright 2018 Sergio Corato
+# Copyright 2024 Simone Rubino - Aion Tech
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
     "name": "ITA - Fattura elettronica - Emissione",
-    "version": "14.0.2.4.2",
+    "version": "14.0.3.7.2",
     "development_status": "Beta",
     "category": "Localization/Italy",
     "summary": "Emissione fatture elettroniche",
@@ -20,6 +21,7 @@
         "l10n_it_fiscal_document_type",
     ],
     "data": [
+        "security/res_groups.xml",
         "data/invoice_it_template.xml",
         "wizard/wizard_export_fatturapa_view.xml",
         "wizard/wizard_export_fatturapa_view_regenerate.xml",

@@ -736,6 +736,19 @@ msgid ""
 msgstr ""
 
 #. module: assets_management
+#: model:res.groups,name:assets_management.group_account_invoice_assets
+msgid "Billing and Assets"
+msgstr ""
+
+#. module: assets_management
+#: model:ir.model.fields,help:assets_management.field_wizard_asset_journal_report__show_sold_assets
+#: model:ir.model.fields,help:assets_management.field_wizard_asset_previsional_report__show_sold_assets
+msgid ""
+"By default, only unsold or assets sold in the selected year are printed.\n"
+"By selecting this flag, the report will show all assets, ignoring the sold check."
+msgstr ""
+
+#. module: assets_management
 #: model_terms:ir.ui.view,arch_db:assets_management.wizard_account_move_mange_asset_form_view
 #: model_terms:ir.ui.view,arch_db:assets_management.wizard_asset_generate_depreciation_form_view
 #: model_terms:ir.ui.view,arch_db:assets_management.wizard_asset_journal_report_form_view
@@ -881,15 +894,7 @@ msgstr ""
 #: code:addons/assets_management/models/asset_depreciation.py:0
 #, python-format
 msgid ""
-"Cannot update the following assets which contain newer depreciations for the chosen types:\n"
-"{}"
-msgstr ""
-
-#. module: assets_management
-#: code:addons/assets_management/models/asset_depreciation.py:0
-#, python-format
-msgid ""
-"Cannot update the following assets which contain posted depreciation for the chosen date and types:\n"
+"Cannot update the following assets which contain draft depreciation for the chosen date and types:\n"
 "{}"
 msgstr ""
 
@@ -1007,12 +1012,6 @@ msgstr ""
 #: code:addons/assets_management/wizard/account_move_manage_asset.py:0
 #, python-format
 msgid "Could not determine how to link move lines to asset in mode `{}`."
-msgstr ""
-
-#. module: assets_management
-#: code:addons/assets_management/wizard/account_move_manage_asset.py:0
-#, python-format
-msgid "Could not retrieve depreciation line type from move `{}` (type `{}`)."
 msgstr ""
 
 #. module: assets_management
@@ -1246,14 +1245,6 @@ msgid "Dep. Percentage (%)"
 msgstr ""
 
 #. module: assets_management
-#: code:addons/assets_management/report/asset_journal_xlsx.py:0
-#: code:addons/assets_management/report/asset_previsional_xlsx.py:0
-#: model:ir.model.fields,field_description:assets_management.field_asset_depreciation__amount_depreciable
-#, python-format
-msgid "Depreciable Amount"
-msgstr ""
-
-#. module: assets_management
 #: model:ir.model.fields,field_description:assets_management.field_asset_depreciation__base_coeff
 msgid "Depreciable Base Coeff"
 msgstr ""
@@ -1392,9 +1383,20 @@ msgid "Depreciations cannot start before {}."
 msgstr ""
 
 #. module: assets_management
+#: code:addons/assets_management/wizard/account_move_manage_asset.py:0
+#, python-format
+msgid "Direct dismiss"
+msgstr ""
+
+#. module: assets_management
 #: model:ir.model.fields.selection,name:assets_management.selection__wizard_account_move_manage_asset__management_type__dismiss
 #: model_terms:ir.ui.view,arch_db:assets_management.wizard_account_move_mange_asset_form_view
 msgid "Dismiss Asset"
+msgstr ""
+
+#. module: assets_management
+#: model:ir.model.fields,field_description:assets_management.field_wizard_account_move_manage_asset__dismiss_asset_without_sale
+msgid "Dismiss Asset Without Sale"
 msgstr ""
 
 #. module: assets_management
@@ -1403,6 +1405,18 @@ msgid "Dismiss Asset and Show"
 msgstr ""
 
 #. module: assets_management
+#: code:addons/assets_management/wizard/account_move_manage_asset.py:0
+#, python-format
+msgid "Dismiss Asset without Sale"
+msgstr ""
+
+#. module: assets_management
+#: model:ir.actions.act_window,name:assets_management.action_wizard_asset_move_manage_asset
+msgid "Dismiss Assets"
+msgstr ""
+
+#. module: assets_management
+#: model:ir.model.fields,field_description:assets_management.field_asset_asset__dismiss_date
 #: model:ir.model.fields,field_description:assets_management.field_wizard_account_move_manage_asset__dismiss_date
 msgid "Dismiss Date"
 msgstr ""
@@ -1410,6 +1424,17 @@ msgstr ""
 #. module: assets_management
 #: model:ir.model.fields,field_description:assets_management.field_asset_depreciation__dismiss_move_id
 msgid "Dismiss Move"
+msgstr ""
+
+#. module: assets_management
+#: model:ir.model.fields,field_description:assets_management.field_asset_asset__dismissed
+msgid "Dismissed"
+msgstr ""
+
+#. module: assets_management
+#: model_terms:ir.ui.view,arch_db:assets_management.template_asset_journal_title
+#: model_terms:ir.ui.view,arch_db:assets_management.template_asset_previsional_title
+msgid "Dismissed assets: show"
 msgstr ""
 
 #. module: assets_management
@@ -1752,7 +1777,6 @@ msgstr ""
 
 #. module: assets_management
 #: model:ir.model.fields,help:assets_management.field_asset_asset__message_has_error
-#: model:ir.model.fields,help:assets_management.field_asset_asset__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr ""
 
@@ -1804,6 +1828,14 @@ msgstr ""
 #: code:addons/assets_management/models/asset_accounting_info.py:0
 #, python-format
 msgid "Incoherent move data."
+msgstr ""
+
+#. module: assets_management
+#: code:addons/assets_management/report/asset_journal_xlsx.py:0
+#: code:addons/assets_management/report/asset_previsional_xlsx.py:0
+#: model:ir.model.fields,field_description:assets_management.field_asset_depreciation__amount_depreciable
+#, python-format
+msgid "Initial Depreciable Amount"
 msgstr ""
 
 #. module: assets_management
@@ -2603,11 +2635,6 @@ msgid "Responsible User"
 msgstr ""
 
 #. module: assets_management
-#: model:ir.model.fields,field_description:assets_management.field_asset_asset__message_has_sms_error
-msgid "SMS Delivery error"
-msgstr ""
-
-#. module: assets_management
 #: model:ir.model.fields.selection,name:assets_management.selection__wizard_account_move_manage_asset__move_type__sale
 msgid "Sale"
 msgstr ""
@@ -2654,6 +2681,22 @@ msgid "Show Category Totals"
 msgstr ""
 
 #. module: assets_management
+#: model:ir.model.fields,field_description:assets_management.field_report_asset_journal__show_dismissed_assets
+#: model:ir.model.fields,field_description:assets_management.field_report_asset_previsional__show_dismissed_assets
+#: model:ir.model.fields,field_description:assets_management.field_wizard_asset_journal_report__show_dismissed_assets
+#: model:ir.model.fields,field_description:assets_management.field_wizard_asset_previsional_report__show_dismissed_assets
+msgid "Show Dismissed Assets"
+msgstr ""
+
+#. module: assets_management
+#: model:ir.model.fields,field_description:assets_management.field_report_asset_journal__show_sold_assets
+#: model:ir.model.fields,field_description:assets_management.field_report_asset_previsional__show_sold_assets
+#: model:ir.model.fields,field_description:assets_management.field_wizard_asset_journal_report__show_sold_assets
+#: model:ir.model.fields,field_description:assets_management.field_wizard_asset_previsional_report__show_sold_assets
+msgid "Show Sold Assets"
+msgstr ""
+
+#. module: assets_management
 #: model:ir.model.fields,field_description:assets_management.field_report_asset_journal__show_totals
 #: model:ir.model.fields,field_description:assets_management.field_report_asset_previsional__show_totals
 #: model:ir.model.fields,field_description:assets_management.field_wizard_asset_journal_report__show_totals
@@ -2664,6 +2707,12 @@ msgstr ""
 #. module: assets_management
 #: model:ir.model.fields,field_description:assets_management.field_asset_asset__sold
 msgid "Sold"
+msgstr ""
+
+#. module: assets_management
+#: model_terms:ir.ui.view,arch_db:assets_management.template_asset_journal_title
+#: model_terms:ir.ui.view,arch_db:assets_management.template_asset_previsional_title
+msgid "Sold assets: show"
 msgstr ""
 
 #. module: assets_management
@@ -2729,19 +2778,8 @@ msgid "Technical Data"
 msgstr ""
 
 #. module: assets_management
-#: code:addons/assets_management/models/asset.py:0
-#, python-format
-msgid ""
-"The assets you are trying to delete are currently linked to accounting info."
-" Please remove them if necessary before removing these assets:\n"
-msgstr ""
-
-#. module: assets_management
-#: code:addons/assets_management/models/asset_depreciation_line.py:0
-#, python-format
-msgid ""
-"The lines you you are trying to delete are currently linked to accounting "
-"info. Please remove them if necessary before removing these lines:\n"
+#: model:ir.model.fields,help:assets_management.field_asset_accounting_info__move_id
+msgid "The move of this entry line."
 msgstr ""
 
 #. module: assets_management
@@ -2851,7 +2889,7 @@ msgstr ""
 
 #. module: assets_management
 #: model:ir.model.fields,field_description:assets_management.field_asset_depreciation__amount_depreciable_updated
-msgid "Updated Amount"
+msgid "Updated Depreciable Amount"
 msgstr ""
 
 #. module: assets_management
@@ -2946,7 +2984,6 @@ msgstr ""
 
 #. module: assets_management
 #: model_terms:ir.ui.view,arch_db:assets_management.asset_dep_line_form_view
-#: model_terms:ir.ui.view,arch_db:assets_management.asset_form_view
 msgid ""
 "You confirm the removal of the current line? Depreciation line amounts will "
 "not be affected and will have to be updated manually."
@@ -3010,11 +3047,6 @@ msgstr ""
 #, python-format
 msgid ""
 "`{}`: cannot change move's company once it's already related to an asset."
-msgstr ""
-
-#. module: assets_management
-#: model_terms:ir.ui.view,arch_db:assets_management.wizard_account_move_mange_asset_form_view
-msgid "move lines"
 msgstr ""
 
 #. module: assets_management
