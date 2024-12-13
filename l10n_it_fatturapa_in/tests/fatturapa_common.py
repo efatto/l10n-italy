@@ -10,6 +10,10 @@ from odoo.tests.common import SingleTransactionCase
 
 
 class FatturapaCommon(SingleTransactionCase):
+    """
+    Common class for Fatturapa tests.
+    """
+
     def getFile(self, filename, module_name=None):
         if module_name is None:
             module_name = "l10n_it_fatturapa_in"
