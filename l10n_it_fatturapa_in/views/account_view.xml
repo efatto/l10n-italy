@@ -152,10 +152,10 @@
     <record id="view_invoice_tree_fatturapa_in" model="ir.ui.view">
         <field name="name">view_invoice_tree_fatturapa_in</field>
         <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_invoice_tree" />
+        <field name="inherit_id" ref="account.view_in_invoice_tree" />
         <field name="arch" type="xml">
             <field name="invoice_date" position="after">
-                <field name="e_invoice_received_date" />
+                <field name="e_invoice_received_date" optional="show" invisible="context.get('default_move_type') not in ('in_invoice', 'in_refund','in_receipt')" />
             </field>
         </field>
     </record>
