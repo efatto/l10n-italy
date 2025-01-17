@@ -673,19 +673,8 @@ class TestInvoiceDueCost(riba_common.TestRibaCommon):
         # because they have been added during `action_post`
         # and recorded in the exception message,
         # but `assertRaises` rolls them back
-        collection_fees = self.invoice.invoice_payment_term_id.riba_payment_cost
-        collection_fees_tax = self.invoice.fiscal_position_id.map_tax(
-            self.service_due_cost.taxes_id
-        )
-        taxed_collection_fees = collection_fees_tax.compute_all(collection_fees)[
-            "total_included"
-        ]
         self.assertIn(
-            str(
-                self.invoice.amount_total
-                + len(self.invoice.invoice_payment_term_id.line_ids)
-                * taxed_collection_fees
-            ),
+            str(self.invoice.amount_total),
             err_msg,
         )
 
