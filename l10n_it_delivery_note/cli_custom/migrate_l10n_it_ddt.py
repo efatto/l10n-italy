@@ -256,7 +256,8 @@ class MigrateL10nItDdt(EasyCommand):
                 'name': record.ddt_number,
                 'partner_sender_id': record.company_id.id,
                 'partner_id': record.partner_id.id,
-                'partner_shipping_id': record.partner_shipping_id.id,
+                'partner_shipping_id':
+                    record.partner_shipping_id.id or record.partner_id.id,
                 'type_id': self._document_types[record.ddt_type_id].id,
                 'date': record.date,
                 'carrier_id': record.carrier_id.id,
