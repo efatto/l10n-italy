@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-
     <record id="view_comunicazione_liquidazione_tree" model="ir.ui.view">
         <field name="name">comunicazione.liquidazione.tree</field>
         <field name="model">comunicazione.liquidazione</field>
@@ -95,7 +94,6 @@
                                 </tree>
                             </field>
                         </page>
-
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">
@@ -157,103 +155,145 @@
                 <newline />
                 <group string="Tax statement" name="liquidazione_imposta" col="3">
                     <hr colspan="3" />
-                    <group><div><b
-                            >VP2</b> Profitable operations total (without VAT)</div></group>
-                    <group><field
-                            name="imponibile_operazioni_attive"
-                            nolabel="1"
-                        /></group>
-                    <group><div /></group>
+                    <group>
+                        <div><b>VP2</b> Profitable operations total (without VAT)</div>
+                    </group>
+                    <group>
+                        <field name="imponibile_operazioni_attive" nolabel="1" />
+                    </group>
+                    <group>
+                        <div />
+                    </group>
 
                     <hr colspan="3" />
-                    <group><div><b
-                            >VP3</b> Unprofitable operations total (without VAT)</div></group>
-                    <group><div /></group>
-                    <group><field
-                            name="imponibile_operazioni_passive"
-                            nolabel="1"
-                        /></group>
+                    <group>
+                        <div><b
+                        >VP3</b> Unprofitable operations total (without VAT)</div>
+                    </group>
+                    <group>
+                        <div />
+                    </group>
+                    <group>
+                        <field name="imponibile_operazioni_passive" nolabel="1" />
+                    </group>
 
                     <hr colspan="3" />
-                    <group><div><b>VP4</b> Due VAT</div></group>
-                    <group><field name="iva_esigibile" nolabel="1" /></group>
+                    <group>
+                        <div><b>VP4</b> Due VAT</div>
+                    </group>
+                    <group>
+                        <field name="iva_esigibile" nolabel="1" />
+                    </group>
                     <group />
 
                     <hr colspan="3" />
-                    <group><div><b>VP5</b> Deducted VAT</div></group>
+                    <group>
+                        <div><b>VP5</b> Deducted VAT</div>
+                    </group>
                     <group />
-                    <group><field name="iva_detratta" nolabel="1" /></group>
+                    <group>
+                        <field name="iva_detratta" nolabel="1" />
+                    </group>
 
                     <hr colspan="3" />
-                    <group><div><b>VP6</b> Debit VAT</div></group>
-                    <group><field name="iva_dovuta_debito" nolabel="1" /></group>
-                    <group><span> or credit</span> <field
-                            name="iva_dovuta_credito"
-                            nolabel="1"
-                        /></group>
+                    <group>
+                        <div><b>VP6</b> Debit VAT</div>
+                    </group>
+                    <group>
+                        <field name="iva_dovuta_debito" nolabel="1" />
+                    </group>
+                    <group>
+                        <span> or credit</span>
+                        <field name="iva_dovuta_credito" nolabel="1" />
+                    </group>
 
                     <hr colspan="3" />
-                    <group><div><b
-                            >VP7</b> Previous period debit, not grater than 25,82 €</div></group>
-                    <group><field
-                            name="debito_periodo_precedente"
-                            nolabel="1"
-                        /></group>
-                    <group />
-
-                    <hr colspan="3" />
-                    <group><div><b>VP8</b> Previous period credit</div></group>
-                    <group />
-                    <group><field
-                            name="credito_periodo_precedente"
-                            nolabel="1"
-                        /></group>
-
-                    <hr colspan="3" />
-                    <group><div><b>VP9</b> Previous year credit</div></group>
-                    <group />
-                    <group><field name="credito_anno_precedente" nolabel="1" /></group>
-
-                    <hr colspan="3" />
-                    <group><div><b>VP10</b> Auto UE payments</div></group>
-                    <group />
-                    <group><field name="versamento_auto_UE" nolabel="1" /></group>
-
-                    <hr colspan="3" />
-                    <group><div><b>VP11</b> Tax credits</div></group>
-                    <group />
-                    <group><field name="crediti_imposta" nolabel="1" /></group>
-
-                    <hr colspan="3" />
-                    <group><div><b
-                            >VP12</b> Due interests for quarterly statements</div></group>
-                    <group><field name="interessi_dovuti" nolabel="1" /></group>
+                    <group>
+                        <div><b
+                        >VP7</b> Previous period debit, not grater than 25,82 €</div>
+                    </group>
+                    <group>
+                        <field name="debito_periodo_precedente" nolabel="1" />
+                    </group>
                     <group />
 
                     <hr colspan="3" />
-                    <group><div><b>VP13</b> Due down payment</div></group>
-                    <group><div
-                            attrs="{'invisible': [('accounto_dovuto', '=', 0)]}"
-                        ><span>Computation method: </span><field
+                    <group>
+                        <div><b>VP8</b> Previous period credit</div>
+                    </group>
+                    <group />
+                    <group>
+                        <field name="credito_periodo_precedente" nolabel="1" />
+                    </group>
+
+                    <hr colspan="3" />
+                    <group>
+                        <div><b>VP9</b> Previous year credit</div>
+                    </group>
+                    <group />
+                    <group>
+                        <field name="credito_anno_precedente" nolabel="1" />
+                    </group>
+
+                    <hr colspan="3" />
+                    <group>
+                        <div><b>VP10</b> Auto UE payments</div>
+                    </group>
+                    <group />
+                    <group>
+                        <field name="versamento_auto_UE" nolabel="1" />
+                    </group>
+
+                    <hr colspan="3" />
+                    <group>
+                        <div><b>VP11</b> Tax credits</div>
+                    </group>
+                    <group />
+                    <group>
+                        <field name="crediti_imposta" nolabel="1" />
+                    </group>
+
+                    <hr colspan="3" />
+                    <group>
+                        <div><b>VP12</b> Due interests for quarterly statements</div>
+                    </group>
+                    <group>
+                        <field name="interessi_dovuti" nolabel="1" />
+                    </group>
+                    <group />
+
+                    <hr colspan="3" />
+                    <group>
+                        <div><b>VP13</b> Due down payment</div>
+                    </group>
+                    <group>
+                        <div attrs="{'invisible': [('accounto_dovuto', '=', 0)]}">
+                            <span>Computation method: </span>
+                            <field
                                 attrs="{'required': [('accounto_dovuto', '!=', 0)]}"
                                 name="metodo_calcolo_acconto"
                                 nolabel="1"
                                 class="oe_inline"
-                            /></div></group>
-                    <group><field name="accounto_dovuto" nolabel="1" /></group>
+                            />
+                        </div>
+                    </group>
+                    <group>
+                        <field name="accounto_dovuto" nolabel="1" />
+                    </group>
 
                     <hr colspan="3" />
-                    <group><div><b>VP14</b> VAT to pay</div></group>
-                    <group><field name="iva_da_versare" nolabel="1" /></group>
-                    <group><span> or credit</span> <field
-                            name="iva_a_credito"
-                            nolabel="1"
-                        /></group>
-
+                    <group>
+                        <div><b>VP14</b> VAT to pay</div>
+                    </group>
+                    <group>
+                        <field name="iva_da_versare" nolabel="1" />
+                    </group>
+                    <group>
+                        <span> or credit</span>
+                        <field name="iva_a_credito" nolabel="1" />
+                    </group>
                 </group>
             </form>
         </field>
     </record>
-
-
 </odoo>

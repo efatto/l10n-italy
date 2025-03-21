@@ -1,6 +1,5 @@
 <?xml version="1.0" ?>
 <odoo>
-
     <record id="wizard_liquidazione_export_file" model="ir.ui.view">
         <field name="name">Export file</field>
         <field name="model">comunicazione.liquidazione.export.file</field>
@@ -9,16 +8,16 @@
                 <div>
                     <p>
                     Click on <strong
-                        >Export</strong> to generate VAT statement communication file.
+                    >Export</strong> to generate VAT statement communication file.
                     </p>
                 </div>
                 <footer>
                     <button
-                        name="export"
-                        string="Export"
-                        type="object"
-                        class="oe_highlight"
-                    />
+                    name="export"
+                    string="Export"
+                    type="object"
+                    class="oe_highlight"
+                />
                     or
                     <button string="Cancel" class="oe_link" special="cancel" />
                 </footer>
@@ -53,5 +52,4 @@
             ref="l10n_it_vat_statement_communication.model_comunicazione_liquidazione"
         />
     </record>
-
 </odoo>
