@@ -1,6 +1,6 @@
 import base64
 
-from odoo import _, fields, models
+from odoo import fields, models
 from odoo.exceptions import UserError
 
 
@@ -14,9 +14,9 @@ class ComunicazioneLiquidazioneExportFile(models.TransientModel):
     def export(self):
         comunicazione_ids = self._context.get("active_ids")
         if not comunicazione_ids:
-            raise UserError(_("No communication selected"))
+            raise UserError(self.env._("No communication selected"))
         if len(comunicazione_ids) > 1:
-            raise UserError(_("You can export only 1 communication at a time"))
+            raise UserError(self.env._("You can export only 1 communication at a time"))
 
         for wizard in self:
             for comunicazione in self.env["comunicazione.liquidazione"].browse(

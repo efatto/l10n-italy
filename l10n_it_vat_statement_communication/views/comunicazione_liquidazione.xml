@@ -4,11 +4,11 @@
         <field name="name">comunicazione.liquidazione.tree</field>
         <field name="model">comunicazione.liquidazione</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name" />
                 <field name="identificativo" />
                 <field name="company_id" />
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -45,15 +45,15 @@
                                 <group
                                     string="Declarant"
                                     name="dichiarante"
-                                    attrs="{'invisible': [('declarant_different', '!=', True)]}"
+                                    invisible="not declarant_different"
                                 >
                                     <field
                                         name="declarant_fiscalcode"
-                                        attrs="{'required': [('declarant_different', '=', True)]}"
+                                        required="declarant_different"
                                     />
                                     <field
                                         name="codice_carica_id"
-                                        attrs="{'required': [('declarant_different', '=', True)]}"
+                                        required="declarant_different"
                                     />
                                     <field name="declarant_fiscalcode_company" />
                                 </group>
@@ -62,7 +62,7 @@
                             <group string="Signature" name="firma">
                                 <field
                                     name="declarant_sign"
-                                    attrs="{'required': [('declarant_fiscalcode', '!=', True)]}"
+                                    required="not declarant_fiscalcode"
                                 />
                             </group>
                             <group
@@ -73,11 +73,11 @@
                                     <field name="delegate_fiscalcode" />
                                     <field
                                         name="delegate_commitment"
-                                        attrs="{'required': [('delegate_fiscalcode', '!=', False)]}"
+                                        required="delegate_fiscalcode"
                                     />
                                     <field
                                         name="date_commitment"
-                                        attrs="{'required': [('delegate_fiscalcode', '!=', False)]}"
+                                        required="delegate_fiscalcode"
                                     />
                                     <field name="delegate_sign" />
                                 </group>
@@ -85,21 +85,18 @@
                         </page>
                         <page string="VP table" name="quadro_vp">
                             <field name="quadri_vp_ids">
-                                <tree>
+                                <list>
                                     <field name="period_type" />
                                     <field name="month" />
                                     <field name="quarter" />
                                     <field name="iva_da_versare" />
                                     <field name="iva_a_credito" />
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
                 </sheet>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers" />
-                    <field name="message_ids" widget="mail_thread" />
-                </div>
+                <chatter />
             </form>
         </field>
     </record>
@@ -138,13 +135,13 @@
                         <field name="period_type" />
                         <field
                             name="month"
-                            attrs="{'invisible': [('period_type', '!=', 'month')],
-                                    'required': [('period_type', '=', 'month')]}"
+                            invisible="period_type != 'month'"
+                            required="period_type == 'month'"
                         />
                         <field
                             name="quarter"
-                            attrs="{'invisible': [('period_type', '!=', 'quarter')],
-                                    'required': [('period_type', '=', 'quarter')]}"
+                            invisible="period_type != 'quarter'"
+                            required="period_type == 'quarter'"
                         />
                     </group>
                     <group>
@@ -267,10 +264,10 @@
                         <div><b>VP13</b> Due down payment</div>
                     </group>
                     <group>
-                        <div attrs="{'invisible': [('accounto_dovuto', '=', 0)]}">
+                        <div invisible="accounto_dovuto == 0">
                             <span>Computation method: </span>
                             <field
-                                attrs="{'required': [('accounto_dovuto', '!=', 0)]}"
+                                required="accounto_dovuto"
                                 name="metodo_calcolo_acconto"
                                 nolabel="1"
                                 class="oe_inline"

@@ -334,11 +334,15 @@ class VatStatementCommunicationCase(TestAccountReconciliationCommon):
         old_company = comunicazione_liquidazione.company_id
 
         old_company.partner_id.write(
-            {"vat": "IT12345670017", "fiscalcode": "FNCPLC19D01I168X"}
+            {"vat": "IT12345670017", "l10n_it_codice_fiscale": "FNCPLC19D01I168X"}
         )
 
         company = self.env["res.company"].create(
-            {"name": "foo", "vat": "IT12345670017", "fiscalcode": "FNCPLC19D01I168X"}
+            {
+                "name": "foo",
+                "vat": "IT12345670017",
+                "l10n_it_codice_fiscale": "FNCPLC19D01I168X",
+            }
         )
 
         with Form(comunicazione_liquidazione) as invoice_form:
@@ -349,7 +353,7 @@ class VatStatementCommunicationCase(TestAccountReconciliationCommon):
         )
         self.assertEqual(
             comunicazione_liquidazione.taxpayer_fiscalcode,
-            company.partner_id.fiscalcode,
+            company.partner_id.l10n_it_codice_fiscale,
         )
 
         with Form(comunicazione_liquidazione) as invoice_form:
@@ -360,7 +364,7 @@ class VatStatementCommunicationCase(TestAccountReconciliationCommon):
         )
         self.assertEqual(
             comunicazione_liquidazione.taxpayer_fiscalcode,
-            old_company.partner_id.fiscalcode,
+            old_company.partner_id.l10n_it_codice_fiscale,
         )
 
     def _check_file_report(self, comunicazione_liquidazione):

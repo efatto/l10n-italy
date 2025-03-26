@@ -1,6 +1,6 @@
 from lxml import etree
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 NS_IV = "urn:www.agenziaentrate.gov.it:specificheTecniche:sco:ivp"
@@ -29,7 +29,7 @@ class ComunicazioneLiquidazione(models.Model):
         dichiarazioni = self.search(domain)
         if len(dichiarazioni) > 1:
             raise ValidationError(
-                _("Communication with identifier {} already exists").format(
+                self.env._("Communication with identifier {} already exists").format(
                     self.identificativo
                 )
             )
@@ -41,9 +41,9 @@ class ComunicazioneLiquidazione(models.Model):
                 if not name:
                     period_type = ""
                     if quadro.period_type == "month":
-                        period_type = _("month")
+                        period_type = self.env._("month")
                     else:
-                        period_type = _("quarter")
+                        period_type = self.env._("quarter")
                     name += f"{str(dich.year)} {period_type}"
                 if quadro.period_type == "month":
                     name += f", {str(quadro.month)}"
@@ -113,7 +113,7 @@ class ComunicazioneLiquidazione(models.Model):
                 self.taxpayer_vat = self.company_id.partner_id.vat[2:]
             else:
                 self.taxpayer_vat = ""
-            self.taxpayer_fiscalcode = self.company_id.partner_id.fiscalcode
+            self.taxpayer_fiscalcode = self.company_id.partner_id.l10n_it_codice_fiscale
 
     def get_export_xml(self):
         self._validate()
@@ -155,7 +155,7 @@ class ComunicazioneLiquidazione(models.Model):
         self.ensure_one()
         # Anno obbligatorio
         if not self.year:
-            raise ValidationError(_("Year required"))
+            raise ValidationError(self.env._("Year required"))
 
         # Codice Fiscale
         if not self.taxpayer_fiscalcode or len(self.taxpayer_fiscalcode) not in [
@@ -163,7 +163,7 @@ class ComunicazioneLiquidazione(models.Model):
             16,
         ]:
             raise ValidationError(
-                _(
+                self.env._(
                     "Taxpayer Fiscalcode is required. It's accepted codes \
                     with lenght 11 or 16 chars"
                 )
@@ -177,7 +177,7 @@ class ComunicazioneLiquidazione(models.Model):
             and not self.declarant_fiscalcode
         ):
             raise ValidationError(
-                _(
+                self.env._(
                     "Declarant Fiscalcode is required. You can enable the \
                 section with different declarant option"
                 )
@@ -190,22 +190,25 @@ class ComunicazioneLiquidazione(models.Model):
         if self.liquidazione_del_gruppo:
             if self.controller_vat:
                 raise ValidationError(
-                    _("For group's statement, controller's TIN must be empty")
+                    self.env._("For group's statement, controller's TIN must be empty")
                 )
             if len(self.taxpayer_fiscalcode) == 16:
                 raise ValidationError(
-                    _("Group's statement not valid, as fiscal code is 16 " "characters")
+                    self.env._(
+                        "Group's statement not valid, as fiscal code is 16 "
+                        "characters"
+                    )
                 )
         # CodiceCaricaDichiarante
         if self.declarant_fiscalcode:
             if not self.codice_carica_id:
-                raise ValidationError(_("Specify role code of declarant"))
+                raise ValidationError(self.env._("Specify role code of declarant"))
         # CodiceFiscaleSocieta:
         # Obbligatori per codice carica 9
         if self.codice_carica_id and self.codice_carica_id.code == "9":
             if not self.declarant_fiscalcode_company:
                 raise ValidationError(
-                    _(
+                    self.env._(
                         "With this role code, you need to specify fiscal code "
                         "of declarant company"
                     )
@@ -214,14 +217,14 @@ class ComunicazioneLiquidazione(models.Model):
         if self.delegate_fiscalcode:
             if not self.delegate_commitment:
                 raise ValidationError(
-                    _(
+                    self.env._(
                         "With intermediary fiscal code, you need to specify "
                         "commitment code"
                     )
                 )
             if not self.date_commitment:
                 raise ValidationError(
-                    _(
+                    self.env._(
                         "With intermediary fiscal code, you need to specify "
                         "commitment date"
                     )
@@ -229,7 +232,7 @@ class ComunicazioneLiquidazione(models.Model):
         # ImpegnoPresentazione::
         if self.delegate_fiscalcode and not self.delegate_sign:
             raise ValidationError(
-                _(
+                self.env._(
                     "With delegate in commitment section, you need to check "
                     "'delegate sign'"
                 )
