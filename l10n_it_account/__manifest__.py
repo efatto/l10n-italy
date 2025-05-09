@@ -21,6 +21,7 @@
         "account_tax_balance",
         "date_range",
         "web",
+        "l10n_it",  # for _l10n_it_is_split_payment
     ],
     "data": [
         "views/account_menuitem.xml",
