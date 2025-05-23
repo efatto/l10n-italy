@@ -5,12 +5,16 @@
         <field name="model">account.tax</field>
         <field
             name="inherit_id"
-            ref="account_vat_period_end_statement.view_tax_form_vat"
+            ref="l10n_it_account_vat_period_end_settlement.view_tax_form_vat"
         />
         <field name="type">form</field>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='vat_statement_account_id']" position="after">
-                <field name="vsc_exclude_operation" />
+            <xpath
+                expr="//field[@name='exclude_from_vat_settlements']"
+                position="after"
+            >
+                <field name="vsc_exclude_active_operation" />
+                <field name="vsc_exclude_passive_operation" />
                 <field name="vsc_exclude_vat" />
             </xpath>
         </field>

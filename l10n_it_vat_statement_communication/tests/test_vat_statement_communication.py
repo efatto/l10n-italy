@@ -3,16 +3,19 @@
 
 from odoo import fields
 from odoo.exceptions import UserError, ValidationError
-from odoo.tests.common import Form, tagged
+from odoo.tests import Form, tagged
 
-from odoo.addons.account.tests.common import TestAccountReconciliationCommon
+from odoo.addons.l10n_it_account_vat_period_end_settlement.tests.common import (
+    TestVATStatementCommon,
+)
 
 
 @tagged("-at_install", "post_install")
-class VatStatementCommunicationCase(TestAccountReconciliationCommon):
+class VatStatementCommunicationCase(TestVATStatementCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.env.user.company_id = cls.company.id
 
         # Comunicazione liquidazione
 
@@ -22,29 +25,29 @@ class VatStatementCommunicationCase(TestAccountReconciliationCommon):
         # Journals
 
         cls.miscellaneous_journal = cls.env["account.journal"].search(
-            [("type", "=", "general"), ("company_id", "=", cls.env.company.id)], limit=1
+            [("type", "=", "general"), ("company_id", "=", cls.company.id)], limit=1
         )
 
         # Accounts
 
         cls.account_erario = cls.env["account.account"].search(
-            [("code", "=", "252000"), ("company_id", "=", cls.env.company.id)], limit=1
+            [("code", "=", "252000"), ("company_ids", "in", cls.company.id)], limit=1
         )
         cls.account_interessi = cls.env["account.account"].search(
-            [("code", "=", "600000"), ("company_id", "=", cls.env.company.id)], limit=1
+            [("code", "=", "520200"), ("company_ids", "in", cls.company.id)], limit=1
         )
 
         cls.paid_vat_account = cls.env["account.account"].search(
             [
                 ("account_type", "=", "asset_current"),
-                ("company_id", "=", cls.env.company.id),
+                ("company_ids", "in", cls.company.id),
             ],
             limit=1,
         )
         cls.received_vat_account = cls.env["account.account"].search(
             [
                 ("account_type", "=", "liability_current"),
-                ("company_id", "=", cls.env.company.id),
+                ("company_ids", "in", cls.company.id),
             ],
             limit=1,
         )
@@ -53,115 +56,9 @@ class VatStatementCommunicationCase(TestAccountReconciliationCommon):
 
         cls.product_product_10 = cls.env.ref("product.product_product_10")
 
-        # Taxes
+        cls.tax_22_purchase = cls.company_data_2["default_tax_purchase"]
 
-        tax_model = cls.env["account.tax"]
-
-        cls.tax_22_purchase = tax_model.create(
-            {
-                "name": "IVA 22 Purchase",
-                "description": "22",
-                "amount": 22.00,
-                "type_tax_use": "purchase",
-                "invoice_repartition_line_ids": [
-                    (5, 0, 0),
-                    (
-                        0,
-                        0,
-                        {
-                            "factor_percent": 100,
-                            "repartition_type": "base",
-                        },
-                    ),
-                    (
-                        0,
-                        0,
-                        {
-                            "factor_percent": 100,
-                            "repartition_type": "tax",
-                            "account_id": cls.paid_vat_account.id,
-                        },
-                    ),
-                ],
-                "refund_repartition_line_ids": [
-                    (5, 0, 0),
-                    (
-                        0,
-                        0,
-                        {
-                            "factor_percent": 100,
-                            "repartition_type": "base",
-                        },
-                    ),
-                    (
-                        0,
-                        0,
-                        {
-                            "factor_percent": 100,
-                            "repartition_type": "tax",
-                            "account_id": cls.paid_vat_account.id,
-                        },
-                    ),
-                ],
-            }
-        )
-
-        cls.tax_22_sale = tax_model.create(
-            {
-                "name": "IVA 22 Sale",
-                "description": "22",
-                "amount": 22.00,
-                "type_tax_use": "sale",
-                "invoice_repartition_line_ids": [
-                    (5, 0, 0),
-                    (
-                        0,
-                        0,
-                        {
-                            "factor_percent": 100,
-                            "repartition_type": "base",
-                        },
-                    ),
-                    (
-                        0,
-                        0,
-                        {
-                            "factor_percent": 100,
-                            "repartition_type": "tax",
-                            "account_id": cls.received_vat_account.id,
-                        },
-                    ),
-                ],
-                "refund_repartition_line_ids": [
-                    (5, 0, 0),
-                    (
-                        0,
-                        0,
-                        {
-                            "factor_percent": 100,
-                            "repartition_type": "base",
-                        },
-                    ),
-                    (
-                        0,
-                        0,
-                        {
-                            "factor_percent": 100,
-                            "repartition_type": "tax",
-                            "account_id": cls.received_vat_account.id,
-                        },
-                    ),
-                ],
-            }
-        )
-
-        # Set VAT revenue account in taxes to take in VAT statement
-        cls.env["account.tax"].search([("type_tax_use", "=", "sale")]).write(
-            {"vat_statement_account_id": cls.received_vat_account.id}
-        )
-        cls.env["account.tax"].search([("type_tax_use", "=", "purchase")]).write(
-            {"vat_statement_account_id": cls.paid_vat_account.id}
-        )
+        cls.tax_22_sale = cls.company_data_2["default_tax_sale"]
 
         # Partners
 
@@ -169,9 +66,13 @@ class VatStatementCommunicationCase(TestAccountReconciliationCommon):
 
         # Type of periods
 
-        cls.type_month = cls.env["date.range.type"].create({"name": "Month"})
+        cls.type_month = cls.env["date.range.type"].create(
+            {"name": "Month", "company_id": cls.company.id}
+        )
 
-        cls.type_quarter = cls.env["date.range.type"].create({"name": "Quarter"})
+        cls.type_quarter = cls.env["date.range.type"].create(
+            {"name": "Quarter", "company_id": cls.company.id}
+        )
 
     def get_vals_comunicazione_liquidazione(self):
         # Returns the dictionary of VAT settlement's info
@@ -181,6 +82,7 @@ class VatStatementCommunicationCase(TestAccountReconciliationCommon):
             "taxpayer_fiscalcode": "FNCPLC19D01I168X",
             "declarant_fiscalcode": "FNCPLC19D01I168X",
             "codice_carica_id": self.env.ref("l10n_it_appointment_code.1").id,
+            "company_id": self.company.id,
         }
 
     def _create_vat_statement(
@@ -212,6 +114,8 @@ class VatStatementCommunicationCase(TestAccountReconciliationCommon):
         date_range.write({"vat_statement_id": vat_statement.id})
 
         vat_statement.compute_amounts()
+        # let's assume previous VAT has been paid
+        vat_statement.previous_debit_vat_amount = 0.0
         vat_statement._compute_authority_vat_amount()
 
         vat_statement.create_move()
@@ -220,6 +124,7 @@ class VatStatementCommunicationCase(TestAccountReconciliationCommon):
 
     def test_name(self):
         # Checks name of VAT statements
+        self.env.user.company_id = self.company.id
         comunicazione_liquidazione = self.env["comunicazione.liquidazione"].create(
             self.get_vals_comunicazione_liquidazione()
         )
@@ -256,6 +161,7 @@ class VatStatementCommunicationCase(TestAccountReconciliationCommon):
 
     def test_identificativo(self):
         # Checks identificatiovo of VAT statements
+        self.env.user.company_id = self.company.id
         comunicazione_liquidazione = self.env["comunicazione.liquidazione"].create(
             self.get_vals_comunicazione_liquidazione()
         )
@@ -275,6 +181,7 @@ class VatStatementCommunicationCase(TestAccountReconciliationCommon):
 
     def test_validate(self):
         # Checks if there are some error in VAT statement's dictionary info
+        self.env.user.company_id = self.company.id
         with self.assertRaises(ValidationError):
             vals = self.get_vals_comunicazione_liquidazione()
             vals["taxpayer_fiscalcode"] = "FNCPLC"
@@ -327,6 +234,7 @@ class VatStatementCommunicationCase(TestAccountReconciliationCommon):
 
     def test_onchange_company(self):
         # Checks if company is correct
+        self.env.user.company_id = self.company.id
         comunicazione_liquidazione = self.env["comunicazione.liquidazione"].create(
             self.get_vals_comunicazione_liquidazione()
         )
@@ -369,6 +277,7 @@ class VatStatementCommunicationCase(TestAccountReconciliationCommon):
 
     def _check_file_report(self, comunicazione_liquidazione):
         # Checks if there is the export file
+        self.env.user.company_id = self.company.id
         wizard = (
             self.env["comunicazione.liquidazione.export.file"]
             .with_context(active_ids=comunicazione_liquidazione.ids)
@@ -383,6 +292,7 @@ class VatStatementCommunicationCase(TestAccountReconciliationCommon):
 
     def test_export_xml(self):
         # Checks whole flow of VAT statement
+        self.env.user.company_id = self.company.id
         with self.assertRaises(UserError):
             wizard = self.env["comunicazione.liquidazione.export.file"].create({})
             wizard.export()

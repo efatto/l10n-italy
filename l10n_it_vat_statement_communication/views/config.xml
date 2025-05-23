@@ -5,7 +5,7 @@
         <field name="model">res.company</field>
         <field
             name="inherit_id"
-            ref="account_vat_period_end_statement.view_vat_period_end_statement_company_form"
+            ref="l10n_it_account_vat_period_end_settlement.view_vat_period_end_statement_company_form"
         />
         <field name="arch" type="xml">
             <xpath

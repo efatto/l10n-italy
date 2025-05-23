@@ -610,7 +610,7 @@ class ComunicazioneLiquidazioneVp(models.Model):
         for debit in liq.debit_vat_account_line_ids:
             debit_taxes |= debit.tax_id
         for debit_tax in debit_taxes:
-            if debit_tax.vsc_exclude_operation:
+            if debit_tax.vsc_exclude_active_operation:
                 continue
             tax = debit_taxes.with_context(**self._get_tax_context(period)).browse(
                 debit_tax.id
@@ -623,7 +623,7 @@ class ComunicazioneLiquidazioneVp(models.Model):
         for credit in liq.credit_vat_account_line_ids:
             credit_taxes |= credit.tax_id
         for credit_tax in credit_taxes:
-            if credit_tax.vsc_exclude_operation:
+            if credit_tax.vsc_exclude_passive_operation:
                 continue
             tax = credit_taxes.with_context(**self._get_tax_context(period)).browse(
                 credit_tax.id
