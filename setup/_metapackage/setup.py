@@ -64,6 +64,7 @@ setuptools.setup(
         'odoo14-addon-l10n_it_ipa',
         'odoo14-addon-l10n_it_location_nuts',
         'odoo14-addon-l10n_it_mis_reports_pl_bs',
+        'odoo14-addon-l10n_it_partner_statement_riba',
         'odoo14-addon-l10n_it_payment_reason',
         'odoo14-addon-l10n_it_pec',
         'odoo14-addon-l10n_it_pos_fatturapa',

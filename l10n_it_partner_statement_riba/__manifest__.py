@@ -3,7 +3,7 @@
 
 {
     "name": "ITA - Estratti conto cliente con ricevute bancarie",
-    "version": "14.0.1.0.0",
+    "version": "14.0.1.1.0",
     "author": "PyTech, Odoo Community Association (OCA)",
     "category": "Localization/Italy",
     "summary": "Visualizzare le RiBa negli estratti conto cliente.",
