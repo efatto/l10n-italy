@@ -271,6 +271,7 @@ class TestRibaCommon(common.TransactionCase):
                 "unsolved_journal_id": self.bank_journal.id,
                 "overdue_effects_account_id": self.unsolved_account.id,
                 "protest_charge_account_id": self.expenses_account.id,
+                "settlement_journal_id": self.bank_journal.id,
             }
         )
 
