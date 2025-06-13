@@ -7,14 +7,15 @@ msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-05-22 15:52+0000\n"
-"PO-Revision-Date: 2025-05-22 15:52+0000\n"
-"Last-Translator: \n"
+"PO-Revision-Date: 2025-06-13 10:26+0000\n"
+"Last-Translator: Francesco Foresti <francesco.foresti@ooops404.com>\n"
 "Language-Team: \n"
-"Language: \n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.10.4\n"
 
 #. module: l10n_it_partner_statement_riba
 #: model:ir.model.fields,help:l10n_it_partner_statement_riba.field_outstanding_statement_wizard__l10n_it_show_riba
@@ -36,7 +37,7 @@ msgstr "Nome visualizzato"
 #: model:ir.model.fields,field_description:l10n_it_partner_statement_riba.field_report_p_s_report_outstanding_statement_xlsx__id
 #: model:ir.model.fields,field_description:l10n_it_partner_statement_riba.field_report_partner_statement_outstanding_statement__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: l10n_it_partner_statement_riba
 #: model:ir.model.fields,field_description:l10n_it_partner_statement_riba.field_outstanding_statement_wizard____last_update
@@ -66,7 +67,7 @@ msgstr "Estratto conto in sospeso partner"
 #: model_terms:ir.ui.view,arch_db:l10n_it_partner_statement_riba.outstanding_balance
 #, python-format
 msgid "RiBa"
-msgstr ""
+msgstr "RiBa"
 
 #. module: l10n_it_partner_statement_riba
 #: model:ir.model.fields,field_description:l10n_it_partner_statement_riba.field_outstanding_statement_wizard__l10n_it_show_riba
