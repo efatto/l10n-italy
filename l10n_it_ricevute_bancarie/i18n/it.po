@@ -212,6 +212,19 @@ msgid "Bank account used for C/O issuing."
 msgstr "Conto bancario usato per l'emissione RiBa."
 
 #. module: l10n_it_ricevute_bancarie
+#: model:ir.model.fields,help:l10n_it_ricevute_bancarie.field_account_bank_statement_line__riba_supplier_company_bank_id
+#: model:ir.model.fields,help:l10n_it_ricevute_bancarie.field_account_move__riba_supplier_company_bank_id
+#: model:ir.model.fields,help:l10n_it_ricevute_bancarie.field_account_payment__riba_supplier_company_bank_id
+msgid "Bank account used for the RiBa of this vendor bill."
+msgstr ""
+
+#. module: l10n_it_ricevute_bancarie
+#: model:ir.model.fields,help:l10n_it_ricevute_bancarie.field_res_partner__property_riba_supplier_company_bank_id
+#: model:ir.model.fields,help:l10n_it_ricevute_bancarie.field_res_users__property_riba_supplier_company_bank_id
+msgid "Bank account used for the Riba of this suplier."
+msgstr ""
+
+#. module: l10n_it_ricevute_bancarie
 #: code:addons/l10n_it_ricevute_bancarie/wizard/wizard_unsolved.py:0
 #, python-format
 msgid "Bills"
@@ -447,6 +460,20 @@ msgstr "Aziende"
 #: model:ir.model.fields,field_description:l10n_it_ricevute_bancarie.field_riba_distinta_line__company_id
 msgid "Company"
 msgstr "Azienda"
+
+#. module: l10n_it_ricevute_bancarie
+#: model_terms:ir.ui.view,arch_db:l10n_it_ricevute_bancarie.view_partner_form_riba
+msgid "Company Bank Account"
+msgstr ""
+
+#. module: l10n_it_ricevute_bancarie
+#: model:ir.model.fields,field_description:l10n_it_ricevute_bancarie.field_account_bank_statement_line__riba_supplier_company_bank_id
+#: model:ir.model.fields,field_description:l10n_it_ricevute_bancarie.field_account_move__riba_supplier_company_bank_id
+#: model:ir.model.fields,field_description:l10n_it_ricevute_bancarie.field_account_payment__riba_supplier_company_bank_id
+#: model:ir.model.fields,field_description:l10n_it_ricevute_bancarie.field_res_partner__property_riba_supplier_company_bank_id
+#: model:ir.model.fields,field_description:l10n_it_ricevute_bancarie.field_res_users__property_riba_supplier_company_bank_id
+msgid "Company Bank Account for Supplier"
+msgstr ""
 
 #. module: l10n_it_ricevute_bancarie
 #: model:ir.model,name:l10n_it_ricevute_bancarie.model_res_config_settings
@@ -892,6 +919,12 @@ msgstr "E' un pagamento RiBa"
 #: model:ir.model.fields,field_description:l10n_it_ricevute_bancarie.field_riba_distinta_line__message_is_follower
 msgid "Is Follower"
 msgstr "Segue"
+
+#. module: l10n_it_ricevute_bancarie
+#: model:ir.model.fields,field_description:l10n_it_ricevute_bancarie.field_res_partner__is_supplier_payment_riba
+#: model:ir.model.fields,field_description:l10n_it_ricevute_bancarie.field_res_users__is_supplier_payment_riba
+msgid "Is Riba Paymnet"
+msgstr ""
 
 #. module: l10n_it_ricevute_bancarie
 #: model:ir.model.fields,field_description:l10n_it_ricevute_bancarie.field_account_bank_statement_line__is_unsolved
