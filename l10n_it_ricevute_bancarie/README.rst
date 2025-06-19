@@ -1,7 +1,3 @@
-.. image:: https://odoo-community.org/readme-banner-image
-   :target: https://odoo-community.org/get-involved?utm_source=readme
-   :alt: Odoo Community Association
-
 =======================
 ITA - Ricevute bancarie
 =======================
@@ -17,7 +13,7 @@ ITA - Ricevute bancarie
 .. |badge1| image:: https://img.shields.io/badge/maturity-Beta-yellow.png
     :target: https://odoo-community.org/page/development-status
     :alt: Beta
-.. |badge2| image:: https://img.shields.io/badge/license-AGPL--3-blue.png
+.. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fl10n--italy-lightgray.png?logo=github
@@ -113,11 +109,15 @@ della RiBa non ancora scaduta.
 
 In maniera predefinita la data delle registrazioni dei pagamenti viene
 impostata con la data di scadenza della RiBa, ma è possibile modificarla
-in due momenti:
+in diversi momenti:
 
-- durante la creazione del pagamento,
+- Nella distinta RiBa durante la creazione del pagamento,
   cliccando su "Segna righe come pagate", "Segna come pagata"
   oppure usando l'azione "Registrazione RiBa a data di scadenza",
+  e indicando una data nel campo `Data pagamento`;
+
+- Nella lista dei Dettagli RiBa selezionando una o più righe,
+  poi Azione > "Paga riga RiBa",
   e indicando una data nel campo `Data pagamento`;
 
 - successivamente al pagamento effettivamente avvenuto,
@@ -169,6 +169,9 @@ Contributors
   - Simone Rubino <sir@takobi.online>
 
 * Nextev Srl <odoo@nextev.it>
+* `PyTech <https://www.pytech.it>`_:
+
+  * Simone Rubino <simone.rubino@pytech.it>
 
 Maintainers
 ~~~~~~~~~~~
