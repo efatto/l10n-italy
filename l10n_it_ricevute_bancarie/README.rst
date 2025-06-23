@@ -1,7 +1,3 @@
-.. image:: https://odoo-community.org/readme-banner-image
-   :target: https://odoo-community.org/get-involved?utm_source=readme
-   :alt: Odoo Community Association
-
 =======================
 ITA - Ricevute bancarie
 =======================
@@ -17,7 +13,7 @@ ITA - Ricevute bancarie
 .. |badge1| image:: https://img.shields.io/badge/maturity-Beta-yellow.png
     :target: https://odoo-community.org/page/development-status
     :alt: Beta
-.. |badge2| image:: https://img.shields.io/badge/license-AGPL--3-blue.png
+.. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fl10n--italy-lightgray.png?logo=github
@@ -101,6 +97,10 @@ contabili, le quali verranno riepilogate nella scheda «Contabilità».
 Questa scheda è presente sia sulla distinta che sulle sue righe.
 Queste ultime hanno una vista dedicata per facilitare le
 operazioni sul singolo elemento invece che su tutta la distinta.
+
+Il campo `Data accettazione` è obbligatorio per poter indicare la RiBa come accettata.
+All'accettazione, il valore del campo `Data accettazione`
+verrà riportato sulle registrazioni contabili di accettazione.
 
 La voce di menù 'Presentazione Riba' permette di estrarre le riba fino al
 raggiungimento dell'importo massimo inserito dall'utente. La stessa procedura
