@@ -17,13 +17,13 @@ ITA - Fattura accompagnatoria
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fl10n--italy-lightgray.png?logo=github
-    :target: https://github.com/OCA/l10n-italy/tree/16.0/l10n_it_accompanying_invoice
+    :target: https://github.com/OCA/l10n-italy/tree/18.0/l10n_it_accompanying_invoice
     :alt: OCA/l10n-italy
 .. |badge4| image:: https://img.shields.io/badge/weblate-Translate%20me-F47D42.png
-    :target: https://translation.odoo-community.org/projects/l10n-italy-16-0/l10n-italy-16-0-l10n_it_accompanying_invoice
+    :target: https://translation.odoo-community.org/projects/l10n-italy-18-0/l10n-italy-18-0-l10n_it_accompanying_invoice
     :alt: Translate me on Weblate
 .. |badge5| image:: https://img.shields.io/badge/runboat-Try%20me-875A7B.png
-    :target: https://runboat.odoo-community.org/builds?repo=OCA/l10n-italy&target_branch=16.0
+    :target: https://runboat.odoo-community.org/builds?repo=OCA/l10n-italy&target_branch=18.0
     :alt: Try me on Runboat
 
 |badge1| |badge2| |badge3| |badge4| |badge5|
@@ -49,27 +49,7 @@ Usage
 Valorizzare i campi del foglio *Informazioni di spedizione*.
 
 Usare l'azione *Fattura accompagnatoria* all'interno della lista di
-azioni *Stampa*, nella vista delle fatture.
-
-Known issues / Roadmap
-======================
-
-**Italiano**
-
-Odoo Italia non supporta più i moduli alla versione 12.0 perciò non ci
-siamo occupati ufficialmente della migrazione dei dati da questa
-versione.
-
-Tuttavia se non si volessero perdere i dati già presenti nella versione
-12.0 si può provare in un ambiente di test la procedura di migrazione a
-proprio rischio e non garantita togliendo la dipendenza dal modulo
-``l10n_it_ddt`` nel ``__manifest__.py`` e lanciando gli script di
-migrazione commentati. Passaggi:
-
-- decommentare il riferimento a ``hooks.py`` in ``__init__.py``
-- decommentare ``external_dependencies`` e ``pre_init_hook`` in
-  ``__manifest__.py``
-- spostare la cartella ``readme/migrations`` nella root del modulo
+azioni *Scarica*, nella vista delle fatture.
 
 Bug Tracker
 ===========
@@ -77,7 +57,7 @@ Bug Tracker
 Bugs are tracked on `GitHub Issues <https://github.com/OCA/l10n-italy/issues>`_.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us to smash it by providing a detailed and welcomed
-`feedback <https://github.com/OCA/l10n-italy/issues/new?body=module:%20l10n_it_accompanying_invoice%0Aversion:%2016.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
+`feedback <https://github.com/OCA/l10n-italy/issues/new?body=module:%20l10n_it_accompanying_invoice%0Aversion:%2018.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
 
 Do not contact contributors directly about support or help with technical issues.
 
@@ -92,8 +72,9 @@ Authors
 Contributors
 ------------
 
-- Lorenzo Battistini <lorenzo.battistini@agilebg.com>
-- Simone Vanin <simone.vanin@agilebg.com>
+-  Lorenzo Battistini <lorenzo.battistini@agilebg.com>
+-  Simone Vanin <simone.vanin@agilebg.com>
+-  Simone Rubino <simone.rubino88@gmail.com>
 
 Maintainers
 -----------
@@ -108,6 +89,6 @@ OCA, or the Odoo Community Association, is a nonprofit organization whose
 mission is to support the collaborative development of Odoo features and
 promote its widespread use.
 
-This module is part of the `OCA/l10n-italy <https://github.com/OCA/l10n-italy/tree/16.0/l10n_it_accompanying_invoice>`_ project on GitHub.
+This module is part of the `OCA/l10n-italy <https://github.com/OCA/l10n-italy/tree/18.0/l10n_it_accompanying_invoice>`_ project on GitHub.
 
 You are welcome to contribute. To learn how please visit https://odoo-community.org/page/Contribute.
