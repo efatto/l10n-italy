@@ -29,7 +29,7 @@ class ComunicazioneLiquidazioneExportFile(models.TransientModel):
                     str(comunicazione.identificativo).rjust(5, "0"),
                 )
             view_id = self.env.ref(
-                "l10n_it_vat_statement_communication.wizard_liquidazione_export_file_exit"
+                "l10n_it_vat_settlement_communication.wizard_liquidazione_export_file_exit"
             ).id
 
             return {
