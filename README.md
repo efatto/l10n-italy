@@ -93,9 +93,9 @@ addon | version | maintainers | summary
 [l10n_it_sdi_channel](l10n_it_sdi_channel/) | 14.0.2.4.0 | <a href='https://github.com/sergiocorato'><img src='https://github.com/sergiocorato.png' width='32' height='32' style='border-radius:50%;' alt='sergiocorato'/></a> | Aggiunge il canale di invio/ricezione dei file XML attraverso lo SdI
 [l10n_it_split_payment](l10n_it_split_payment/) | 14.0.1.0.7 |  | Scissione pagamenti
 [l10n_it_vat_payability](l10n_it_vat_payability/) | 14.0.1.0.2 |  | ITA - Esigibilità IVA
-[l10n_it_vat_registries](l10n_it_vat_registries/) | 14.0.1.2.1 |  | ITA - Registri IVA
+[l10n_it_vat_registries](l10n_it_vat_registries/) | 14.0.1.3.0 |  | ITA - Registri IVA
 [l10n_it_vat_registries_split_payment](l10n_it_vat_registries_split_payment/) | 14.0.1.1.1 |  | Modulo di congiunzione tra registri IVA e scissione dei pagamenti
-[l10n_it_vat_settlement_date](l10n_it_vat_settlement_date/) | 14.0.1.0.2 |  | Settlement date for VAT Statement
+[l10n_it_vat_settlement_date](l10n_it_vat_settlement_date/) | 14.0.1.1.0 |  | Settlement date for VAT Statement
 [l10n_it_vat_statement_communication](l10n_it_vat_statement_communication/) | 14.0.1.0.2 |  | Comunicazione liquidazione IVA ed esportazione file xmlconforme alle specifiche dell'Agenzia delle Entrate
 [l10n_it_vat_statement_split_payment](l10n_it_vat_statement_split_payment/) | 14.0.1.0.2 |  | Migliora la liquidazione dell'IVA tenendo in considerazione la scissione dei pagamenti
 [l10n_it_website_portal_fatturapa](l10n_it_website_portal_fatturapa/) | 14.0.1.0.0 |  | Add fatturapa fields and checks in frontend user's details
