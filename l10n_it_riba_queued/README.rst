@@ -1,7 +1,3 @@
-.. image:: https://odoo-community.org/readme-banner-image
-   :target: https://odoo-community.org/get-involved?utm_source=readme
-   :alt: Odoo Community Association
-
 ===================================
 ITA - Ricevute bancarie - Asincrono
 ===================================
@@ -17,7 +13,7 @@ ITA - Ricevute bancarie - Asincrono
 .. |badge1| image:: https://img.shields.io/badge/maturity-Beta-yellow.png
     :target: https://odoo-community.org/page/development-status
     :alt: Beta
-.. |badge2| image:: https://img.shields.io/badge/license-AGPL--3-blue.png
+.. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fl10n--italy-lightgray.png?logo=github
@@ -36,9 +32,15 @@ ITA - Ricevute bancarie - Asincrono
 
 Pagare righe RiBa in modo asincrono.
 
+Ogni riga verrà pagata in un job dedicato, così eventuali errori non
+bloccheranno il pagamento di altre righe.
+
 **English**
 
 Pay multiple C/O lines asynchronously.
+
+Each C/O line will be paid in a dedicated job, this way any error won't
+prevent other lines' payment.
 
 **Table of contents**
 
