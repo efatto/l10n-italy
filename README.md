@@ -31,7 +31,7 @@ addon | version | maintainers | summary
 [l10n_it_account_stamp](l10n_it_account_stamp/) | 14.0.1.2.0 |  | Gestione automatica dell'imposta di bollo
 [l10n_it_account_tax_kind](l10n_it_account_tax_kind/) | 14.0.1.1.1 |  | Gestione natura delle aliquote IVA
 [l10n_it_amount_to_text](l10n_it_amount_to_text/) | 14.0.1.0.0 |  | Localizza le valute in italiano per amount_to_text
-[l10n_it_appointment_code](l10n_it_appointment_code/) | 14.0.1.0.1 |  | Aggiunge la tabella dei codici carica da usare nelle dichiarazioni fiscali italiane
+[l10n_it_appointment_code](l10n_it_appointment_code/) | 14.0.1.0.2 |  | Aggiunge la tabella dei codici carica da usare nelle dichiarazioni fiscali italiane
 [l10n_it_asset_history_import](l10n_it_asset_history_import/) | 14.0.1.0.0 |  | Cespiti: importazione storico dati
 [l10n_it_asset_history_import_queue](l10n_it_asset_history_import_queue/) | 14.0.1.0.0 | <a href='https://github.com/GSLabit'><img src='https://github.com/GSLabit.png' width='32' height='32' style='border-radius:50%;' alt='GSLabit'/></a> | Cespiti: importazione storico dati in background
 [l10n_it_ateco](l10n_it_ateco/) | 14.0.1.1.0 |  | ITA - Codici Ateco
