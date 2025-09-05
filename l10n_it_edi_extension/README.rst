@@ -74,7 +74,6 @@ Le funzionalità principali incluse sono:
       non esistono in anagrafica tra cui:
 
       -  ``<RappresentanteFiscale>``
-      -  ``<TerzoIntermediarioOSoggettoEmittente>``
 
    -  Nome e cognome vengono assegnati ai nuovi contatti in base ai nodi
       ``<Nome>`` e ``<Cognome>`` della fattura elettronica.
@@ -230,7 +229,6 @@ The main features included are:
       they don't exist in the address book, including:
 
       -  ``<RappresentanteFiscale>``
-      -  ``<TerzoIntermediarioOSoggettoEmittente>``
 
    -  Name and surname are set in the new contacts based on the
       ``<Nome>`` and ``<Cognome>`` nodes of the E-Bill.
@@ -366,6 +364,7 @@ Le uniche configurazioni disponibili sono:
 
    -  ``<CessionarioCommittente>``
    -  ``<CedentePrestatore>``
+   -  ``<RappresentanteFiscale>``
 
 Non sono necessarie altre configurazioni specifiche per
 l10n_it_edi_extension: una volta installato, le sue funzionalità sono
@@ -417,7 +416,6 @@ The only available configurations are:
    -  ``<CessionarioCommittente>``
    -  ``<CedentePrestatore>``
    -  ``<RappresentanteFiscale>``
-   -  ``<TerzoIntermediarioOSoggettoEmittente>``
 
 No other specific configurations are required for l10n_it_edi_extension:
 once installed, its features are active and automatically integrate into
