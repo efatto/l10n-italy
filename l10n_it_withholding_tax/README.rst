@@ -1,7 +1,3 @@
-.. image:: https://odoo-community.org/readme-banner-image
-   :target: https://odoo-community.org/get-involved?utm_source=readme
-   :alt: Odoo Community Association
-
 ========================
 ITA - Ritenute d'acconto
 ========================
@@ -17,7 +13,7 @@ ITA - Ritenute d'acconto
 .. |badge1| image:: https://img.shields.io/badge/maturity-Beta-yellow.png
     :target: https://odoo-community.org/page/development-status
     :alt: Beta
-.. |badge2| image:: https://img.shields.io/badge/license-AGPL--3-blue.png
+.. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fl10n--italy-lightgray.png?logo=github
@@ -75,6 +71,8 @@ Il sistema provvederà alla creazione di un ulteriore pagamento che coprirà l'a
 
 .. figure:: https://raw.githubusercontent.com/OCA/l10n-italy/14.0/l10n_it_withholding_tax/static/img/pagamento-ritenuta.png
    :alt: Pagamento ritenuta
+
+Per evitare di generare questo ulteriore pagamento: abilitare "Non generare registrazione per ritenuta" nella scheda "Altre informazioni", sezione "Contabilità".
 
 Per il pagamento della ritenuta d'acconto fare riferimento al modulo `l10n_it_withholding_tax_payment`.
 
