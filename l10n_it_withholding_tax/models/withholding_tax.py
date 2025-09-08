@@ -278,9 +278,6 @@ class WithholdingTaxStatement(models.Model):
                     )
                 if st.invoice_id.move_type in ["in_refund", "out_refund"]:
                     amount_wt = -1 * amount_wt
-            elif st.invoice_id:
-                tax_data = st.withholding_tax_id.compute_tax(amount_reconcile)
-                amount_wt = tax_data["tax"]
             return amount_wt
 
     def name_get(self):
