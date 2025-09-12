@@ -1100,7 +1100,7 @@ class TestFatturaPAXMLValidation(FatturapaCommon):
                 }
             ]
         )
-        self.run_wizard("test56", "IT02780790107_11004_bank.xml")
+        self.run_wizard("test56", "12818490968_11004_bank.xml")
         self.assertEqual(bank.name, "Bank Test 001")
 
     def test_01_xml_link(self):
