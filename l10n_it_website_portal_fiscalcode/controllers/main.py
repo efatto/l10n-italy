@@ -1,15 +1,18 @@
 # Copyright 2019 Simone Rubino
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 from odoo.http import request
 
 from odoo.addons.portal.controllers.portal import CustomerPortal
 
-CustomerPortal.OPTIONAL_BILLING_FIELDS.extend(["fiscalcode"])
-
 
 class WebsitePortalFiscalCode(CustomerPortal):
+    def _get_optional_fields(self):
+        optional_fields = super()._get_optional_fields()
+        optional_fields.append("l10n_it_codice_fiscale")
+        return optional_fields
+
     def details_form_validate(self, data, partner_creation=False):
         error, error_message = super().details_form_validate(
             data, partner_creation=partner_creation
@@ -29,14 +32,14 @@ class WebsitePortalFiscalCode(CustomerPortal):
                 company_name = partner.name
         dummy_partner = request.env["res.partner"].new(
             {
-                "fiscalcode": data.get("fiscalcode"),
+                "l10n_it_codice_fiscale": data.get("l10n_it_codice_fiscale"),
                 "company_name": company_name,
                 "company_type": company_type,
             }
         )
         try:
-            dummy_partner.check_fiscalcode()
-        except ValidationError as e:
-            error["fiscalcode"] = "error"
-            error_message.append(e)
+            dummy_partner.validate_codice_fiscale()
+        except (UserError, ValidationError) as e:
+            error["l10n_it_codice_fiscale"] = "error"
+            error_message.append(e.args[0])
         return error, error_message
