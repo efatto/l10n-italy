@@ -17,7 +17,7 @@
     "license": "LGPL-3",
     "depends": [
         "product",
-        "account",
+        "l10n_it_edi",
     ],
     "data": [
         "data/data.xml",
