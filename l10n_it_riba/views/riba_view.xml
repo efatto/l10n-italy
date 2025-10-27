@@ -4,7 +4,6 @@
   ~ License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
   -->
 <odoo>
-
     <menuitem name="RiBa" parent="account.menu_finance" id="menu_riba" />
 
     <!-- ====================================================== -->
@@ -38,7 +37,7 @@
                 <field name="config_id" />
                 <field name="date_accepted" />
                 <field name="date_paid" />
-           </search>
+            </search>
         </field>
     </record>
 
@@ -80,7 +79,6 @@
                                     <field name="partner_id" />
                                     <field name="amount" />
                                     <field name="due_date" />
-
                                 </group>
                                 <group>
                                     <field name="amount" />
@@ -104,8 +102,8 @@
                                 </form>
                             </field>
                             <group>
-                            <field name="acceptance_move_id" />
-                            <field name="past_due_move_id" />
+                                <field name="acceptance_move_id" />
+                                <field name="past_due_move_id" />
                             </group>
                             <separator string="Payments" colspan="4" />
                             <field name="payment_ids" nolabel="1" colspan="4">
@@ -128,7 +126,6 @@
             </form>
         </field>
     </record>
-
 
     <!-- ====================================================== -->
     <!--                     RIBA SLIP FORM                 -->
@@ -295,5 +292,4 @@
         id="menu_riba_distinte"
         action="slip_riba_action"
     />
-
 </odoo>

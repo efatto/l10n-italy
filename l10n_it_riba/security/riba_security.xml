@@ -4,7 +4,6 @@
   ~ License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
   -->
 <odoo noupdate="1">
-
     <!-- Multi - Company Rules -->
     <record id="riba_slip_company_rule" model="ir.rule">
         <field name="name">RiBa slip multi-company</field>
@@ -32,5 +31,4 @@
             ['|',('company_id','=',False),('company_id','in',company_ids)]
         </field>
     </record>
-
 </odoo>

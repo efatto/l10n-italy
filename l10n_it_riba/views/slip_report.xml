@@ -18,27 +18,29 @@
                     </div>
                     <div class="col-5 offset-1" name="company_address">
                         <ul class="list-unstyled">
-                            <strong><li t-if="company.name"><span
-                                        t-field="company.name"
-                                    /></li></strong>
+                            <strong>
+                                <li t-if="company.name">
+                                    <span t-field="company.name" />
+                                </li>
+                            </strong>
                             <li t-if="company.vat"><t
-                                    t-esc="company.country_id.vat_label or 'Tax ID'"
-                                />: <span t-field="company.vat" /></li>
+                                t-esc="company.country_id.vat_label or 'Tax ID'"
+                            />: <span t-field="company.vat" /></li>
                             <li t-if="company.phone">Tel: <span
-                                    class="o_force_ltr"
-                                    t-field="company.phone"
-                                /></li>
-                            <li t-if="company.email"><span
-                                    t-field="company.email"
-                                /></li>
-                            <li t-if="company.website"><span
-                                    t-field="company.website"
-                                /></li>
+                                class="o_force_ltr"
+                                t-field="company.phone"
+                            /></li>
+                            <li t-if="company.email">
+                                <span t-field="company.email" />
+                            </li>
+                            <li t-if="company.website">
+                                <span t-field="company.website" />
+                            </li>
                         </ul>
                     </div>
                 </div>
             </div>
-         </div>
+        </div>
 
         <div
             class="article"
@@ -61,8 +63,8 @@
                         <div class="row p-1">
                             <p>
                                 RiBa Slip No. <span
-                                    t-esc="o.name or 'Draft'"
-                                /> of <span t-field="o.registration_date" />
+                                t-esc="o.name or 'Draft'"
+                            /> of <span t-field="o.registration_date" />
                             </p>
                         </div>
 
@@ -83,27 +85,27 @@
                             <tbody>
                                 <t t-foreach="o.line_ids" t-as="line">
                                     <tr>
-                                        <td name="td_number"><span
-                                                t-field="line.sequence"
-                                            /></td>
-                                        <td name="td_invoice_number"><span
-                                                t-field="line.invoice_number"
-                                            /></td>
-                                        <td name="td_invoice_date"><span
-                                                t-field="line.invoice_date"
-                                            /></td>
-                                        <td name="td_customer"><span
-                                                t-field="line.partner_id"
-                                            /></td>
-                                        <td name="td_iban"><span
-                                                t-field="line.iban"
-                                            /></td>
-                                        <td name="td_amount"><span
-                                                t-field="line.amount"
-                                            /></td>
-                                        <td name="td_due_date"><span
-                                                t-field="line.due_date"
-                                            /></td>
+                                        <td name="td_number">
+                                            <span t-field="line.sequence" />
+                                        </td>
+                                        <td name="td_invoice_number">
+                                            <span t-field="line.invoice_number" />
+                                        </td>
+                                        <td name="td_invoice_date">
+                                            <span t-field="line.invoice_date" />
+                                        </td>
+                                        <td name="td_customer">
+                                            <span t-field="line.partner_id" />
+                                        </td>
+                                        <td name="td_iban">
+                                            <span t-field="line.iban" />
+                                        </td>
+                                        <td name="td_amount">
+                                            <span t-field="line.amount" />
+                                        </td>
+                                        <td name="td_due_date">
+                                            <span t-field="line.due_date" />
+                                        </td>
                                     </tr>
                                     <t
                                         t-set="tot_amount"
@@ -120,8 +122,9 @@
                                 >
                                     <table class="table table-condensed">
                                         <tr class="border-black o_total">
-                                            <td name="td_amount_total_label"><strong
-                                                >Total</strong></td>
+                                            <td name="td_amount_total_label">
+                                                <strong>Total</strong>
+                                            </td>
                                             <td
                                                 name="td_amount_total"
                                                 class="text-right"

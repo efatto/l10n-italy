@@ -404,9 +404,7 @@ class RibaListLine(models.Model):
             total_credit = 0.0
             move = move_model.create(
                 {
-                    "ref": "{} RiBa {} - Line {}".format(
-                        line.invoice_number, line.slip_id.name, line.sequence
-                    ),
+                    "ref": f"{line.invoice_number} RiBa {line.slip_id.name} - Line {line.sequence}",
                     "journal_id": journal.id,
                     "date": line.due_date,
                 }
@@ -453,13 +451,7 @@ class RibaListLine(models.Model):
                 to_be_reconciled |= riba_move_line.move_line_id
             move_line_model.with_context(check_move_validity=False).create(
                 {
-                    "name": "{} RiBa {}-{} Ref. {} - {}".format(
-                        line.invoice_number,
-                        line.slip_id.name,
-                        line.sequence,
-                        riba_move_line_name,
-                        line.partner_id.name,
-                    ),
+                    "name": f"{line.invoice_number} RiBa {line.slip_id.name}-{line.sequence} Ref. {riba_move_line_name} - {line.partner_id.name}",
                     "account_id": (
                         line.acceptance_account_id.id
                         or line.slip_id.config_id.acceptance_account_id.id
@@ -523,10 +515,7 @@ class RibaListLine(models.Model):
 
             settlement_move_amount = settlement_move_line.debit
 
-            move_ref = "Settlement RiBa {} - {}".format(
-                riba_line.slip_id.name,
-                riba_line.partner_id.name,
-            )
+            move_ref = f"Settlement RiBa {riba_line.slip_id.name} - {riba_line.partner_id.name}"
             move_date = date or riba_line.due_date.strftime("%Y-%m-%d")
             settlement_move = move_model.create(
                 {

@@ -33,5 +33,4 @@
         <field name="state">code</field>
         <field name="code">action = records.action_riba_payment_date()</field>
     </record>
-
 </odoo>

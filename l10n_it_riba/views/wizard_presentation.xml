@@ -37,7 +37,6 @@
         <field name="res_model">presentation.riba.issue</field>
         <field name="target">new</field>
         <field name="view_id" ref="wizard_presentation_riba" />
-
     </record>
 
     <menuitem

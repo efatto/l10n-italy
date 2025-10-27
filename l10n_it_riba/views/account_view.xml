@@ -4,7 +4,6 @@
   ~ License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
   -->
 <odoo>
-
     <!-- ====================================================== -->
     <!--                     EXTRA FIELDS                       -->
     <!-- ====================================================== -->
@@ -27,10 +26,10 @@
         <field name="model">res.bank</field>
         <field name="inherit_id" ref="base.view_res_bank_form" />
         <field name="arch" type="xml">
-             <field name="bic" position="after">
+            <field name="bic" position="after">
                 <field name="banca_estera" />
-             </field>
-         </field>
+            </field>
+        </field>
     </record>
     <record id="view_partner_bank_sia_form" model="ir.ui.view">
         <field name="name">res.partner.bank.form.sia.inherit</field>
@@ -73,34 +72,34 @@
     <!-- RiBa To Issue - Filter -->
 
     <record id="riba_filter" model="ir.ui.view">
-    <field name="name">RiBa filter</field>
-    <field name="model">account.move.line</field>
-    <field name="inherit_id" ref="account_due_list.view_payments_filter" />
-    <field name="arch" type="xml">
-        <xpath expr="//search" position="inside">
-            <separator />
-            <filter
+        <field name="name">RiBa filter</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account_due_list.view_payments_filter" />
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator />
+                <filter
                     name="da_emettere"
                     string="RiBa To Issue"
                     domain="[('slip_line_ids', '=', False)]"
                 />
-            <filter
+                <filter
                     name="emesse"
                     string="Issued RiBas"
                     domain="[('slip_line_ids', '!=', False)]"
                 />
-            <separator />
-            <filter
+                <separator />
+                <filter
                     name="reconciled"
                     string="Reconciled"
                     domain="[('reconciled', '!=', False)]"
                 />
-            <filter
+                <filter
                     name="to_reconcile"
                     string="To Reconcile"
                     domain="[('reconciled', '=', False)]"
                 />
-            <separator />
+                <separator />
                 <filter
                     name="past_due"
                     string="Past Due"
@@ -126,7 +125,6 @@
         >{'search_default_da_emettere':1, 'search_default_to_reconcile':1}</field>
     </record>
 
-
     <menuitem
         name="Issue"
         parent="menu_riba"
@@ -144,7 +142,7 @@
             <xpath expr="//field[@name='invoice_payment_term_id']" position="after">
                 <field name="is_riba_payment" invisible="1" />
                 <field name="commercial_partner_id" invisible="1" />
-                 <field
+                <field
                     name="riba_partner_bank_id"
                     attrs="{'invisible': ['|',('is_riba_payment','=', False),('move_type','!=','out_invoice')], 'required': ['&amp;',('is_riba_payment','=', True),('move_type','=', 'out_invoice')]}"
                     domain="[('partner_id','=', commercial_partner_id)]"
@@ -194,7 +192,6 @@
         <field name="search_view_id" ref="account.view_account_invoice_filter" />
     </record>
 
-
     <record id="action_invoice_tree1_view1" model="ir.actions.act_window.view">
         <field eval="1" name="sequence" />
         <field name="view_mode">tree</field>
@@ -213,5 +210,4 @@
         id="menu_invoices"
         action="action_invoice_tree1"
     />
-
 </odoo>

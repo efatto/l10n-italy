@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-
     <record id="riba_due_date_settlement" model="ir.ui.view">
         <field name="name">riba.due.date.settlement.wizard</field>
         <field name="model">riba.due.date.settlement</field>
@@ -35,5 +34,4 @@
         <field name="state">code</field>
         <field name="code">action = records.action_riba_due_date_settlement()</field>
     </record>
-
 </odoo>
