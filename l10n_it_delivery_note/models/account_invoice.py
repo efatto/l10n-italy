@@ -112,7 +112,7 @@ class AccountInvoice(models.Model):
             context["lang"] = invoice.partner_id.lang
 
             if len(invoice.delivery_note_ids) == 1:
-                sequence = invoice.invoice_line_ids[0].sequence - 1
+                sequence = min(invoice.invoice_line_ids.mapped("sequence")) - 1
                 new_lines.append(
                     (
                         0,
@@ -123,7 +123,6 @@ class AccountInvoice(models.Model):
                     )
                 )
             else:
-                sequence = 1
                 done_invoice_lines = self.env["account.move.line"]
                 for dn in invoice.mapped("delivery_note_ids").sorted(key="name"):
                     dn_invoice_lines = invoice.invoice_line_ids.filtered(
@@ -147,6 +146,7 @@ class AccountInvoice(models.Model):
                                     note_line.delivery_note_id.id
                                 )
                     if dn_invoice_lines:
+                        sequence = min(dn_invoice_lines.mapped("sequence")) - 1
                         new_lines.append(
                             (
                                 0,
@@ -154,9 +154,6 @@ class AccountInvoice(models.Model):
                                 self._prepare_note_dn_value(sequence, dn),
                             )
                         )
-                        sequence += 1
-                    for invoice_line in dn_invoice_lines:
-                        invoice_line.sequence = sequence
                         sequence += 1
 
             invoice.write({"line_ids": new_lines})
