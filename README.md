@@ -24,7 +24,7 @@ addon | version | maintainers | summary
 [l10n_it_abicab](l10n_it_abicab/) | 18.0.1.0.0 | <a href='https://github.com/Borruso'><img src='https://github.com/Borruso.png' width='32' height='32' style='border-radius:50%;' alt='Borruso'/></a> | Base Bank ABI/CAB codes
 [l10n_it_accompanying_invoice](l10n_it_accompanying_invoice/) | 18.0.1.0.0 |  | Stampa della fattura accompagnatoria
 [l10n_it_account](l10n_it_account/) | 18.0.1.0.1 |  | Modulo base usato come dipendenza di altri moduli contabili
-[l10n_it_account_stamp](l10n_it_account_stamp/) | 18.0.1.1.1 |  | Gestione automatica dell'imposta di bollo
+[l10n_it_account_stamp](l10n_it_account_stamp/) | 18.0.1.2.0 |  | Gestione automatica dell'imposta di bollo
 [l10n_it_account_vat_period_end_settlement](l10n_it_account_vat_period_end_settlement/) | 18.0.1.0.2 |  | Allow to create the 'VAT Settlement'.
 [l10n_it_appointment_code](l10n_it_appointment_code/) | 18.0.1.0.0 |  | Aggiunge la tabella dei codici carica da usare nelle dichiarazioni fiscali italiane
 [l10n_it_ateco](l10n_it_ateco/) | 18.0.1.0.0 |  | ITA - Codici Ateco
