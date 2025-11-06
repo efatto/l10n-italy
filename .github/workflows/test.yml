@@ -53,6 +53,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - name: Install python_venv
+        run: pip3 install -e "git+https://github.com/efatto/openupgrader@16.0#egg=odoo-addon-python_venv&subdirectory=setup/python_venv"
+      - name: Install openupgrader
+        run: pip3 install -e "git+https://github.com/efatto/openupgrader@16.0#egg=odoo-addon-openupgrader&subdirectory=setup/openupgrader"
       - name: Install addons and dependencies
         run: oca_install_addons
       - name: Check licenses

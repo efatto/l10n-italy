@@ -21,6 +21,7 @@
         "account_tax_balance",
         "date_range",
         "web",
+        "openupgrader",
     ],
     "data": [
         "views/account_menuitem.xml",
