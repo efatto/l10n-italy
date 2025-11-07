@@ -200,7 +200,7 @@ class AccountPartialReconcile(models.Model):
         for wt_st in wt_statements:
             if wt_st.invoice_id.withholding_tax_no_generate_move:
                 continue
-            amount_wt = wt_st.get_wt_competence()
+            amount_wt = wt_st.get_wt_competence(self.amount)
             # Date maturity
             p_date_maturity = False
             payment_lines = wt_st.withholding_tax_id.payment_term.compute(
@@ -329,7 +329,7 @@ class AccountMove(models.Model):
         "invoice_line_ids.price_subtotal",
         "withholding_tax_line_ids.tax",
         "amount_total",
-        "amount_total_signed",
+        # "payment_move_line_ids",
     )
     def _compute_amount_withholding_tax(self):
         dp_obj = self.env["decimal.precision"]

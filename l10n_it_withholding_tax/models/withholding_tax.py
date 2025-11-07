@@ -2,7 +2,6 @@
 # Copyright 2018 Lorenzo Battistini - Agile Business Group
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-import warnings
 
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
@@ -277,25 +276,8 @@ class WithholdingTaxStatement(models.Model):
                     domain, limit=1
                 )
                 if wt_inv:
-                    # Compute how much has been already paid
-                    # but has no corresponding Withholding Tax move
-                    payment_moves = self.env["account.move"].browse()
-                    for (
-                        _partial,
-                        _amount,
-                        counterpart_line,
-                    ) in st.invoice_id._get_reconciled_invoices_partials():
-                        payment_moves |= counterpart_line.move_id
-                    # Exclude payments created for Withholding Taxes
-                    wt_moves = self.env["withholding.tax.move"].search(
-                        [("account_move_id", "in", payment_moves.ids)]
-                    )
-                    wt_payment_moves = wt_moves.wt_account_move_id
-                    no_wt_payment_moves = payment_moves - wt_payment_moves
-                    no_wt_paid_amount = sum(no_wt_payment_moves.mapped("amount_total"))
-
                     amount_base = st.invoice_id.amount_untaxed * (
-                        no_wt_paid_amount / st.invoice_id.amount_net_pay
+                        amount_reconcile / st.invoice_id.amount_net_pay
                     )
                     base = round(amount_base * wt_inv.base_coeff, 5)
                     amount_wt = round(
