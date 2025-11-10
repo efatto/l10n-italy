@@ -292,10 +292,10 @@ class WithholdingTaxStatement(models.Model):
                     )
                     wt_payment_moves = wt_moves.wt_account_move_id
                     no_wt_payment_moves = payment_moves - wt_payment_moves
-                    no_wt_paid_amount = sum(no_wt_payment_moves.mapped("amount_total"))
+                    sum(no_wt_payment_moves.mapped("amount_total"))
 
                     amount_base = st.invoice_id.amount_untaxed * (
-                        no_wt_paid_amount / st.invoice_id.amount_net_pay
+                        amount_reconcile / st.invoice_id.amount_net_pay
                     )
                     base = round(amount_base * wt_inv.base_coeff, 5)
                     amount_wt = round(
