@@ -205,7 +205,9 @@ class WithholdingTaxStatement(models.Model):
     _description = "Withholding Tax Statement"
     _order = "id desc"
 
-    @api.depends("move_ids.amount", "move_ids.state", "move_ids.reconcile_partial_id")
+    @api.depends(
+        "move_ids", "move_ids.amount", "move_ids.state", "move_ids.reconcile_partial_id"
+    )
     def _compute_total(self):
         for statement in self:
             tot_wt_amount = 0
@@ -295,12 +297,15 @@ class WithholdingTaxStatement(models.Model):
                     no_wt_paid_amount = sum(no_wt_payment_moves.mapped("amount_total"))
 
                     amount_base = st.invoice_id.amount_untaxed * (
-                        no_wt_paid_amount / st.invoice_id.amount_net_pay
+                        min(1, no_wt_paid_amount / st.invoice_id.amount_net_pay)
                     )
                     base = round(amount_base * wt_inv.base_coeff, 5)
                     amount_wt = round(
                         base * wt_inv.tax_coeff, dp_obj.precision_get("Account")
                     )
+                    if st.amount:
+                        # subtract already registered withholding amount
+                        amount_wt -= st.amount
                 if st.invoice_id.move_type in ["in_refund", "out_refund"]:
                     amount_wt = -1 * amount_wt
             return amount_wt

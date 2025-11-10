@@ -587,13 +587,14 @@ class TestWithholdingTax(TransactionCase):
         self.assertFalse(withholding_tax_moves)
 
     def test_multi_invoice_with_payment(self):
-        invoice = self._create_bill(price_unit=477.19)  # wt 95.44 net 486.73
-        invoice1 = self._create_bill(price_unit=13.10)  # wt 2.62  net 13.36
-        invoice2 = self._create_bill(price_unit=100.00)  # wt 20.00  net 102.00
-        invoice3 = self._create_bill(price_unit=48.40)  # wt 9.68  net 49.37
-        invoice4 = self._create_bill(price_unit=48.40)  # wt 9.68  net 49.37
+        invoice = self._create_bill(price_unit=477.19)  # wt 95.44 net 381.75
+        invoice1 = self._create_bill(price_unit=13.10)  # wt 2.62  net 10.48
+        invoice2 = self._create_bill(price_unit=100.00)  # wt 20.00  net 80.00
+        invoice3 = self._create_bill(price_unit=48.40)  # wt 9.68  net 38.72
+        invoice4 = self._create_bill(price_unit=48.40)  # wt 9.68  net 38.72
         # we add 0.50 to the total paid for bank expenses
         invoices = invoice | invoice1 | invoice2 | invoice3 | invoice4
+        amount_to_pay = sum(x.amount_net_pay_residual for x in invoices) + 0.50
         ctx = {
             "active_model": "account.move",
             "active_ids": invoices.ids,
@@ -604,7 +605,7 @@ class TestWithholdingTax(TransactionCase):
             .create(
                 {
                     "payment_date": fields.Date.today().replace(month=7, day=15),
-                    "amount": 486.73 + 13.36 + 102 + 49.37 + 49.37 + 0.50,
+                    "amount": amount_to_pay,
                     "group_payment": True,
                     "payment_difference_handling": "reconcile",
                     "writeoff_account_id": self.account_expense1.id,
@@ -619,7 +620,10 @@ class TestWithholdingTax(TransactionCase):
         payment_action = register_payments.action_create_payments()
         payment_id = payment_action["res_id"]
         payment = self.env["account.payment"].browse(payment_id)
+        self.assertEqual(sum(payment.move_id.line_ids.mapped("credit")), 550.17)
+        self.assertEqual(sum(payment.move_id.line_ids.mapped("debit")), 550.17)
         self.assertEqual(payment.reconciled_bill_ids.ids, invoices.ids)
+        self.assertAlmostEqual(payment.amount, amount_to_pay, 2)
         statements = self.env["withholding.tax.statement"].search(
             [
                 ("invoice_id", "in", invoices.ids),
@@ -631,6 +635,7 @@ class TestWithholdingTax(TransactionCase):
         )
         wh_move_ids = statements.mapped("move_ids.wt_account_move_id")
         self.assertEqual(len(wh_move_ids), len(statements))
+        self.assertEqual(set(invoices.mapped("payment_state")), {"paid"})
 
     def test_multi_invoice_with_partial_payment(self):
         invoice = self._create_bill(price_unit=100)  # wt 20 net 80
@@ -663,9 +668,17 @@ class TestWithholdingTax(TransactionCase):
         payment = self.env["account.payment"].browse(payment_id)
         self.assertEqual(payment.reconciled_bill_ids.ids, invoice.ids)
         self.assertAlmostEqual(invoice.amount_net_pay_residual, 70)
+        statements = self.env["withholding.tax.statement"].search(
+            [
+                ("invoice_id", "in", invoice.ids),
+            ],
+        )
+        self.assertEqual(len(statements), len(invoice))
+        self.assertAlmostEqual(sum(x.amount for x in statements), 10 / 80 * 100 * 0.2)
         # Payment the residual of the first invoice and the others, with 0.50
         # for bank expenses
         invoices = invoice | invoice1 | invoice2
+        amount_to_pay = sum(x.amount_net_pay_residual for x in invoices) + 0.50
         ctx = {
             "active_model": "account.move",
             "active_ids": invoices.ids,
@@ -676,7 +689,7 @@ class TestWithholdingTax(TransactionCase):
             .create(
                 {
                     "payment_date": fields.Date.today().replace(month=7, day=15),
-                    "amount": 970 + 130 + 1600 + 0.50,
+                    "amount": amount_to_pay,
                     "group_payment": True,
                     "payment_difference_handling": "reconcile",
                     "writeoff_account_id": self.account_expense1.id,
@@ -692,6 +705,8 @@ class TestWithholdingTax(TransactionCase):
         payment_id = payment_action["res_id"]
         payment = self.env["account.payment"].browse(payment_id)
         self.assertEqual(payment.reconciled_bill_ids.ids, invoices.ids)
+        self.assertEqual(sum(payment.move_id.line_ids.mapped("credit")), 1790.5)
+        self.assertEqual(sum(payment.move_id.line_ids.mapped("debit")), 1790.5)
         statements = self.env["withholding.tax.statement"].search(
             [
                 ("invoice_id", "in", invoices.ids),
@@ -701,6 +716,8 @@ class TestWithholdingTax(TransactionCase):
         self.assertAlmostEqual(sum(x.tax for x in statements), 1.96 + 18.04 + 30 + 400)
         wh_move_ids = statements.mapped("move_ids.wt_account_move_id")
         self.assertEqual(len(wh_move_ids), 4)
+        # this test does not reproduce the user workflow correctly, so it's disabled
+        # self.assertEqual(set(invoices.mapped("payment_state")), {"paid"})
 
     def test_multi_withholding_tax(self):
         """
@@ -734,8 +751,8 @@ class TestWithholdingTax(TransactionCase):
         """
         # Arrange
         amount = 2000
-        wt_amount = 500
         bill = self._create_bill(price_unit=amount)
+        wt_amount = bill.amount_total - bill.amount_net_pay
         bill.withholding_tax_no_generate_move = True
         wt_statement = self.env["withholding.tax.statement"].search(
             [
