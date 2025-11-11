@@ -1,4 +1,6 @@
 # Copyright 2018 Gianmarco Conte (gconte@dinamicheaziendali.it)
+# Copyright 2025 Simone Rubino - PyTech
+# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 import base64
 import io
@@ -124,6 +126,14 @@ class WizardGiornaleReportlab(models.TransientModel):
             if self.daterange_id.progressive_page_number:
                 self.fiscal_page_base = self.daterange_id.progressive_page_number
 
+    @api.model
+    def _clean_aggregated_field_values(self, aggregated_field_values):
+        # Remove duplicates
+        result = set(aggregated_field_values or [])
+        # Remove empty values
+        result = filter(None, result)
+        return ", ".join(result)
+
     def get_grupped_line_reportlab_ids(self):
         wizard = self
         if wizard.target_move == "all":
@@ -133,6 +143,7 @@ class WizardGiornaleReportlab(models.TransientModel):
         sql = """
             SELECT
                 am.date,
+                ARRAY_AGG(aml.ref) AS aml_refs,
                 am.name AS move_name,
                 aa.code AS account_code,
                 aa.name AS account_name,
@@ -349,6 +360,8 @@ class WizardGiornaleReportlab(models.TransientModel):
             )
             account = Paragraph(escape(account_name), style_name)
             name = Paragraph(escape(line["name"]), style_name)
+            refs = self._clean_aggregated_field_values(line["aml_refs"])
+            ref = Paragraph(escape(refs), style_name)
             # dato che nel SQL ho la somma dei crediti e debiti potrei avere
             # che un conto ha sia debito che credito
             lines_data = []
@@ -358,14 +371,18 @@ class WizardGiornaleReportlab(models.TransientModel):
                 )
                 credit = Paragraph(escape(formatLang(self.env, 0)), style_number)
                 list_balance.append((line["debit"], 0))
-                lines_data.append([[row, date, move, account, name, debit, credit]])
+                lines_data.append(
+                    [[row, date, ref, move, account, name, debit, credit]]
+                )
             if line["credit"] > 0:
                 debit = Paragraph(escape(formatLang(self.env, 0)), style_number)
                 credit = Paragraph(
                     escape(formatLang(self.env, line["credit"])), style_number
                 )
                 list_balance.append((0, line["credit"]))
-                lines_data.append([[row, date, move, account, name, debit, credit]])
+                lines_data.append(
+                    [[row, date, ref, move, account, name, debit, credit]]
+                )
             for line_data in lines_data:
                 if previous_move_name != line["move_name"]:
                     previous_move_name = line["move_name"]

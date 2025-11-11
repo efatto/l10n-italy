@@ -8,11 +8,14 @@ from datetime import datetime
 
 from dateutil.rrule import MONTHLY
 
-from odoo.tests.common import Form, SavepointCase
+from odoo.tests.common import Form, tagged
 from odoo.tools import pdf
 
+from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
-class TestCentralJournalReportlab(SavepointCase):
+
+@tagged("post_install", "-at_install")
+class TestCentralJournalReportlab(AccountTestInvoicingCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -39,6 +42,9 @@ class TestCentralJournalReportlab(SavepointCase):
         cls.report_model = cls.env["ir.actions.report"]
         cls.report_name = "l10n_it_central_journal_reportlab.report_giornale_reportlab"
         cls.journals = cls.env["account.journal"].search([])
+        cls.invoice = cls.init_invoice(
+            "out_invoice", amounts=[100], invoice_date=cls.today, post=True
+        )
 
     def test_wizard_reportlab(self):
         wizard_form = Form(self.wizard_model)
@@ -61,3 +67,26 @@ class TestCentralJournalReportlab(SavepointCase):
         self.minimal_reader_buffer = io.BytesIO(decode_giornale)
         self.minimal_pdf_reader = pdf.OdooPdfFileReader(self.minimal_reader_buffer)
         self.assertTrue(self.minimal_reader_buffer)
+
+    def test_grouped_report(self):
+        # Arrange
+        wizard_form = Form(self.wizard_model)
+        wizard_form.daterange_id = self.current_period
+        wizard_form.group_by_account = True
+        wizard = wizard_form.save()
+        wizard.year_footer = self.today.year + 1
+        wizard.fiscal_page_base = 99
+        invoice = self.invoice
+        line_ref = "Test Reference"
+        invoice.invoice_line_ids.ref = line_ref
+
+        # Act
+        wizard.print_giornale_reportlab()
+
+        # Assert
+        pdf_content = base64.b64decode(wizard.report_giornale)
+        pdf_reader = pdf.OdooPdfFileReader(io.BytesIO(pdf_content))
+        content = ""
+        for page in pdf_reader.pages:
+            content += page.extractText()
+        self.assertIn(line_ref, content)
