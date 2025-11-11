@@ -90,3 +90,4 @@ class TestCentralJournalReportlab(AccountTestInvoicingCommon):
         for page in pdf_reader.pages:
             content += page.extractText()
         self.assertIn(line_ref, content)
+        self.assertIn(invoice.partner_id.name, content)

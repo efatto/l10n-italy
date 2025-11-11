@@ -146,14 +146,17 @@ class WizardGiornaleReportlab(models.TransientModel):
                 ARRAY_AGG(aml.ref) AS aml_refs,
                 am.name AS move_name,
                 aa.code AS account_code,
+                aa.internal_type AS account_type,
                 aa.name AS account_name,
                 COALESCE(am.ref, '') AS name,
+                ARRAY_AGG(rp.name) AS partner_names,
                 SUM(aml.debit) AS debit,
                 SUM(aml.credit) AS credit
             FROM
                 account_move_line aml
                 LEFT JOIN account_move am ON (am.id = aml.move_id)
                 LEFT JOIN account_account aa ON (aa.id = aml.account_id)
+                LEFT JOIN res_partner rp ON (rp.id = am.partner_id)
             WHERE
                 aa.code IS NOT NULL
                 AND aa.name IS NOT NULL
@@ -165,6 +168,7 @@ class WizardGiornaleReportlab(models.TransientModel):
                 am.date,
                 am.name,
                 aa.code,
+                aa.internal_type,
                 aa.name,
                 am.ref
             ORDER BY
@@ -359,7 +363,13 @@ class WizardGiornaleReportlab(models.TransientModel):
                 else line["account_name"]
             )
             account = Paragraph(escape(account_name), style_name)
-            name = Paragraph(escape(line["name"]), style_name)
+            if line["account_type"] in ["receivable", "payable"]:
+                partner_names = self._clean_aggregated_field_values(
+                    line["partner_names"]
+                )
+                name = Paragraph(escape(partner_names), style_name)
+            else:
+                name = Paragraph(escape(line["name"]), style_name)
             refs = self._clean_aggregated_field_values(line["aml_refs"])
             ref = Paragraph(escape(refs), style_name)
             # dato che nel SQL ho la somma dei crediti e debiti potrei avere
