@@ -1,4 +1,5 @@
 # Copyright 2022 Giuseppe Borruso
+# Copyright 2025 Simone Rubino - PyTech
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
 
 import base64
@@ -7,36 +8,37 @@ from datetime import datetime
 
 from dateutil.rrule import MONTHLY
 
-from odoo.tests.common import Form, TransactionCase
+from odoo.tests.common import Form, SavepointCase
 from odoo.tools import pdf
 
 
-class TestCentralJournalReportlab(TransactionCase):
-    def setUp(self):
-        super(TestCentralJournalReportlab, self).setUp()
+class TestCentralJournalReportlab(SavepointCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
 
-        self.today = datetime.now()
-        self.range_type = self.env["date.range.type"].create({"name": "Fiscal year"})
-        self.env["date.range.generator"].create(
+        cls.today = datetime.now()
+        cls.range_type = cls.env["date.range.type"].create({"name": "Fiscal year"})
+        cls.env["date.range.generator"].create(
             {
-                "date_start": "%s-01-01" % self.today.year,
-                "name_prefix": "%s-" % self.today.year,
-                "type_id": self.range_type.id,
+                "date_start": "%s-01-01" % cls.today.year,
+                "name_prefix": "%s-" % cls.today.year,
+                "type_id": cls.range_type.id,
                 "duration_count": 1,
                 "unit_of_time": str(MONTHLY),
                 "count": 12,
             }
         ).action_apply()
-        self.current_period = self.env["date.range"].search(
+        cls.current_period = cls.env["date.range"].search(
             [
-                ("date_start", "<=", self.today.date()),
-                ("date_end", ">=", self.today.date()),
+                ("date_start", "<=", cls.today.date()),
+                ("date_end", ">=", cls.today.date()),
             ]
         )
-        self.wizard_model = self.env["wizard.giornale.reportlab"]
-        self.report_model = self.env["ir.actions.report"]
-        self.report_name = "l10n_it_central_journal_reportlab.report_giornale_reportlab"
-        self.journals = self.env["account.journal"].search([])
+        cls.wizard_model = cls.env["wizard.giornale.reportlab"]
+        cls.report_model = cls.env["ir.actions.report"]
+        cls.report_name = "l10n_it_central_journal_reportlab.report_giornale_reportlab"
+        cls.journals = cls.env["account.journal"].search([])
 
     def test_wizard_reportlab(self):
         wizard_form = Form(self.wizard_model)
