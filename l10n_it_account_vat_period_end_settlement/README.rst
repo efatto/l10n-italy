@@ -1,7 +1,3 @@
-.. image:: https://odoo-community.org/readme-banner-image
-   :target: https://odoo-community.org/get-involved?utm_source=readme
-   :alt: Odoo Community Association
-
 ======================
 ITA - Liquidazione IVA
 ======================
@@ -17,7 +13,7 @@ ITA - Liquidazione IVA
 .. |badge1| image:: https://img.shields.io/badge/maturity-Beta-yellow.png
     :target: https://odoo-community.org/page/development-status
     :alt: Beta
-.. |badge2| image:: https://img.shields.io/badge/license-AGPL--3-blue.png
+.. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fl10n--italy-lightgray.png?logo=github
@@ -123,6 +119,10 @@ Configuration
    da utilizzare (conto e percentuale) nei dati aziendali, nella scheda
    'Liquidazione IVA'.
 
+   Per le imposte interamente indetraibili è comunque necessario
+   indicare una riga di ripartizione a 0% che faccia riferimento ad un
+   conto IVA.
+
 **English**
 
    In order to generate VAT Settlement's periods, open Accounting >
@@ -146,6 +146,9 @@ Configuration
    If you need to calculate interest, you can add default information in
    your company data (percentage and account), in the 'VAT Settlement'
    tab.
+
+   Fully undeductable taxes still need one repartition line (0% amount)
+   with a reference to a VAT account.
 
 Bug Tracker
 ===========
