@@ -68,6 +68,14 @@ class TestCentralJournalReportlab(AccountTestInvoicingCommon):
         self.minimal_pdf_reader = pdf.OdooPdfFileReader(self.minimal_reader_buffer)
         self.assertTrue(self.minimal_reader_buffer)
 
+    def _get_report_content(self, wizard):
+        pdf_content = base64.b64decode(wizard.report_giornale)
+        pdf_reader = pdf.OdooPdfFileReader(io.BytesIO(pdf_content))
+        content = ""
+        for page in pdf_reader.pages:
+            content += page.extractText()
+        return content
+
     def test_grouped_report(self):
         # Arrange
         wizard_form = Form(self.wizard_model)
@@ -84,11 +92,7 @@ class TestCentralJournalReportlab(AccountTestInvoicingCommon):
         wizard.print_giornale_reportlab()
 
         # Assert
-        pdf_content = base64.b64decode(wizard.report_giornale)
-        pdf_reader = pdf.OdooPdfFileReader(io.BytesIO(pdf_content))
-        content = ""
-        for page in pdf_reader.pages:
-            content += page.extractText()
+        content = self._get_report_content(wizard)
         self.assertIn(line_ref, content)
         self.assertIn(invoice.partner_id.name, content)
 
@@ -153,11 +157,7 @@ class TestCentralJournalReportlab(AccountTestInvoicingCommon):
         wizard.print_giornale_reportlab()
 
         # Assert
-        pdf_content = base64.b64decode(wizard.report_giornale)
-        pdf_reader = pdf.OdooPdfFileReader(io.BytesIO(pdf_content))
-        content = ""
-        for page in pdf_reader.pages:
-            content += page.extractText()
+        content = self._get_report_content(wizard)
         self.assertNotIn(move.ref, content)
         self.assertIn(invoice.ref, content)
 
@@ -188,11 +188,7 @@ class TestCentralJournalReportlab(AccountTestInvoicingCommon):
         wizard.print_giornale_reportlab()
 
         # Assert
-        pdf_content = base64.b64decode(wizard.report_giornale)
-        pdf_reader = pdf.OdooPdfFileReader(io.BytesIO(pdf_content))
-        content = ""
-        for page in pdf_reader.pages:
-            content += page.extractText()
+        content = self._get_report_content(wizard)
         self.assertIn(move.ref, content)
         self.assertIn(invoice.ref, content)
 
@@ -223,11 +219,7 @@ class TestCentralJournalReportlab(AccountTestInvoicingCommon):
         wizard.print_giornale_reportlab()
 
         # Assert
-        pdf_content = base64.b64decode(wizard.report_giornale)
-        pdf_reader = pdf.OdooPdfFileReader(io.BytesIO(pdf_content))
-        content = ""
-        for page in pdf_reader.pages:
-            content += page.extractText()
+        content = self._get_report_content(wizard)
         self.assertNotIn(move.ref, content)
         self.assertIn(invoice.ref, content)
 
@@ -258,10 +250,6 @@ class TestCentralJournalReportlab(AccountTestInvoicingCommon):
         wizard.print_giornale_reportlab()
 
         # Assert
-        pdf_content = base64.b64decode(wizard.report_giornale)
-        pdf_reader = pdf.OdooPdfFileReader(io.BytesIO(pdf_content))
-        content = ""
-        for page in pdf_reader.pages:
-            content += page.extractText()
+        content = self._get_report_content(wizard)
         self.assertIn(move.ref, content)
         self.assertIn(invoice.ref, content)
