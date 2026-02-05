@@ -1,7 +1,3 @@
-.. image:: https://odoo-community.org/readme-banner-image
-   :target: https://odoo-community.org/get-involved?utm_source=readme
-   :alt: Odoo Community Association
-
 ======================
 ITA - Gestione Cespiti
 ======================
@@ -17,7 +13,7 @@ ITA - Gestione Cespiti
 .. |badge1| image:: https://img.shields.io/badge/maturity-Beta-yellow.png
     :target: https://odoo-community.org/page/development-status
     :alt: Beta
-.. |badge2| image:: https://img.shields.io/badge/license-AGPL--3-blue.png
+.. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fl10n--italy-lightgray.png?logo=github
@@ -88,22 +84,23 @@ Authors
 Contributors
 ------------
 
-- Alessandro Camilli <alessandrocamilli@openforce.it>
-- Silvio Gregorini <silviogregorini@openforce.it>
-- Stefano Pezzini <stefanopezzini@openforce.it>
-- Lorenzo Battistini <lb@takobi.online>
-- `TAKOBI <https://takobi.online>`__:
+-  Alessandro Camilli <alessandrocamilli@openforce.it>
+-  Silvio Gregorini <silviogregorini@openforce.it>
+-  Stefano Pezzini <stefanopezzini@openforce.it>
+-  Lorenzo Battistini <lb@takobi.online>
+-  `TAKOBI <https://takobi.online>`__:
 
-  - Simone Rubino <sir@takobi.online>
+   -  Simone Rubino <sir@takobi.online>
 
-- `Aion Tech <https://aiontech.company/>`__:
+-  `Aion Tech <https://aiontech.company/>`__:
 
-  - Simone Rubino <simone.rubino@aion-tech.it>
+   -  Simone Rubino <simone.rubino@aion-tech.it>
 
-- Nextev Srl <odoo@nextev.it>
+-  Nextev Srl <odoo@nextev.it>
 
 Base icon made by `surang <https://www.flaticon.com/authors/surang>`__
-from `www.flaticon.com <http://www.flaticon.com>`__.
+from
+[`www.flaticon.com](https://www.flaticon.com/) <http://www.flaticon.com](https://www.flaticon.com/)>`__.
 
 Maintainers
 -----------
