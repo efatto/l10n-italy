@@ -19,18 +19,8 @@ msgstr ""
 
 #. module: l10n_it_riba_oca
 #: model_terms:ir.ui.view,arch_db:l10n_it_riba_oca.view_account_config_settings_riba
-msgid ""
-"<span class=\"o_form_label\">RiBa Collection Fees</span>\n"
-"                        <span class=\"fa fa-lg fa-building-o\" "
-"title=\"Product used as Service for RiBa Collection Fees\" aria-"
-"label=\"Product used as Service for RiBa Collection Fees\" "
-"groups=\"base.group_multi_company\" role=\"img\"/>"
+msgid "<span class=\"o_form_label\">RiBa Collection Fees</span>"
 msgstr ""
-"<span class=\"o_form_label\">Spese di incasso RiBa</span>\n"
-"                        <span class=\"fa fa-lg fa-building-o\" "
-"title=\"Prodotto usato come servizio per le spese di incasso RiBa\" aria-"
-"label=\"Prodotto usato come servizio per le spese di incasso RiBa\" "
-"groups=\"base.group_multi_company\" role=\"img\"/>"
 
 #. module: l10n_it_riba_oca
 #: model_terms:ir.ui.view,arch_db:l10n_it_riba_oca.slip_qweb
@@ -1616,6 +1606,19 @@ msgstr "del"
 #: code:addons/l10n_it_riba_oca/models/account.py:0
 msgid "{line_name} for {month}-{year}"
 msgstr "{line_name} per {month}-{year}"
+
+#~ msgid ""
+#~ "<span class=\"o_form_label\">RiBa Collection Fees</span>\n"
+#~ "                        <span class=\"fa fa-lg fa-building-o\" "
+#~ "title=\"Product used as Service for RiBa Collection Fees\" aria-"
+#~ "label=\"Product used as Service for RiBa Collection Fees\" "
+#~ "groups=\"base.group_multi_company\" role=\"img\"/>"
+#~ msgstr ""
+#~ "<span class=\"o_form_label\">Spese di incasso RiBa</span>\n"
+#~ "                        <span class=\"fa fa-lg fa-building-o\" "
+#~ "title=\"Prodotto usato come servizio per le spese di incasso RiBa\" aria-"
+#~ "label=\"Prodotto usato come servizio per le spese di incasso RiBa\" "
+#~ "groups=\"base.group_multi_company\" role=\"img\"/>"
 
 #, python-format
 #~ msgid "A/C Bank"
