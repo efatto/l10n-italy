@@ -163,7 +163,7 @@ repos:
           - --header
           - "# generated from manifests external_dependencies"
   - repo: https://github.com/PyCQA/flake8
-    rev: 5.0.0
+    rev: 6.1.0
     hooks:
       - id: flake8
         name: flake8
