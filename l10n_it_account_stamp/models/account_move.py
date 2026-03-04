@@ -55,7 +55,7 @@ class AccountMove(models.Model):
         "invoice_date",
         "move_type",
         "manually_apply_tax_stamp",
-        "line_ids.tax_ids",
+        "invoice_line_ids.tax_ids",
     )
     def _compute_tax_stamp(self):
         for invoice in self:
