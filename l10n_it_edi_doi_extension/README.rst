@@ -1,7 +1,3 @@
-.. image:: https://odoo-community.org/readme-banner-image
-   :target: https://odoo-community.org/get-involved?utm_source=readme
-   :alt: Odoo Community Association
-
 =====================================
 Declaration of Intent for Italy (OCA)
 =====================================
@@ -17,7 +13,7 @@ Declaration of Intent for Italy (OCA)
 .. |badge1| image:: https://img.shields.io/badge/maturity-Beta-yellow.png
     :target: https://odoo-community.org/page/development-status
     :alt: Beta
-.. |badge2| image:: https://img.shields.io/badge/license-AGPL--3-blue.png
+.. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fl10n--italy-lightgray.png?logo=github
@@ -40,11 +36,11 @@ vendor bills and purchase orders.
 
 Key features:
 
-- Support for multiple Declarations of Intent per invoice
-- Dedicated tab in invoice form for managing DOI associations
-- Automatic validation of DOI amounts and available thresholds
-- Smart warnings when invoice amounts don't match DOI coverage
-- Backward compatibility with single-declaration workflow
+-  Support for multiple Declarations of Intent per invoice
+-  Dedicated tab in invoice form for managing DOI associations
+-  Automatic validation of DOI amounts and available thresholds
+-  Smart warnings when invoice amounts don't match DOI coverage
+-  Backward compatibility with single-declaration workflow
 
 **Italiano**
 
@@ -54,11 +50,11 @@ ingresso e gli ordini di acquisto.
 
 Caratteristiche principali:
 
-- Supporto per dichiarazioni di intento multiple per fattura
-- Tab dedicato nel form fattura per gestire le associazioni DOI
-- Validazione automatica degli importi e soglie disponibili
-- Avvisi intelligenti quando gli importi non corrispondono
-- Retrocompatibilità con il flusso a dichiarazione singola
+-  Supporto per dichiarazioni di intento multiple per fattura
+-  Tab dedicato nel form fattura per gestire le associazioni DOI
+-  Validazione automatica degli importi e soglie disponibili
+-  Avvisi intelligenti quando gli importi non corrispondono
+-  Retrocompatibilità con il flusso a dichiarazione singola
 
 **Table of contents**
 
@@ -76,8 +72,8 @@ for the Declaration of Intent for incoming vendor bills.
 In the contacts, you can create a Declaration of Intent by choosing
 between two types:
 
-- "Issued from company": for declarations issued by the company.
-- "Received from customer": for declarations received from suppliers.
+-  "Issued from company": for declarations issued by the company.
+-  "Received from customer": for declarations received from suppliers.
 
 **Multiple Declarations of Intent:**
 
@@ -89,10 +85,10 @@ Declarations of Intent:
 3. For each declaration, specify the amount to be covered
 4. The module will automatically:
 
-   - Validate that amounts don't exceed available thresholds
-   - Show a warning if total DOI amounts don't match invoice amount
-   - Update the invoiced amounts on each declaration
-   - Generate protocol numbers in the XML export
+   -  Validate that amounts don't exceed available thresholds
+   -  Show a warning if total DOI amounts don't match invoice amount
+   -  Update the invoiced amounts on each declaration
+   -  Generate protocol numbers in the XML export
 
 You can also use the traditional single-declaration field for backward
 compatibility, or mix both approaches for different invoices.
@@ -104,8 +100,9 @@ dedicata alla Dichiarazione di Intento per le fatture in ingresso. Nei
 contatti è possibile creare una Dichiarazione di Intento scegliendo tra
 due tipologie:
 
-- "Issued from company": per le dichiarazioni emesse dall'azienda.
-- "Received from customer": per le dichiarazioni ricevute dai fornitori.
+-  "Issued from company": per le dichiarazioni emesse dall'azienda.
+-  "Received from customer": per le dichiarazioni ricevute dai
+   fornitori.
 
 **Dichiarazioni di Intento Multiple:**
 
@@ -117,11 +114,11 @@ possibile associare più Dichiarazioni di Intento:
 3. Per ogni dichiarazione, specifica l'importo da coprire
 4. Il modulo automaticamente:
 
-   - Valida che gli importi non superino le soglie disponibili
-   - Mostra un avviso se il totale DOI non corrisponde all'importo
-     fattura
-   - Aggiorna gli importi fatturati su ogni dichiarazione
-   - Genera i numeri di protocollo nell'esportazione XML
+   -  Valida che gli importi non superino le soglie disponibili
+   -  Mostra un avviso se il totale DOI non corrisponde all'importo
+      fattura
+   -  Aggiorna gli importi fatturati su ogni dichiarazione
+   -  Genera i numeri di protocollo nell'esportazione XML
 
 È possibile continuare ad usare il campo tradizionale a dichiarazione
 singola per retrocompatibilità, o combinare entrambi gli approcci per
@@ -148,7 +145,10 @@ Authors
 Contributors
 ------------
 
-- Nextev Srl<odoo@nextev.it>
+-  Nextev Srl<odoo@nextev.it>
+-  `Stesi Consulting <https://www.stesi.consulting>`__:
+
+   -  Michele Di Croce <dicroce.m@stesi.consulting>
 
 Maintainers
 -----------
