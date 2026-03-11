@@ -13,6 +13,7 @@ from odoo.addons.base.models.ir_qweb_fields import Markup, nl2br, nl2br_enclose
 from odoo.addons.l10n_it_account.migration_tools import _remove_module
 
 OLD_MODULES = [
+    "l10n_it_account_tax_kind",
     "l10n_it_fatturapa_in_purchase",
     "l10n_it_fatturapa_in_rc",
     "l10n_it_fatturapa_in",
@@ -23,13 +24,17 @@ OLD_MODULES = [
     "l10n_it_fiscal_payment_term",
     "l10n_it_fiscalcode",
     "l10n_it_ipa",
+    "l10n_it_payment_reason",
     "l10n_it_pec",
     "l10n_it_rea",
     "l10n_it_reverse_charge_start_end_dates",
     "l10n_it_reverse_charge",
+    "l10n_it_split_payment",
     "l10n_it_vat_payability",
     "l10n_it_vat_registries_rc",
     "l10n_it_vat_settlement_date_rc",
+    "l10n_it_withholding_tax_reason",
+    "l10n_it_withholding_tax",
 ]
 
 
@@ -966,7 +971,57 @@ def _l10n_it_vat_payability_pre_migration(env):
         openupgrade.logged_query(env.cr, query)
 
 
+def _delete_old_module_views(env):
+    """Delete views from old invoicing modules no longer present in v18.
+
+    These are the base modules typically installed alongside
+    l10n_it_fatturapa_in and l10n_it_fatturapa_out in v16.
+    Uses a recursive CTE to delete child views before parent views,
+    avoiding FK violations on ir_ui_view.inherit_id.
+    """
+    installed_old_modules = [
+        m for m in OLD_MODULES if openupgrade.is_module_installed(env.cr, m)
+    ]
+    if not installed_old_modules:
+        return
+
+    # Collect all view IDs owned by old modules
+    env.cr.execute(
+        """
+        SELECT ARRAY_AGG(imd.res_id)
+        FROM ir_model_data imd
+        WHERE imd.module = ANY(%s)
+        AND imd.model = 'ir.ui.view'
+        """,
+        (installed_old_modules,),
+    )
+    view_ids = env.cr.fetchone()[0]
+    if not view_ids:
+        return
+
+    # Recursive CTE: find views and all their descendants,
+    # then delete everything
+    openupgrade.logged_query(
+        env.cr,
+        """
+        WITH RECURSIVE view_tree AS (
+            SELECT id, inherit_id
+            FROM ir_ui_view
+            WHERE id = ANY(%s)
+            UNION
+            SELECT v.id, v.inherit_id
+            FROM ir_ui_view v
+            JOIN view_tree vt ON v.inherit_id = vt.id
+        )
+        DELETE FROM ir_ui_view
+        WHERE id IN (SELECT id FROM view_tree)
+        """,
+        (view_ids,),
+    )
+
+
 def _l10n_it_edi_extension_pre_init_hook(env):
+    _delete_old_module_views(env)
     for module in OLD_MODULES:
         migration_function = globals().get(f"_{module}_pre_migration")
         if openupgrade.is_module_installed(env.cr, module) and migration_function:
