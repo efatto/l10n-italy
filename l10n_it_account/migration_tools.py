@@ -1,3 +1,4 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 # Common methods for migrations
 from openupgradelib import openupgrade
 
@@ -16,4 +17,45 @@ def _remove_module(env, module_name):
         dict(
             module_name=module_name,
         ),
+    )
+
+
+def remove_modules_views(cr, modules):
+    """Remove the views registered by the given modules and any view inheriting
+    them.
+
+    ``modules`` can be a single module name or a list of module names.
+
+    Uses a recursive CTE so that:
+     - inherited views are deleted before their parents (no FK violation)
+     - all ir_model_data rows for deleted views are removed (no orphans)
+    """
+    if isinstance(modules, str):
+        modules = [modules]
+    if not modules:
+        return
+    openupgrade.logged_query(
+        cr,
+        """
+        WITH RECURSIVE views_to_delete AS (
+            SELECT v.id
+            FROM ir_ui_view v
+            JOIN ir_model_data imd
+                ON imd.model = 'ir.ui.view'
+               AND imd.res_id = v.id
+               AND imd.module = ANY(%s)
+            UNION ALL
+            SELECT v.id
+            FROM ir_ui_view v
+            JOIN views_to_delete vtd ON v.inherit_id = vtd.id
+        ),
+        deleted_imd AS (
+            DELETE FROM ir_model_data
+            WHERE model = 'ir.ui.view'
+              AND res_id IN (SELECT id FROM views_to_delete)
+        )
+        DELETE FROM ir_ui_view
+        WHERE id IN (SELECT id FROM views_to_delete)
+        """,
+        (list(modules),),
     )
