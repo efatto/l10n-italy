@@ -7,6 +7,7 @@ from odoo.addons.l10n_it_account.migration_tools import _remove_module
 
 OLD_MODULES = [
     "l10n_it_account_tax_kind",
+    "l10n_it_declaration_of_intent",
     "l10n_it_fatturapa",
     "l10n_it_fatturapa_pec",
 ]
@@ -99,9 +100,26 @@ def _l10n_it_account_tax_kind_migration(env):
     )
 
 
+def _l10n_it_declaration_of_intent_migration(env):
+    """
+    Install "l10n_it_edi_doi_extension" which replaces the old
+    l10n_it_declaration_of_intent module.
+    """
+    openupgrade.logged_query(
+        env.cr,
+        """
+        UPDATE ir_module_module
+        SET state = 'to install'
+        WHERE name = 'l10n_it_edi_doi_extension'
+        AND state = 'uninstalled'
+        """,
+    )
+
+
 def _l10n_it_fatturapa_migration(env):
     """
-    Remove exclusion for installation of "l10n_it_edi"
+    Remove exclusion for installation of "l10n_it_edi" and install
+    "l10n_it_edi_extension" which replaces the old l10n_it_fatturapa modules.
     """
     query = """
         DELETE
@@ -109,6 +127,15 @@ def _l10n_it_fatturapa_migration(env):
         WHERE name = 'l10n_it_edi'
     """
     openupgrade.logged_query(env.cr, query)
+    openupgrade.logged_query(
+        env.cr,
+        """
+        UPDATE ir_module_module
+        SET state = 'to install'
+        WHERE name = 'l10n_it_edi_extension'
+        AND state = 'uninstalled'
+        """,
+    )
 
 
 def _l10n_it_fatturapa_pec_migration(env):
