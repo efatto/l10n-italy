@@ -1,6 +1,10 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 # Common methods for migrations
+import logging
+
 from openupgradelib import openupgrade
+
+_logger = logging.getLogger(__name__)
 
 
 def _remove_module(env, module_name):
@@ -59,3 +63,27 @@ def remove_modules_views(cr, modules):
         """,
         (list(modules),),
     )
+    cr.execute(
+        """
+        SELECT module, name, id from ir_model_data
+        WHERE model = 'ir.ui.menu'
+        AND module = ANY(%s)
+        """,
+        (list(modules),),
+    )
+    menus = cr.fetchall()
+    if menus:
+        deleted_menus = "\n".join(
+            f"module: {menu[0]}: name: {menu[1]}, id (ir.model.data): {menu[2]}"
+            for menu in menus
+        )
+        _logger.info(f"Deleted menus: {deleted_menus}")
+        openupgrade.logged_query(
+            cr,
+            """
+            DELETE from ir_model_data
+            WHERE model = 'ir.ui.menu'
+            AND module = ANY(%s)
+            """,
+            (list(modules),),
+        )
