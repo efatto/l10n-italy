@@ -167,3 +167,85 @@ class AccountInvoice(models.Model):
         dn_lines.sync_invoice_status()
         dn_lines.delivery_note_id._compute_invoice_status()
         dn_lines.delivery_note_id.state = "confirm"
+
+    def _l10n_it_edi_invoice_is_direct(self):
+        """An invoice is direct if ddt are all done the same day as the invoice."""
+        if self.delivery_note_ids:
+            return all(
+                ddt.date and ddt.date == self.invoice_date
+                for ddt in self.delivery_note_ids
+            )
+        return super()._l10n_it_edi_invoice_is_direct()
+
+    def _l10n_it_edi_get_values(self, pdf_values=None):
+        """Extend to add dati_ddt_list for delivery notes."""
+        values = super()._l10n_it_edi_get_values(pdf_values)
+        values["dati_ddt_list"] = self._get_dati_ddt()
+        return values
+
+    def _get_dati_ddt(self):
+        """
+        Get the data for rendering DatiDDT.
+
+        :return: a list of dictionaries, with one dictionary per involved DdT.
+        Each dictionary has shape:
+        {
+            '_delivery_note': <stock.delivery.note record of the involved the DdT>,
+            'NumeroDDT': <string representing the DdT>,
+            'DataDDT': <date of the DdT>,
+            '_invoice_lines': (optional)
+                <account.move.line records of invoice lines involved in the DdT>,
+            'RiferimentoNumeroLinea': (optional)
+                <list of integers representing invoice line numbers>,
+        }
+        """
+        self.ensure_one()
+        dati_ddt_list = []
+
+        if not self.delivery_note_ids:
+            return dati_ddt_list
+
+        e_invoice_lines = self.line_ids.filtered(
+            lambda x: x.display_type == "product"
+        ).sorted(lambda line: line.sequence)
+        e_invoice_lines_list = list(e_invoice_lines)
+
+        for delivery_note in self.delivery_note_ids:
+            ddt_data = {
+                "_delivery_note": delivery_note,
+                "NumeroDDT": delivery_note.name,
+                "DataDDT": delivery_note.date,
+            }
+
+            # Find invoice lines linked to this delivery note
+            e_invoice_delivery_note_lines = e_invoice_lines.filtered(
+                lambda line, dn=delivery_note: line.delivery_note_id == dn
+            )
+
+            if e_invoice_delivery_note_lines:
+                # RiferimentoNumeroLinea contains 1-based line numbers
+                lines_refs_list = [
+                    e_invoice_lines_list.index(line) + 1
+                    for line in e_invoice_delivery_note_lines
+                ]
+                ddt_data.update(
+                    {
+                        "_invoice_lines": e_invoice_delivery_note_lines,
+                        "RiferimentoNumeroLinea": lines_refs_list,
+                    }
+                )
+            elif len(self.delivery_note_ids) == 1:
+                # If there's only one DDT and no lines are linked, include all lines
+                # This handles the case where update_delivery_note_lines() wasn't called
+                ddt_data.update(
+                    {
+                        "_invoice_lines": e_invoice_lines,
+                        "RiferimentoNumeroLinea": list(
+                            range(1, len(e_invoice_lines_list) + 1)
+                        ),
+                    }
+                )
+
+            dati_ddt_list.append(ddt_data)
+
+        return dati_ddt_list
