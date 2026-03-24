@@ -25,4 +25,5 @@
     ],
     "installable": True,
     "pre_init_hook": "pre_absorb_old_module",
+    "post_init_hook": "post_absorb_old_module",
 }
