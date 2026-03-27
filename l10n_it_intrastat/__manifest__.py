@@ -14,8 +14,7 @@
     "license": "AGPL-3",
     "depends": [
         "product",
-        "stock",
-        "stock_account",
+        "account",
         "uom",
     ],
     "data": [
