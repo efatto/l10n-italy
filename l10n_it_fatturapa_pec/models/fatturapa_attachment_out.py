@@ -112,9 +112,9 @@ class FatturaPAAttachmentOut(models.Model):
                 {
                     "state": "accepted",
                     "last_sdi_response": (
-                        "SdI ID: {}; Message ID: {}; Receipt date: {};"
-                        " Description: {}"
-                    ).format(id_sdi, message_id, receipt_dt, description.text),
+                        f"SdI ID: {id_sdi}; Message ID: {message_id}; Receipt date: {receipt_dt};"
+                        f" Description: {description.text}"
+                    ),
                 }
             )
 

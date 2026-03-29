@@ -143,10 +143,8 @@ class SdiChannel(models.Model):
                     "model": att._name,
                     "res_id": att.id,
                     "subject": att.name,
-                    "body": "XML file for FatturaPA {} sent to Exchange System to "
-                    "the email address {}.".format(
-                        att.name, company.email_exchange_system
-                    ),
+                    "body": f"XML file for FatturaPA {att.name} sent to Exchange System to "
+                    f"the email address {company.email_exchange_system}.",
                     "attachment_ids": [(6, 0, att.ir_attachment_id.ids)],
                     "email_from": (company.email_from_for_fatturaPA),
                     "reply_to": (company.email_from_for_fatturaPA),

@@ -194,9 +194,7 @@ class Fetchmail(models.Model):
                 }
             ).send()
             _logger.info(
-                "Notifying partners {} about PEC server {} error".format(
-                    self.e_inv_notify_partner_ids.ids, self.name
-                )
+                f"Notifying partners {self.e_inv_notify_partner_ids.ids} about PEC server {self.name} error"
             )
         else:
             _logger.error("Can't notify anyone about PEC server %s error" % self.name)
