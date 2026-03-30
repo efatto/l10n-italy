@@ -42,18 +42,18 @@ class AccountMove(models.Model):
         return res
 
     def write(self, vals):
+        if self.env.context.get("skip_split_payment_computation"):
+            return super().write(vals)
         res = super(AccountMove, self.with_context(check_move_validity=False)).write(
             vals
         )
-        if self.env.context.get("skip_split_payment_computation"):
-            return res
-        if "fiscal_position_id" in vals:
-            self._compute_amount()
-        self.with_context(
-            skip_split_payment_computation=True, check_move_validity=False
-        ).compute_split_payment()
         container = {"records": self}
-        self._check_balanced(container)
+        with self._check_balanced(container):
+            if "fiscal_position_id" in vals:
+                self._compute_amount()
+            self.with_context(
+                skip_split_payment_computation=True, check_move_validity=False
+            ).compute_split_payment()
         return res
 
     def copy(self, default=None):

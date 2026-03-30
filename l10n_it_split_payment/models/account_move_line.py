@@ -17,7 +17,7 @@ class AccountMoveLine(models.Model):
     def _compute_is_split_payment(self):
         for line in self:
             line.is_split_payment = False
-            if line.account_id == line.company_id.sp_account_id:
+            if line.account_id and line.account_id == line.company_id.sp_account_id:
                 line.is_split_payment = True
 
     def _compute_all_tax(self):
