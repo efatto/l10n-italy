@@ -6,6 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-29 12:20+0000\n"
+"PO-Revision-Date: 2026-03-29 12:20+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -378,6 +380,12 @@ msgstr ""
 #. module: l10n_it_edi_extension
 #: model:ir.model,name:l10n_it_edi_extension.model_l10n_it_edi_summary_data
 msgid "E-invoice summary data"
+msgstr ""
+
+#. module: l10n_it_edi_extension
+#. odoo-python
+#: code:addons/l10n_it_edi_extension/wizards/l10n_it_edi_import_file_wizard.py:0
+msgid "E-invoices"
 msgstr ""
 
 #. module: l10n_it_edi_extension
@@ -766,6 +774,12 @@ msgid ""
 msgstr ""
 
 #. module: l10n_it_edi_extension
+#. odoo-python
+#: code:addons/l10n_it_edi_extension/wizards/l10n_it_edi_import_file_wizard.py:0
+msgid "Partial import: skipped files"
+msgstr ""
+
+#. module: l10n_it_edi_extension
 #: model:ir.model.fields,field_description:l10n_it_edi_extension.field_l10n_it_edi_discount_rise_price__percentage
 msgid "Percentage"
 msgstr ""
@@ -1040,6 +1054,20 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_it_edi_extension/models/res_partner.py:0
 msgid "The fiscal code '%s' must have 16 characters."
+msgstr ""
+
+#. module: l10n_it_edi_extension
+#. odoo-python
+#: code:addons/l10n_it_edi_extension/wizards/l10n_it_edi_import_file_wizard.py:0
+msgid ""
+"The following files were skipped (not valid XML/P7M):\n"
+"%s"
+msgstr ""
+
+#. module: l10n_it_edi_extension
+#. odoo-python
+#: code:addons/l10n_it_edi_extension/wizards/l10n_it_edi_import_file_wizard.py:0
+msgid "The following files were skipped (not valid XML/P7M):<ul>%s</ul>"
 msgstr ""
 
 #. module: l10n_it_edi_extension
