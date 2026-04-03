@@ -1103,8 +1103,8 @@ msgstr "Aliquota fiscale"
 #. odoo-python
 #: code:addons/l10n_it_edi_extension/models/account_move.py:0
 msgid ""
-"Taxed amount (%(tax_amount)s}) does not match with e-invoice taxed amount "
-"(%(edi_tax_amount)s)"
+"Taxed amount (%(tax_amount)s}) does not match with e-invoice taxed amount (%"
+"(edi_tax_amount)s)"
 msgstr ""
 "L'importo tassato (%(tax_amount)s}) non corrisponde all'importo tassato "
 "della e-fattura (%(edi_tax_amount)s)"
@@ -1144,16 +1144,6 @@ msgstr "Il codice fiscale '%s' deve avere 16 caratteri."
 #. module: l10n_it_edi_extension
 #. odoo-python
 #: code:addons/l10n_it_edi_extension/wizards/l10n_it_edi_import_file_wizard.py:0
-msgid ""
-"The following files were skipped (not valid XML/P7M):\n"
-"%s"
-msgstr ""
-"Questi file non sono stati importati (formato XML/P7M invalido):\n"
-"%s"
-
-#. module: l10n_it_edi_extension
-#. odoo-python
-#: code:addons/l10n_it_edi_extension/wizards/l10n_it_edi_import_file_wizard.py:0
 msgid "The following files were skipped (not valid XML/P7M):<ul>%s</ul>"
 msgstr ""
 "Questi file non sono stati importati (formato XML/P7M invalido):<ul>%s</ul>"
@@ -1177,8 +1167,8 @@ msgstr "Prezzo totale"
 #. odoo-python
 #: code:addons/l10n_it_edi_extension/models/account_move.py:0
 msgid ""
-"Total amount (%(total_amount)s) does not match with e-invoice total amount "
-"(%(edi_total_amount)s)"
+"Total amount (%(total_amount)s) does not match with e-invoice total amount (%"
+"(edi_total_amount)s)"
 msgstr ""
 "L'importo totale (%(total_amount)s) non corrisponde all'importo totale della "
 "e-fattura (%(edi_total_amount)s)"
@@ -1211,9 +1201,9 @@ msgid ""
 "Untaxed amount (%(amount_untaxed)s}) minus rounding (%(rounding)s}) does not "
 "match with e-invoice untaxed amount %(edi_amount_untaxed)s)"
 msgstr ""
-"L'importo non tassato (%(amount_untaxed)s}) meno l'arrotondamento "
-"(%(rounding)s}) non corrisponde all'importo non tassato della e-fattura "
-"%(edi_amount_untaxed)s)"
+"L'importo non tassato (%(amount_untaxed)s}) meno l'arrotondamento (%"
+"(rounding)s}) non corrisponde all'importo non tassato della e-fattura %"
+"(edi_amount_untaxed)s)"
 
 #. module: l10n_it_edi_extension
 #: model:ir.model.fields,help:l10n_it_edi_extension.field_res_partner__l10n_it_edi_ext_default_product_id
@@ -1406,6 +1396,13 @@ msgstr ""
 #: code:addons/l10n_it_edi_extension/__init__.py:0
 msgid "from XML file:"
 msgstr "da file XML:"
+
+#~ msgid ""
+#~ "The following files were skipped (not valid XML/P7M):\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Questi file non sono stati importati (formato XML/P7M invalido):\n"
+#~ "%s"
 
 #~ msgid "Some e-invoices were not imported"
 #~ msgstr "Alcune fatture non sono state importate"
