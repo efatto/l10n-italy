@@ -11,7 +11,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-30 21:25+0000\n"
 "PO-Revision-Date: 2026-05-05 16:01+0000\n"
-"Last-Translator: Francesco Foresti <francesco.foresti@ooops404.com>\n"
+"Last-Translator: SirPyTech <simone.rubino@pytech.it>\n"
 "Language-Team: Italian (https://www.transifex.com/oca/teams/23907/it/)\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -1443,6 +1443,9 @@ msgid ""
 "Reconcile the Past Due Bills Amount with the acceptance entry if possible.\n"
 "This allows to get rid of the outstanding payments in the invoice."
 msgstr ""
+"Riconcilia l'importo effetti insoluti con la registrazione di accettazione "
+"se possibile.\n"
+"Questo permette di non avere crediti in sospeso nella fattura."
 
 #. module: l10n_it_ricevute_bancarie
 #: model_terms:ir.ui.view,arch_db:l10n_it_ricevute_bancarie.riba_filter
