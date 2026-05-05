@@ -26,14 +26,14 @@ msgid ""
 "<span class=\"o_form_label\">C/O Collection Fees</span>\n"
 "                        <span class=\"fa fa-lg fa-building-o\" "
 "title=\"Product used as Service for C/O Collection Fees\" aria-"
-"label=\"Product used as Service for C/O Collection Fees\" groups=\"base."
-"group_multi_company\" role=\"img\"/>"
+"label=\"Product used as Service for C/O Collection Fees\" "
+"groups=\"base.group_multi_company\" role=\"img\"/>"
 msgstr ""
 "<span class=\"o_form_label\">Spese di incasso RiBa</span>\n"
 "                        <span class=\"fa fa-lg fa-building-o\" "
 "title=\"Prodotto usato come servizio per le spese di incasso RiBa\" aria-"
-"label=\"Product used as Service for C/O Collection Fees\" groups=\"base."
-"group_multi_company\" role=\"img\"/>"
+"label=\"Product used as Service for C/O Collection Fees\" "
+"groups=\"base.group_multi_company\" role=\"img\"/>"
 
 #. module: l10n_it_ricevute_bancarie
 #: model_terms:ir.ui.view,arch_db:l10n_it_ricevute_bancarie.invoice_form
@@ -1431,6 +1431,18 @@ msgstr "RIBA emessa"
 #: model_terms:ir.ui.view,arch_db:l10n_it_ricevute_bancarie.riba_filter
 msgid "RIBA To Issue"
 msgstr "RIBA da emettere"
+
+#. module: l10n_it_ricevute_bancarie
+#: model:ir.model.fields,field_description:l10n_it_ricevute_bancarie.field_riba_unsolved__reconcile_overdue_effects
+msgid "Reconcile Overdue Effects"
+msgstr ""
+
+#. module: l10n_it_ricevute_bancarie
+#: model:ir.model.fields,help:l10n_it_ricevute_bancarie.field_riba_unsolved__reconcile_overdue_effects
+msgid ""
+"Reconcile the Past Due Bills Amount with the acceptance entry if possible.\n"
+"This allows to get rid of the outstanding payments in the invoice."
+msgstr ""
 
 #. module: l10n_it_ricevute_bancarie
 #: model_terms:ir.ui.view,arch_db:l10n_it_ricevute_bancarie.riba_filter
