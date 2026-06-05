@@ -113,6 +113,14 @@ class TestFatturaPAXMLValidation(Common):
                 any(tag in str(body) for body in move.mapped("message_ids.body")),
                 f"'{tag}' not found in message bodies",
             )
+        self.assertEqual(
+            move.l10n_it_edi_stabile_organizzazione_indirizzo, "VIA PROVA 12"
+        )
+        self.assertEqual(move.l10n_it_edi_stabile_organizzazione_civico, "12")
+        self.assertEqual(move.l10n_it_edi_stabile_organizzazione_cap, "00100")
+        self.assertEqual(move.l10n_it_edi_stabile_organizzazione_comune, "ROMA")
+        self.assertEqual(move.l10n_it_edi_stabile_organizzazione_provincia, "RM")
+        self.assertEqual(move.l10n_it_edi_stabile_organizzazione_nazione, "IT")
 
         # verify if attached documents are correctly imported
         attachments = self.env["ir.attachment"].search(
