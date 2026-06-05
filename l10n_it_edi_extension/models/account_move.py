@@ -778,6 +778,7 @@ class AccountMoveInherit(models.Model):
                 "street_number_xpath": f"{partner_sede_xpath}//NumeroCivico",
                 "street_xpath": f"{partner_sede_xpath}//Indirizzo",
                 "vat_xpath": f"{partner_vat_xpath}//IdCodice",
+                "vat_country_xpath": f"{partner_vat_xpath}//IdPaese",
                 "zip_xpath": f"{partner_sede_xpath}//CAP",
             }
         )
@@ -819,6 +820,12 @@ class AccountMoveInherit(models.Model):
                     vals[field_name] = value
 
             country_code = get_text(tree, partner_info["country_code_xpath"])
+            if (
+                vat_country := get_text(tree, partner_info.get("vat_country_xpath", ""))
+            ) != country_code:
+                vat_code = get_text(tree, partner_info["vat_xpath"])
+                vals["vat"] = f"{vat_country}{vat_code}" if vat_country else vat_code
+
             if country := self.env["res.country"].search(
                 [
                     ("code", "=", country_code),
