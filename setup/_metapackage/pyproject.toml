@@ -1,6 +1,6 @@
 [project]
 name = "odoo-addons-oca-l10n-italy"
-version = "18.0.20260608.0"
+version = "18.0.20260608.1"
 dependencies = [
     "odoo-addon-l10n_it_abicab==18.0.*",
     "odoo-addon-l10n_it_accompanying_invoice==18.0.*",
@@ -21,7 +21,9 @@ dependencies = [
     "odoo-addon-l10n_it_delivery_note_order_link==18.0.*",
     "odoo-addon-l10n_it_edi_doi_extension==18.0.*",
     "odoo-addon-l10n_it_edi_extension==18.0.*",
+    "odoo-addon-l10n_it_edi_pec==18.0.*",
     "odoo-addon-l10n_it_edi_related_document==18.0.*",
+    "odoo-addon-l10n_it_edi_sdi==18.0.*",
     "odoo-addon-l10n_it_edi_sender_partner==18.0.*",
     "odoo-addon-l10n_it_financial_statement_eu==18.0.*",
     "odoo-addon-l10n_it_financial_statements_report==18.0.*",

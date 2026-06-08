@@ -40,7 +40,9 @@ addon | version | maintainers | summary
 [l10n_it_delivery_note_order_link](l10n_it_delivery_note_order_link/) | 18.0.1.0.0 | <a href='https://github.com/andreampiovesana'><img src='https://github.com/andreampiovesana.png' width='32' height='32' style='border-radius:50%;' alt='andreampiovesana'/></a> | Crea collegamento tra i DDT e ordine di vendita/acquisto
 [l10n_it_edi_doi_extension](l10n_it_edi_doi_extension/) | 18.0.1.1.1 |  | Declaration of Intent for Italy (OCA)
 [l10n_it_edi_extension](l10n_it_edi_extension/) | 18.0.1.10.0 |  | E-invoice base feature
+[l10n_it_edi_pec](l10n_it_edi_pec/) | 18.0.1.0.0 |  | Invio e ricezione fatture elettroniche tramite PEC
 [l10n_it_edi_related_document](l10n_it_edi_related_document/) | 18.0.1.1.2 |  | Related Documents for EDI
+[l10n_it_edi_sdi](l10n_it_edi_sdi/) | 18.0.1.0.0 |  | Logica condivisa per la comunicazione con lo SdI
 [l10n_it_edi_sender_partner](l10n_it_edi_sender_partner/) | 18.0.1.0.0 |  | Terzo intermediario o soggetto emittete per fatturazione elettronica
 [l10n_it_financial_statement_eu](l10n_it_financial_statement_eu/) | 18.0.1.0.0 | <a href='https://github.com/mktsrl'><img src='https://github.com/mktsrl.png' width='32' height='32' style='border-radius:50%;' alt='mktsrl'/></a> | ITA - Bilancio UE con XBRL
 [l10n_it_financial_statements_report](l10n_it_financial_statements_report/) | 18.0.1.1.0 |  | Rendicontazione .pdf e .xls per stato patrimoniale e conto economico a sezioni contrapposte
