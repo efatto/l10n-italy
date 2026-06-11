@@ -66,13 +66,17 @@ Authors
 Contributors
 ------------
 
-- Gianmarco Conte <gconte@dinamicheaziendali.it>
-- Lara Baggio <lbaggio@linkgroup.it>
-- Glauco Prina <gprina@linkgroup.it>
-- Giuseppe Borruso <gborruso@dinamicheaziendali.it>
-- `Aion Tech <https://aiontech.company/>`__:
+-  Gianmarco Conte <gconte@dinamicheaziendali.it>
+-  Lara Baggio <lbaggio@linkgroup.it>
+-  Glauco Prina <gprina@linkgroup.it>
+-  Giuseppe Borruso <gborruso@dinamicheaziendali.it>
+-  `Aion Tech <https://aiontech.company/>`__:
 
-  - Simone Rubino <simone.rubino@aion-tech.it>
+   -  Simone Rubino <simone.rubino@aion-tech.it>
+
+-  `Stesi Consulting <https://www.stesi.consulting/>`__:
+
+   -  Michele Di Croce <dicroce.m@stesi.consulting>
 
 Maintainers
 -----------
