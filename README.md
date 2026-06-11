@@ -9,7 +9,7 @@
 
 # l10n-italy
 
-l10n-italy
+Canale Discord sviluppo, tutti i venerdì ore 9.30: https://discord.gg/xnrZXczzRC
 
 <!-- /!\ do not modify below this line -->
 
