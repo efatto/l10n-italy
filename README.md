@@ -29,7 +29,7 @@ addon | version | maintainers | summary
 [l10n_it_account_vat_period_end_settlement](l10n_it_account_vat_period_end_settlement/) | 18.0.1.0.5 |  | Allow to create the 'VAT Settlement'.
 [l10n_it_amount_to_text](l10n_it_amount_to_text/) | 18.0.1.0.0 |  | Localizza le valute in italiano per amount_to_text
 [l10n_it_appointment_code](l10n_it_appointment_code/) | 18.0.1.0.0 |  | Aggiunge la tabella dei codici carica da usare nelle dichiarazioni fiscali italiane
-[l10n_it_asset_management](l10n_it_asset_management/) | 18.0.1.1.0 |  | Gestione Cespiti
+[l10n_it_asset_management](l10n_it_asset_management/) | 18.0.1.1.1 |  | Gestione Cespiti
 [l10n_it_ateco](l10n_it_ateco/) | 18.0.1.0.0 |  | ITA - Codici Ateco
 [l10n_it_bill_of_entry](l10n_it_bill_of_entry/) | 18.0.1.0.0 |  | ITA - Bolle doganali
 [l10n_it_central_journal_reportlab](l10n_it_central_journal_reportlab/) | 18.0.1.2.1 | <a href='https://github.com/MarcoCalcagni'><img src='https://github.com/MarcoCalcagni.png' width='32' height='32' style='border-radius:50%;' alt='MarcoCalcagni'/></a> <a href='https://github.com/Borruso'><img src='https://github.com/Borruso.png' width='32' height='32' style='border-radius:50%;' alt='Borruso'/></a> | ITA - Libro giornale - Reportlab
@@ -45,7 +45,7 @@ addon | version | maintainers | summary
 [l10n_it_edi_sdi](l10n_it_edi_sdi/) | 18.0.1.0.0 |  | Logica condivisa per la comunicazione con lo SdI
 [l10n_it_edi_sender_partner](l10n_it_edi_sender_partner/) | 18.0.1.0.0 |  | Terzo intermediario o soggetto emittete per fatturazione elettronica
 [l10n_it_financial_statement_eu](l10n_it_financial_statement_eu/) | 18.0.1.0.0 | <a href='https://github.com/mktsrl'><img src='https://github.com/mktsrl.png' width='32' height='32' style='border-radius:50%;' alt='mktsrl'/></a> | ITA - Bilancio UE con XBRL
-[l10n_it_financial_statements_report](l10n_it_financial_statements_report/) | 18.0.1.1.0 |  | Rendicontazione .pdf e .xls per stato patrimoniale e conto economico a sezioni contrapposte
+[l10n_it_financial_statements_report](l10n_it_financial_statements_report/) | 18.0.1.1.1 |  | Rendicontazione .pdf e .xls per stato patrimoniale e conto economico a sezioni contrapposte
 [l10n_it_fiscalcode_sale](l10n_it_fiscalcode_sale/) | 18.0.1.0.0 | <a href='https://github.com/eLBati'><img src='https://github.com/eLBati.png' width='32' height='32' style='border-radius:50%;' alt='eLBati'/></a> | Mostra il codice fiscale del cliente nella stampa del preventivo
 [l10n_it_intrastat](l10n_it_intrastat/) | 18.0.1.1.0 |  | Riclassificazione merci e servizi per dichiarazioni Intrastat
 [l10n_it_intrastat_statement](l10n_it_intrastat_statement/) | 18.0.1.0.0 |  | Dichiarazione Intrastat per l'Agenzia delle Dogane
