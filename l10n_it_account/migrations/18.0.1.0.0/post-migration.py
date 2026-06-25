@@ -100,6 +100,18 @@ def _l10n_it_account_tax_kind_migration(env):
     )
 
 
+def _l10n_it_fatturapa_migration(env):
+    """
+    Remove exclusion for installation of "l10n_it_edi"
+    """
+    query = """
+        DELETE
+        FROM ir_module_module_exclusion
+        WHERE name = 'l10n_it_edi'
+    """
+    openupgrade.logged_query(env.cr, query)
+
+
 def _l10n_it_declaration_of_intent_migration(env):
     """
     Install "l10n_it_edi_doi_extension" which replaces the old
@@ -111,28 +123,6 @@ def _l10n_it_declaration_of_intent_migration(env):
         UPDATE ir_module_module
         SET state = 'to install'
         WHERE name = 'l10n_it_edi_doi_extension'
-        AND state = 'uninstalled'
-        """,
-    )
-
-
-def _l10n_it_fatturapa_migration(env):
-    """
-    Remove exclusion for installation of "l10n_it_edi" and install
-    "l10n_it_edi_extension" which replaces the old l10n_it_fatturapa modules.
-    """
-    query = """
-        DELETE
-        FROM ir_module_module_exclusion
-        WHERE name = 'l10n_it_edi'
-    """
-    openupgrade.logged_query(env.cr, query)
-    openupgrade.logged_query(
-        env.cr,
-        """
-        UPDATE ir_module_module
-        SET state = 'to install'
-        WHERE name = 'l10n_it_edi_extension'
         AND state = 'uninstalled'
         """,
     )
@@ -160,8 +150,7 @@ def migrate(cr, version):
         migration_function = globals().get(f"_{module}_migration")
         if openupgrade.is_module_installed(env.cr, module) and migration_function:
             migration_function(env)
-        if module != "l10n_it_fatturapa_pec":
-            # `l10n_it_fatturapa_pec` will be
-            # migrated and removed
-            # in `l10n_it_edi_pec`
+        if module not in ["l10n_it_declaration_of_intent", "l10n_it_fatturapa_pec"]:
+            # `l10n_it_fatturapa_pec` will be migrated and removed in `l10n_it_edi_pec`
+            # `l10n_it_declaration_of_intent` in `l10n_it_edi_doi_extension`
             _remove_module(env, module)
