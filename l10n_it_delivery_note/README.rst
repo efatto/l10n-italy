@@ -1,7 +1,3 @@
-.. image:: https://odoo-community.org/readme-banner-image
-   :target: https://odoo-community.org/get-involved?utm_source=readme
-   :alt: Odoo Community Association
-
 ============================
 ITA - Documento di trasporto
 ============================
@@ -17,7 +13,7 @@ ITA - Documento di trasporto
 .. |badge1| image:: https://img.shields.io/badge/maturity-Beta-yellow.png
     :target: https://odoo-community.org/page/development-status
     :alt: Beta
-.. |badge2| image:: https://img.shields.io/badge/license-AGPL--3-blue.png
+.. |badge2| image:: https://img.shields.io/badge/licence-AGPL--3-blue.png
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fl10n--italy-lightgray.png?logo=github
@@ -93,6 +89,9 @@ To configure this module, go to:
 
    Checking 'Display Delivery Method in Delivery Note Report' enables in
    report field 'Delivery Method'.
+
+   Checking 'Display total in DN with prices' enables in report the
+   'Import' column and the list of taxes with the sum of the total.
 
 2. *Inventory → Configuration → Warehouse Management → Delivery Note
    Types*
