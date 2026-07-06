@@ -14,6 +14,8 @@
         "queue_job",
     ],
     "data": [
+        "data/queue_job_channel_data.xml",
+        "data/queue_job_function_data.xml",
         "wizards/wizard_riba_multiple_payment_views.xml",
     ],
 }
