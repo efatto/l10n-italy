@@ -132,7 +132,6 @@ class StockDeliveryNote(models.Model):
     partner_shipping_id = fields.Many2one(
         "res.partner",
         string="Shipping address",
-        states=DONE_READONLY_STATE,
         required=True,
         tracking=True,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",

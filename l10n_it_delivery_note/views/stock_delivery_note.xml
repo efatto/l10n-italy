@@ -141,7 +141,10 @@
                                 name="partner_id"
                                 attrs="{'readonly': [('pickings_picker', '!=', [])]}"
                             />
-                            <field name="partner_shipping_id" />
+                            <field
+                                name="partner_shipping_id"
+                                attrs="{'readonly': ['&amp;', ('state', '=', 'done'), ('pickings_picker', '!=', [])]}"
+                            />
                         </group>
                         <group>
                             <field name="type_id" widget="selection" />
