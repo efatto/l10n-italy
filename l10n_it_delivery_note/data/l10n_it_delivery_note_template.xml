@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template
+        id="l10n_it_delivery_note_data"
+        inherit_id="l10n_it_edi.account_invoice_it_FatturaPA_export"
+        priority="99"
+    >
+        <!-- Replace the DatiDDT block with l10n_it_ddt_id condition -->
+        <xpath expr='//DatiDDT[@t-if="record.l10n_it_ddt_id"]' position="replace">
+            <t t-if="dati_ddt_list" t-foreach="dati_ddt_list" t-as="ddt_data">
+                <DatiDDT>
+                    <NumeroDDT
+                        t-if="ddt_data.get('NumeroDDT')"
+                        t-esc="format_alphanumeric(ddt_data['NumeroDDT'][-20:])"
+                    />
+                    <DataDDT t-esc="format_date(ddt_data['DataDDT'])" />
+                    <t
+                        t-if="ddt_data.get('RiferimentoNumeroLinea') and len(dati_ddt_list) > 1"
+                        t-foreach="ddt_data.get('RiferimentoNumeroLinea')"
+                        t-as="NumeroLinea"
+                    >
+                        <RiferimentoNumeroLinea t-esc="NumeroLinea" />
+                    </t>
+                </DatiDDT>
+            </t>
+        </xpath>
+        <!-- Replace the DatiDDT block with ddt_dict condition -->
+        <xpath
+            expr='//t[@t-if="ddt_dict and not record.l10n_it_ddt_id"]'
+            position="replace"
+        >
+            <!-- Do nothing - we only want delivery note DDTs, not picking DDTs -->
+        </xpath>
+    </template>
+</odoo>
