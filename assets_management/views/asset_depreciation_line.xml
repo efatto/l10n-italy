@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <search string="Depreciation Lines">
                 <field name="name" />
+                <field name="depreciation_type_id" />
                 <separator />
                 <filter
                     name="depreciation"
@@ -27,6 +28,11 @@
                         string="Asset"
                         name="group_by_asset_id"
                         context="{'group_by':'asset_id'}"
+                    />
+                    <filter
+                        string="Category Depreciation"
+                        name="group_by_asset_category_id"
+                        context="{'group_by':'asset_category_id'}"
                     />
                     <filter
                         string="Asset Depreciation"
@@ -54,6 +60,8 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="asset_id" />
+                <field name="asset_category_id" />
+                <field name="depreciation_type_id" />
                 <field name="depreciation_id" />
                 <field name="name" />
                 <field name="date" />
@@ -68,6 +76,19 @@
                 <field name="currency_id" invisible="1" />
                 <field name="company_id" invisible="1" />
             </tree>
+        </field>
+    </record>
+
+    <record id="asset_dep_line_pivot" model="ir.ui.view">
+        <field name="name">Asset depreciation line: Pivot</field>
+        <field name="model">asset.depreciation.line</field>
+        <field name="arch" type="xml">
+            <pivot string="asset depreciation line">
+                <field name="asset_id" type="row" />
+                <field name="asset_category_id" type="row" />
+                <field name="date" interval="year" type="col" />
+                <field name="amount" type="measure" />
+            </pivot>
         </field>
     </record>
 
@@ -153,10 +174,9 @@
         <field name="name">Depreciation Lines</field>
         <field name="res_model">asset.depreciation.line</field>
         <field name="view_id" ref="asset_dep_line_tree_view" />
+        <field name="view_mode">tree,form,pivot,graph</field>
         <field name="search_view_id" ref="asset_dep_line_search_view" />
-        <field
-            name="context"
-        >{'search_default_group_by_asset_id': 1, 'search_default_group_by_depreciation_id': 1}</field>
+        <field name="context">{'search_default_group_by_asset_category_id': 1}</field>
     </record>
 
     <menuitem
