@@ -18,6 +18,15 @@ def migrate(env, installed_version):
     # and invoice_id in account_invoice_withholding_tax and withholding_tax_statement
     if openupgrade.column_exists(env.cr, "account_move_line", "old_invoice_line_id"):
         drop_sql = sql.SQL("ALTER TABLE {} DROP CONSTRAINT {}")
+        openupgrade.logged_query(
+            env.cr,
+            drop_sql.format(
+                sql.Identifier("account_invoice_line_tax_wt"),
+                sql.Identifier(
+                    "account_invoice_line_tax_wt_invoice_line_id_withholding_tax_key"
+                ),
+            ),
+        )
         for table, column in [
             ("account_invoice_line_tax_wt", "invoice_line_id"),
             ("account_invoice_withholding_tax", "invoice_id"),
