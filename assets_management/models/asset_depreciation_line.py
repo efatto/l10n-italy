@@ -30,6 +30,12 @@ class AssetDepreciationLine(models.Model):
         store=True,
         string="Asset",
     )
+    asset_category_id = fields.Many2one(
+        "asset.category",
+        related="asset_id.category_id",
+        store=True,
+        string="Asset Category",
+    )
 
     balance = fields.Monetary(
         compute="_compute_balance",
