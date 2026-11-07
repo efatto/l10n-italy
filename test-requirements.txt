@@ -1,1 +1,2 @@
 pdfminer.six # needed by attachment_indexation module
+odoo14-addon-account_financial_report@git+https://github.com/OCA/account-financial-reporting@refs/pull/1251/head#subdirectory=setup/account_financial_report
