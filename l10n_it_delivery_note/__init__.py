@@ -1,4 +1,4 @@
-from . import cli
+from . import cli_custom
 from . import controllers
 from . import mixins
 from . import models
