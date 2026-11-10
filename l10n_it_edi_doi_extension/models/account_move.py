@@ -75,9 +75,15 @@ class AccountMove(models.Model):
     def _compute_l10n_it_edi_doi_warning(self):
         """Override to show custom warning when DOI amounts don't cover
         invoice total.
+
+        The custom warning only applies when the bridge model is used;
+        otherwise the standard warning is kept.
         """
-        super()._compute_l10n_it_edi_doi_warning()
+        res = super()._compute_l10n_it_edi_doi_warning()
         for move in self:
+            if not move.l10n_it_edi_doi_ids:
+                continue
+
             # Clear the warning first
             move.l10n_it_edi_doi_warning = ""
 
@@ -102,7 +108,7 @@ class AccountMove(models.Model):
                     covered=covered,
                     total=total,
                 )
-        return  # W8110
+        return res
 
     def _compute_l10n_it_edi_doi_amount(self):
         purchase_move_ids = self.filtered(lambda x: x.doi_type == "in")
@@ -183,6 +189,87 @@ class AccountMove(models.Model):
             if error := line._l10n_it_edi_doi_ext_get_validation_message(doi_tax):
                 errors.append(error)
         return errors
+
+    def _l10n_it_edi_doi_ext_auto_assign_declarations(self):
+        """Link valid declarations to customer invoices created from SOs.
+
+        When the sale order does not provide a declaration, use one or more
+        valid declarations to cover the invoice amount. If the invoice does
+        not use the declaration tax yet, apply the declaration fiscal position
+        so that the invoice can actually be exempted.
+        """
+        for move in self:
+            if (
+                move.doi_type != "out"
+                or move.state != "draft"
+                or move.l10n_it_edi_doi_ids
+            ):
+                continue
+            company = move.company_id
+            doi_tax = company.l10n_it_edi_doi_tax_id
+            if not doi_tax:
+                continue
+
+            if doi_tax not in move.invoice_line_ids.tax_ids:
+                doi_fiscal_position = company.l10n_it_edi_doi_fiscal_position_id
+                if not doi_fiscal_position:
+                    continue
+                move.fiscal_position_id = doi_fiscal_position
+                for line in move.invoice_line_ids.filtered(
+                    lambda line: line.display_type == "product"
+                ):
+                    line.tax_ids = doi_fiscal_position.map_tax(line.tax_ids)
+
+            if doi_tax not in move.invoice_line_ids.tax_ids:
+                continue
+
+            amount = abs(move.l10n_it_edi_doi_amount)
+            if move.currency_id.compare_amounts(amount, 0) <= 0:
+                continue
+
+            declarations = self.env[
+                "l10n_it_edi_doi.declaration_of_intent"
+            ]._fetch_valid_declarations_of_intent(
+                company,
+                move.partner_id.commercial_partner_id,
+                move.currency_id,
+                move.l10n_it_edi_doi_date,
+                doi_type="out",
+            )
+            remaining = amount
+            for declaration in declarations:
+                if move.currency_id.compare_amounts(remaining, 0) <= 0:
+                    break
+                declaration_amount = min(remaining, declaration.remaining)
+                if move.currency_id.compare_amounts(declaration_amount, 0) <= 0:
+                    continue
+                self.env["account.move.doi"].create(
+                    {
+                        "move_id": move.id,
+                        "declaration_id": declaration.id,
+                        "amount": declaration_amount,
+                    }
+                )
+                remaining -= declaration_amount
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        moves = super().create(vals_list)
+        for move, vals in zip(moves, vals_list, strict=False):
+            origin = vals.get("invoice_origin")
+            if (
+                not origin
+                or vals.get("reversed_entry_id")
+                or move.doi_type != "out"
+                or move.l10n_it_edi_doi_ids
+            ):
+                continue
+            sale_orders = self.env["sale.order"].search(
+                [("name", "in", origin.split(", "))]
+            )
+            if sale_orders.filtered(lambda order: not order.l10n_it_edi_doi_id):
+                move._l10n_it_edi_doi_ext_auto_assign_declarations()
+        return moves
 
     def _post(self, soft=True):
         errors = []

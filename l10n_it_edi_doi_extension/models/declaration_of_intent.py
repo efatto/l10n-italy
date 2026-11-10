@@ -44,17 +44,27 @@ class L10nItDeclarationOfIntent(models.Model):
         if not res or res.type == doi_type:
             return res
         # Same domain as in the original, with the addition of 'type'
-        domain = [
-            ("state", "=", "active"),
-            ("company_id", "=", company.id),
-            ("currency_id", "=", currency.id),
-            ("partner_id", "=", partner.commercial_partner_id.id),
-            ("start_date", "<=", date),
-            ("end_date", ">=", date),
-            ("remaining", ">", 0),
-            ("type", "=", doi_type),
-        ]
-        return self.search(domain, limit=1)
+        return self._fetch_valid_declarations_of_intent(
+            company, partner, currency, date, doi_type
+        )[:1]
+
+    @api.model
+    def _fetch_valid_declarations_of_intent(
+        self, company, partner, currency, date, doi_type="out"
+    ):
+        """Fetch all the declarations valid for the given criteria."""
+        return self.search(
+            [
+                ("state", "=", "active"),
+                ("company_id", "=", company.id),
+                ("currency_id", "=", currency.id),
+                ("partner_id", "=", partner.commercial_partner_id.id),
+                ("start_date", "<=", date),
+                ("end_date", ">=", date),
+                ("remaining", ">", 0),
+                ("type", "=", doi_type),
+            ]
+        )
 
     @api.depends(
         "invoice_ids",
@@ -102,7 +112,8 @@ class L10nItDeclarationOfIntent(models.Model):
             single_declaration_invoices = posted_invoices - bridge_moves
             for invoice in single_declaration_invoices:
                 amount = invoice.l10n_it_edi_doi_amount
-                if invoice.move_type in ("in_refund", "out_refund"):
+                # Purchase amounts are unsigned, sale ones are signed by core
+                if invoice.move_type == "in_refund":
                     amount = -amount
                 total_invoiced += amount
 

@@ -2,11 +2,15 @@
 
 This module extends the functionality of l10n_it_edi_doi, enabling the
 use of the Declaration of Intent (Dichiarazione di Intento) for incoming
-vendor bills and purchase orders.
+vendor bills and purchase orders, and the automatic assignment of the
+received declarations to customer invoices created from sale orders.
 
 Key features:
  - Support for multiple Declarations of Intent per invoice
  - Dedicated tab in invoice form for managing DOI associations
+ - Automatic assignment of valid declarations to customer invoices created
+   from sale orders without a declaration, using one or more declarations
+   to cover the invoice amount
  - Automatic validation of DOI amounts and available thresholds
  - Smart warnings when invoice amounts don't match DOI coverage
  - Backward compatibility with single-declaration workflow
@@ -18,11 +22,15 @@ Key features:
 
 Questo modulo estende la funzionalità di l10n_it_edi_doi, permettendo
 l'utilizzo della Dichiarazione di Intento per le fatture di acquisto in
-ingresso e gli ordini di acquisto.
+ingresso e gli ordini di acquisto, e l'assegnazione automatica delle
+dichiarazioni ricevute alle fatture clienti create da ordini di vendita.
 
 Caratteristiche principali:
  - Supporto per dichiarazioni di intento multiple per fattura
  - Tab dedicato nel form fattura per gestire le associazioni DOI
+ - Assegnazione automatica delle dichiarazioni valide alle fatture clienti
+   create da ordini di vendita senza dichiarazione, usando una o più
+   dichiarazioni per coprire l'importo della fattura
  - Validazione automatica degli importi e soglie disponibili
  - Avvisi intelligenti quando gli importi non corrispondono
  - Retrocompatibilità con il flusso a dichiarazione singola

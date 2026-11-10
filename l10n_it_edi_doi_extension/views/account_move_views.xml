@@ -12,9 +12,12 @@
                 <field name="l10n_it_edi_doi_count" invisible="1" />
                 <field name="l10n_it_edi_doi_total_amount" invisible="1" />
             </xpath>
-            <!-- Hide standard DOI field from header -->
+            <!-- Hide standard DOI field from header for incoming documents,
+                 where the bridge model is used -->
             <xpath expr="//field[@name='l10n_it_edi_doi_id']" position="attributes">
-                <attribute name="invisible">1</attribute>
+                <attribute
+                    name="invisible"
+                >not l10n_it_edi_doi_use or doi_type == 'in'</attribute>
             </xpath>
             <!-- Update warning to show only when there's a message -->
             <xpath
@@ -23,12 +26,15 @@
             >
                 <attribute name="invisible">not l10n_it_edi_doi_warning</attribute>
             </xpath>
-            <!-- Hide the "Open Declaration" button -->
+            <!-- Hide the "Open Declaration" button for incoming documents,
+                 where the bridge model is used -->
             <xpath
                 expr="//button[@name='action_open_declaration_of_intent']"
                 position="attributes"
             >
-                <attribute name="invisible">1</attribute>
+                <attribute
+                    name="invisible"
+                >not l10n_it_edi_doi_id or doi_type == 'in'</attribute>
             </xpath>
         </field>
     </record>

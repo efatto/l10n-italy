@@ -8,6 +8,18 @@ between two types:
  - "Issued from company": for declarations issued by the company. 
  - "Received from customers": for declarations received from suppliers.
 
+**Customer invoices created from sale orders:**
+
+When a customer invoice is created from a sale order without a Declaration
+of Intent, the module automatically links one or more valid declarations
+for the customer, splitting the invoice amount between them according to
+their available thresholds. If the invoice lines still use the standard
+VAT, the Declaration of Intent fiscal position is applied so that the
+invoice uses the declaration tax.
+
+If the sale order already has a Declaration of Intent, the standard
+single-declaration workflow is kept.
+
 **Multiple Declarations of Intent:**
 
 When creating or editing a vendor bill, you can now associate multiple
@@ -34,6 +46,19 @@ contatti è possibile creare una Dichiarazione di Intento scegliendo tra
 due tipologie:
  - "Issued from company": per le dichiarazioni emesse dall'azienda.
  - "Received from customers": per le dichiarazioni ricevute dai fornitori.
+
+**Fatture clienti create da ordini di vendita:**
+
+Quando una fattura cliente viene creata da un ordine di vendita privo di
+Dichiarazione di Intento, il modulo collega automaticamente una o più
+dichiarazioni valide per il cliente, suddividendo l'importo della fattura
+tra esse in base alle soglie disponibili. Se le righe fattura utilizzano
+ancora l'IVA ordinaria, viene applicata la posizione fiscale della
+Dichiarazione di Intento in modo che la fattura utilizzi l'imposta della
+dichiarazione.
+
+Se l'ordine di vendita ha già una Dichiarazione di Intento, viene
+mantenuto il flusso standard a dichiarazione singola.
 
 **Dichiarazioni di Intento Multiple:**
 

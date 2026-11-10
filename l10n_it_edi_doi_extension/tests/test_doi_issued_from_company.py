@@ -3,14 +3,16 @@
 
 from dateutil.relativedelta import relativedelta
 
-from odoo import exceptions, fields
+from odoo import Command, exceptions, fields
 from odoo.tests import Form
 from odoo.tests.common import TransactionCase
 
 
 class TestDoiIssuedFromCompany(TransactionCase):
     @classmethod
-    def _create_declaration(cls, type_doi, protocol_part1=None, protocol_part2=None):
+    def _create_declaration(
+        cls, type_doi, protocol_part1=None, protocol_part2=None, threshold=5000
+    ):
         """Create a declaration with unique protocol numbers."""
         if protocol_part1 is None:
             # Generate unique protocol numbers based on sequence
@@ -30,11 +32,87 @@ class TestDoiIssuedFromCompany(TransactionCase):
                 "issue_date": fields.Date.today(),
                 "start_date": fields.Date.today(),
                 "end_date": fields.Date.today() + relativedelta(months=2),
-                "threshold": 5000,
+                "threshold": threshold,
                 "protocol_number_part1": protocol_part1,
                 "protocol_number_part2": protocol_part2,
             }
         )
+
+    @classmethod
+    def _create_sale_tax(cls):
+        return cls.tax_model.create(
+            {
+                "l10n_it_exempt_reason": "N3.5",
+                "l10n_it_law_reference": "Art. 8, comma 1, lett. a) DPR 633/72",
+                "type_tax_use": "sale",
+                "name": "0% declaration tax sale",
+                "amount": 0,
+                "tax_group_id": cls.tax_group.id,
+            }
+        )
+
+    @classmethod
+    def _create_sale_order(cls, taxes, price_unit=100.0):
+        product = cls.env["product.product"].create(
+            {
+                "name": "DOI sale service",
+                "type": "service",
+                "invoice_policy": "order",
+            }
+        )
+        pricelist = cls.env["product.pricelist"].create(
+            {
+                "name": "DOI sale pricelist",
+                "currency_id": cls.company.currency_id.id,
+            }
+        )
+        return cls.env["sale.order"].create(
+            {
+                "partner_id": cls.partner.id,
+                "pricelist_id": pricelist.id,
+                "date_order": fields.Date.today(),
+                "order_line": [
+                    Command.create(
+                        {
+                            "product_id": product.id,
+                            "product_uom_qty": 1,
+                            "price_unit": price_unit,
+                            "tax_id": [Command.set(taxes.ids)],
+                        }
+                    )
+                ],
+            }
+        )
+
+    @classmethod
+    def _create_doi_sale_configuration(cls):
+        standard_tax = cls.tax_model.create(
+            {
+                "name": "22% test sale",
+                "amount": 22,
+                "type_tax_use": "sale",
+                "tax_group_id": cls.tax_group.id,
+            }
+        )
+        sale_tax = cls._create_sale_tax()
+        cls.company.l10n_it_edi_doi_tax_id = sale_tax
+        cls.company.l10n_it_edi_doi_fiscal_position_id = cls.env[
+            "account.fiscal.position"
+        ].create(
+            {
+                "name": "DOI test fiscal position",
+                "company_id": cls.company.id,
+                "tax_ids": [
+                    Command.create(
+                        {
+                            "tax_src_id": standard_tax.id,
+                            "tax_dest_id": sale_tax.id,
+                        }
+                    )
+                ],
+            }
+        )
+        return standard_tax, sale_tax
 
     @classmethod
     def _create_invoice(cls, name, partner, taxes=False, date=False, in_type=False):
@@ -334,6 +412,35 @@ class TestDoiIssuedFromCompany(TransactionCase):
         self.assertIn(self.doi_in.id, declaration_ids)
         self.assertIn(doi_in_2.id, declaration_ids)
 
+    def test_reset_to_draft_keeps_declaration_amount(self):
+        """A posted invoice reset to draft keeps its DOI amount reserved."""
+        invoice = self._create_invoice(
+            "reset", self.partner, taxes=self.tax, in_type=True
+        )
+        self.env["account.move.doi"].create(
+            {
+                "move_id": invoice.id,
+                "declaration_id": self.doi_in.id,
+                "amount": 900.0,
+            }
+        )
+        invoice.action_post()
+        self.assertEqual(self.doi_in.invoiced, 900.0)
+        self.assertEqual(self.doi_in.remaining, self.doi_in.threshold - 900.0)
+
+        invoice.button_draft()
+
+        # The invoice keeps its number and is expected to be posted again,
+        # so the declaration amount must stay reserved.
+        self.assertEqual(invoice.state, "draft")
+        self.assertNotEqual(invoice.name, "/")
+        self.assertTrue(invoice.posted_before)
+        self.assertEqual(self.doi_in.invoiced, 900.0)
+        self.assertEqual(self.doi_in.remaining, self.doi_in.threshold - 900.0)
+
+        invoice.action_post()
+        self.assertEqual(self.doi_in.invoiced, 900.0)
+
     def test_declaration_with_refund(self):
         """Test that refund correctly reduces the declaration invoiced amount."""
         # Create and post an invoice
@@ -511,6 +618,95 @@ class TestDoiIssuedFromCompany(TransactionCase):
         self.assertNotEqual(previous_used_amount, used_amount)
         self.assertEqual(used_amount, invoice.amount_total)
         self.assertEqual(self.doi_in.state, "active")
+
+    def test_out_invoice_from_sale_order_uses_standard_doi(self):
+        """A customer invoice created from a sale order keeps the core DOI.
+
+        When the sale order already provides a declaration, the standard
+        single-declaration workflow is kept.
+        """
+        sale_tax = self._create_sale_tax()
+        self.company.l10n_it_edi_doi_tax_id = sale_tax
+        declaration = self._create_declaration("out")
+        order = self._create_sale_order(sale_tax)
+        self.assertEqual(order.l10n_it_edi_doi_id, declaration)
+
+        order.action_confirm()
+        invoice = order._create_invoices()
+
+        self.assertEqual(invoice.l10n_it_edi_doi_id, declaration)
+        self.assertFalse(invoice.l10n_it_edi_doi_ids)
+        self.assertEqual(invoice.l10n_it_edi_doi_amount, 100.0)
+        self.assertEqual(invoice.l10n_it_edi_doi_warning, "")
+
+    def test_out_invoice_from_sale_order_without_doi(self):
+        """A customer invoice from an SO without DOI gets valid declarations.
+
+        If the available declarations are not enough, use more than one,
+        splitting the invoice amount between them.
+        """
+        standard_tax, sale_tax = self._create_doi_sale_configuration()
+
+        # Create the order before the declarations, so that it has no DOI
+        order = self._create_sale_order(standard_tax)
+        self.assertFalse(order.l10n_it_edi_doi_id)
+        order.action_confirm()
+
+        declaration_1 = self._create_declaration("out", threshold=60)
+        declaration_2 = self._create_declaration("out", threshold=100)
+        self.assertFalse(order.l10n_it_edi_doi_id)
+
+        invoice = order._create_invoices()
+
+        self.assertEqual(invoice.l10n_it_edi_doi_id, declaration_1)
+        self.assertEqual(invoice.invoice_line_ids.tax_ids, sale_tax)
+        self.assertEqual(invoice.l10n_it_edi_doi_amount, 100.0)
+        self.assertEqual(invoice.l10n_it_edi_doi_total_amount, 100.0)
+        self.assertFalse(invoice.l10n_it_edi_doi_warning)
+        self.assertRecordValues(
+            invoice.l10n_it_edi_doi_ids,
+            [
+                {"declaration_id": declaration_1.id, "amount": 60.0},
+                {"declaration_id": declaration_2.id, "amount": 40.0},
+            ],
+        )
+
+        invoice.action_post()
+        self.assertEqual(declaration_1.invoiced, 60.0)
+        self.assertEqual(declaration_2.invoiced, 40.0)
+
+    def test_down_payment_invoice_from_sale_order_without_doi(self):
+        """A down payment invoice from an SO without DOI gets declarations."""
+        standard_tax, sale_tax = self._create_doi_sale_configuration()
+        order = self._create_sale_order(standard_tax)
+        self.assertFalse(order.l10n_it_edi_doi_id)
+        order.action_confirm()
+        declaration = self._create_declaration("out")
+        self.assertFalse(order.l10n_it_edi_doi_id)
+
+        self.env["sale.advance.payment.inv"].with_context(
+            active_model="sale.order",
+            active_ids=order.ids,
+            active_id=order.id,
+        ).create(
+            {"advance_payment_method": "percentage", "amount": 50}
+        ).create_invoices()
+
+        invoice = order.invoice_ids
+        self.assertEqual(len(invoice), 1)
+        self.assertEqual(invoice.l10n_it_edi_doi_id, declaration)
+        self.assertEqual(
+            invoice.invoice_line_ids.filtered(
+                lambda line: line.display_type == "product"
+            ).tax_ids,
+            sale_tax,
+        )
+        self.assertEqual(invoice.l10n_it_edi_doi_amount, 50.0)
+        self.assertEqual(invoice.l10n_it_edi_doi_total_amount, 50.0)
+        self.assertFalse(invoice.l10n_it_edi_doi_warning)
+
+        invoice.action_post()
+        self.assertEqual(declaration.invoiced, 50.0)
 
     def test_in_invoice_mixed_tax(self):
         """When a vendor bill has a line with only the DoI Tax
