@@ -320,3 +320,26 @@ class TestPlafondFixes(TransactionCase):
         refund.action_post()
         self.assertEqual(self.doi_out.invoiced, 0.0)
         self.assertEqual(self.doi_out_2.invoiced, 0.0)
+
+    # 15: the threshold warning of the first declaration is reported by core,
+    # the bridge rows must not repeat it
+    def test_15_threshold_warning_reported_once(self):
+        invoice = self._create_invoice(self.sale_doi_tax)
+        self._add_link(invoice, self.doi_out, 6000.0)
+        self._add_link(invoice, self.doi_out_2, 100.0)
+        invoice.invalidate_recordset(["l10n_it_edi_doi_warning"])
+        self.assertEqual(
+            invoice.l10n_it_edi_doi_warning.count("Pay attention, the threshold"),
+            1,
+        )
+        self.assertIn("exceeded", invoice.l10n_it_edi_doi_warning)
+
+    # 16: a credit note reverses the amount of the declaration, it does not
+    # consume it again
+    def test_16_credit_note_does_not_exceed_threshold(self):
+        invoice = self._create_invoice(self.sale_doi_tax, price=4000.0)
+        self._add_link(invoice, self.doi_out, 4000.0)
+        invoice.action_post()
+        refund = self._reverse(invoice)
+        refund.invalidate_recordset(["l10n_it_edi_doi_warning"])
+        self.assertNotIn("exceeded", refund.l10n_it_edi_doi_warning)
