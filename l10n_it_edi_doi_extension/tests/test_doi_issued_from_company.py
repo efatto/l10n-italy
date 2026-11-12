@@ -98,6 +98,7 @@ class TestDoiIssuedFromCompany(TransactionCase):
         cls.partner.country_id = cls.env.ref("base.it")
         cls.partner.company_id = cls.company
         cls.doi_in = cls._create_declaration("in")
+        cls.doi_out = cls._create_declaration("out")
         cls.tax_group = cls.env["account.tax.group"].create(
             {"name": "Vat Free", "sequence": 1}
         )
@@ -163,6 +164,29 @@ class TestDoiIssuedFromCompany(TransactionCase):
         self.assertEqual(declaration_2.invoiced, 100.0)
         self.assertEqual(declaration_1.remaining, 0.0)
         self.assertEqual(declaration_2.remaining, 900.0)
+
+    def test_out_invoice_over_declaration_threshold(self):
+        """If an Invoice assigns to a declaration more than the declaration's threshold,
+        a warning message is shown.
+        """
+        # Arrange
+        declaration = self._create_declaration("out")
+        invoice = self._create_invoice("1", self.partner, taxes=self.tax)
+        with Form(invoice) as inv_form, inv_form.l10n_it_edi_doi_ids.new() as doi_line:
+            doi_line.declaration_id = declaration
+            doi_line.amount = invoice.amount_total
+        declaration_line = invoice.l10n_it_edi_doi_ids
+        # pre-condition
+        self.assertLess(declaration_line.amount, declaration_line.declaration_threshold)
+        self.assertNotIn(
+            "Pay attention, the threshold", invoice.l10n_it_edi_doi_warning
+        )
+
+        # Act
+        declaration_line.amount = declaration_line.declaration_threshold + 1
+
+        # Assert
+        self.assertIn("Pay attention, the threshold", invoice.l10n_it_edi_doi_warning)
 
     def test_multiple_declarations_bridge_model(self):
         """Test that multiple declarations can be linked via bridge model."""

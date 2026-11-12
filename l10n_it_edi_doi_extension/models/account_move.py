@@ -72,36 +72,113 @@ class AccountMove(models.Model):
             )
         return  # W8110
 
-    @api.depends("l10n_it_edi_doi_total_amount")
+    def _build_extended_threshold_warning(self):
+        self.ensure_one()
+        # Copied from core, with a few differences:
+        # - we consider all the linked declarations
+        # - we consider purchase orders in case of vendor bill
+        warnings = []
+        is_purchase = self.is_purchase_document()
+        for declaration_line in self.l10n_it_edi_doi_ids:
+            declaration = declaration_line.declaration_id
+            declaration_invoiced = declaration_line.amount
+            declaration_not_yet_invoiced = declaration.not_yet_invoiced
+            if (
+                self.state != "posted"
+            ):  # Here we replicate what would happen when posting the invoice.
+                additional_invoiced_qty = {}
+                linked_orders = (
+                    self.env["purchase.order"] if is_purchase else self.env["sale.order"]
+                )
+                for invoice_line in self.invoice_line_ids:
+                    order_lines = (
+                        invoice_line.purchase_line_id
+                        if is_purchase
+                        else invoice_line.sale_line_ids
+                    )
+                    for order_line in order_lines:
+                        order = order_line.order_id
+                        if order.l10n_it_edi_doi_id == declaration:
+                            linked_orders |= order
+                        qty_invoiced = (
+                            invoice_line.product_uom_id._compute_quantity(
+                                invoice_line.quantity, order_line.product_uom
+                            )
+                            * -self.direction_sign
+                        )
+                        order_line_id = order_line.ids[
+                            0
+                        ]  # do not just use `id` in case of NewId
+                        additional_invoiced_qty[order_line_id] = (
+                            additional_invoiced_qty.get(order_line_id, 0) + qty_invoiced
+                        )
+
+                for order in linked_orders:
+                    not_yet_invoiced = order.l10n_it_edi_doi_not_yet_invoiced
+                    not_yet_invoiced_after_posting = (
+                        order._l10n_it_edi_doi_get_amount_not_yet_invoiced(
+                            declaration,
+                            additional_invoiced_qty=additional_invoiced_qty,
+                        )
+                    )
+                    declaration_not_yet_invoiced -= (
+                        not_yet_invoiced - not_yet_invoiced_after_posting
+                    )
+
+            threshold_warning = declaration._build_threshold_warning_message(
+                declaration_invoiced, declaration_not_yet_invoiced
+            )
+            if threshold_warning:
+                warnings.append(threshold_warning)
+
+        return "\n".join(warnings)
+
+    @api.depends("l10n_it_edi_doi_total_amount", "l10n_it_edi_doi_ids.amount")
     def _compute_l10n_it_edi_doi_warning(self):
-        """Append a coverage warning when the bridge rows do not cover the
-        invoice DOI amount. Core warnings (threshold, validity) are kept.
+        """Append the multi-declaration warnings to the core ones.
+
+        Core only knows the first declaration (``l10n_it_edi_doi_id``): it
+        reports its validity and threshold warnings and leaves the field empty
+        on the documents it does not handle (e.g. vendor bills).
+        Keep that message and append what only the bridge rows make possible:
+        - the threshold warning of every linked declaration, considering the
+          related orders as core does for the first one;
+        - a coverage warning when the linked declarations do not cover the
+          invoice DOI amount.
+
+        The messages are deduplicated because the first declaration is also
+        handled by core.
         """
         super()._compute_l10n_it_edi_doi_warning()
         for move in self.filtered("l10n_it_edi_doi_ids"):
             # Sale documents carry a signed amount (core), purchase ones do not
             doi_amount = abs(move.l10n_it_edi_doi_amount)
+            warnings = [move.l10n_it_edi_doi_warning]
+            if threshold_warning := move._build_extended_threshold_warning():
+                warnings.append(threshold_warning)
             if (
                 move.currency_id.compare_amounts(
                     move.l10n_it_edi_doi_total_amount, doi_amount
                 )
-                >= 0
+                < 0
             ):
-                continue
-            covered = (
-                f"{move.l10n_it_edi_doi_total_amount:.2f} {move.currency_id.symbol}"
-            )
-            total = f"{doi_amount:.2f} {move.currency_id.symbol}"
-            coverage = _(
-                "Warning: The total amount covered by declarations "
-                "(%(covered)s) is less than the invoice DOI amount "
-                "(%(total)s). Please adjust the amounts or add more "
-                "declarations.",
-                covered=covered,
-                total=total,
-            )
+                covered = (
+                    f"{move.l10n_it_edi_doi_total_amount:.2f} "
+                    f"{move.currency_id.symbol}"
+                )
+                total = f"{doi_amount:.2f} {move.currency_id.symbol}"
+                warnings.append(
+                    _(
+                        "Warning: The total amount covered by declarations "
+                        "(%(covered)s) is less than the invoice DOI amount "
+                        "(%(total)s). Please adjust the amounts or add more "
+                        "declarations.",
+                        covered=covered,
+                        total=total,
+                    )
+                )
             move.l10n_it_edi_doi_warning = "\n\n".join(
-                filter(None, [move.l10n_it_edi_doi_warning, coverage])
+                dict.fromkeys(filter(None, warnings))
             )
         return  # W8110
 
