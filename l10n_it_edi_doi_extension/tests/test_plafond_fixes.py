@@ -67,8 +67,9 @@ class TestPlafondFixes(TransactionCase):
                 "start_date": today,
                 "end_date": today + relativedelta(months=2),
                 "threshold": threshold,
-                "protocol_number_part1": protocol,
-                "protocol_number_part2": protocol,
+                # AdE protocol format: AAAANNNNNNNNCCCCC (4 + 8 + 5 characters)
+                "protocol_number_part1": f"{today.year}{int(protocol):04d}",
+                "protocol_number_part2": f"{int(protocol):09d}",
             }
         )
 
