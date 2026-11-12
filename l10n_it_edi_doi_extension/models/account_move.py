@@ -88,7 +88,9 @@ class AccountMove(models.Model):
             ):  # Here we replicate what would happen when posting the invoice.
                 additional_invoiced_qty = {}
                 linked_orders = (
-                    self.env["purchase.order"] if is_purchase else self.env["sale.order"]
+                    self.env["purchase.order"]
+                    if is_purchase
+                    else self.env["sale.order"]
                 )
                 for invoice_line in self.invoice_line_ids:
                     order_lines = (
