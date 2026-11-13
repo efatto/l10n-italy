@@ -143,14 +143,27 @@ class TestPlafondFixes(TransactionCase):
         invoice.action_post()
         self.assertEqual(self.doi_out.invoiced, 900.0)
 
-    # 05b: an invoice set back to draft still counts, it may be posted again
-    def test_05b_reset_to_draft_still_counted(self):
+    # 05b: a reset-to-draft invoice does not count, as in core
+    def test_05b_reset_to_draft_not_counted(self):
         invoice = self._create_invoice(self.sale_doi_tax)
         self._add_link(invoice, self.doi_out, 900.0)
         invoice.action_post()
         invoice.button_draft()
         self.assertEqual(invoice.state, "draft")
-        self.assertEqual(self.doi_out.invoiced, 900.0)
+        self.assertEqual(self.doi_out.invoiced, 0.0)
+
+    # 05c: the threshold warning of a reset-to-draft invoice does not count it
+    # twice (invoiced + simulated posting)
+    def test_05c_reset_to_draft_not_double_counted(self):
+        doi = self._create_declaration("out", "4", threshold=1000)
+        invoice = self._create_invoice(self.sale_doi_tax)
+        invoice.l10n_it_edi_doi_id = doi
+        self._add_link(invoice, doi, 900.0)
+        invoice.action_post()
+        self.assertEqual(doi.invoiced, 900.0)
+        invoice.button_draft()
+        self.assertEqual(doi.invoiced, 0.0)
+        self.assertNotIn("exceeded", invoice.l10n_it_edi_doi_warning)
 
     # 07: bridge rows are locked once the invoice is posted
     def test_07_posted_invoice_rows_locked(self):
