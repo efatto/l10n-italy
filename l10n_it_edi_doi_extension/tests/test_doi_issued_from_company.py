@@ -637,3 +637,37 @@ class TestDoiIssuedFromCompany(Common):
             }
         )
         self.assertTrue(doi)
+
+    def test_existing_invalid_protocol_not_blocking_writes(self):
+        """Declarations stored with a non-conforming protocol (e.g. migrated
+        from the old module) can still be written as long as the protocol is
+        not modified."""
+        # Simulate a protocol stored before this validation existed
+        self.env.cr.execute(
+            """
+            UPDATE l10n_it_edi_doi_declaration_of_intent
+               SET protocol_number_part1 = %s, protocol_number_part2 = %s
+             WHERE id = %s
+            """,
+            ("2025", "1234567", self.doi_in.id),
+        )
+        self.env.invalidate_all()
+        # Rewriting the stored values unchanged must not raise
+        self.doi_in.write({"threshold": 6000})
+        self.doi_in.write(
+            {
+                "type": "in",
+                "protocol_number_part1": "2025",
+                "protocol_number_part2": "1234567",
+            }
+        )
+        # Changing the protocol to another non-conforming value must raise
+        with self.assertRaises(exceptions.ValidationError):
+            self.doi_in.write({"protocol_number_part2": "123"})
+        # Fixing it with a conforming value must be allowed
+        self.doi_in.write(
+            {
+                "protocol_number_part1": f"{self.current_year}0000",
+                "protocol_number_part2": "123456789",
+            }
+        )

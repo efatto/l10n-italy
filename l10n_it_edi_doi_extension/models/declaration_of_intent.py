@@ -120,10 +120,39 @@ class L10nItDeclarationOfIntent(models.Model):
             self.start_date = fields.Date.today().replace(year=year, month=1, day=1)
             self.end_date = fields.Date.today().replace(year=year, month=12, day=31)
 
-    @api.constrains("protocol_number_part1", "protocol_number_part2", "type")
+    def write(self, vals):
+        # Validate issued declarations only when their protocol is created or
+        # actually changed. Declarations already stored with a non-conforming
+        # protocol (e.g. migrated from l10n_it_declaration_of_intent, or created
+        # before this check existed) must remain writable: a constraint on the
+        # fields would make any write carrying their current values fail, even
+        # when the protocol is not being modified.
+        to_validate = self.browse()
+        if {"protocol_number_part1", "protocol_number_part2", "type"} & set(vals):
+            to_validate = self.filtered(lambda doi: doi._protocol_is_modified(vals))
+        res = super().write(vals)
+        to_validate._check_protocol_format()
+        return res
+
+    def _protocol_is_modified(self, vals):
+        """Return whether ``vals`` changes the protocol of an issued declaration."""
+        self.ensure_one()
+        new_type = vals.get("type", self.type)
+        if new_type != "in":
+            return False
+        if new_type != self.type:
+            # Issuing a declaration requires a valid protocol
+            return True
+        return (
+            vals.get("protocol_number_part1", self.protocol_number_part1),
+            vals.get("protocol_number_part2", self.protocol_number_part2),
+        ) != (self.protocol_number_part1, self.protocol_number_part2)
+
     def _check_protocol_format(self):
         """
         Validate AdE protocol format for issued declarations.
+        Called on creation and when the protocol of an existing declaration
+        is modified.
 
         The full protocol (part1 + part2) should be 17 characters:
         - AAAA: Year (4 digits)
@@ -300,7 +329,9 @@ class L10nItDeclarationOfIntent(models.Model):
                 values["number"] = self.env["ir.sequence"].next_by_code(
                     "l10n_it_edi_doi.declaration_of_intent"
                 )
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        records._check_protocol_format()
+        return records
 
     @api.ondelete(at_uninstall=False)
     def _unlink_except_linked_to_purchase_document(self):
