@@ -327,6 +327,47 @@ class TestPlafondFixes(TransactionCase):
         with self.assertRaises(UserError):
             draft_row.move_id = invoice
 
+    # 17: a duplicate of a posted invoice keeps the split, a draft one does not
+    def test_17_posted_duplicate_keeps_rows(self):
+        invoice = self._create_invoice(self.sale_doi_tax)
+        self._add_link(invoice, self.doi_out, 500.0)
+        self._add_link(invoice, self.doi_out_2, 400.0)
+        self.assertFalse(invoice.copy().l10n_it_edi_doi_ids)
+        invoice.action_post()
+        self.assertRecordValues(
+            invoice.copy().l10n_it_edi_doi_ids,
+            [
+                {"declaration_id": self.doi_out.id, "amount": 500.0},
+                {"declaration_id": self.doi_out_2.id, "amount": 400.0},
+            ],
+        )
+
+    # 18: modifying a posted invoice keeps the split on the replacement
+    def test_18_modify_reversal_keeps_rows(self):
+        invoice = self._create_invoice(self.sale_doi_tax)
+        self._add_link(invoice, self.doi_out, 500.0)
+        self._add_link(invoice, self.doi_out_2, 400.0)
+        invoice.action_post()
+        wizard = (
+            self.env["account.move.reversal"]
+            .with_context(active_model="account.move", active_ids=invoice.ids)
+            .create({"journal_id": invoice.journal_id.id, "reason": "test"})
+        )
+        new_invoice = self.env["account.move"].browse(wizard.modify_moves()["res_id"])
+        self.assertEqual(new_invoice.state, "draft")
+        self.assertRecordValues(
+            new_invoice.l10n_it_edi_doi_ids,
+            [
+                {"declaration_id": self.doi_out.id, "amount": 500.0},
+                {"declaration_id": self.doi_out_2.id, "amount": 400.0},
+            ],
+        )
+        # the reversal offsets the original, the replacement consumes it again
+        self.assertEqual(self.doi_out.invoiced, 0.0)
+        new_invoice.action_post()
+        self.assertEqual(self.doi_out.invoiced, 500.0)
+        self.assertEqual(self.doi_out_2.invoiced, 400.0)
+
     # credit notes keep the rows even when the declaration was terminated since
     def test_14_credit_note_on_terminated_declaration(self):
         invoice = self._create_invoice(self.sale_doi_tax)

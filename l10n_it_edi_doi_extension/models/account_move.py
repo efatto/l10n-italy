@@ -224,11 +224,13 @@ class AccountMove(models.Model):
         return super()._post(soft)
 
     def copy_data(self, default=None):
-        """Carry the bridge lines onto credit notes only.
+        """Carry the bridge lines onto the copy of an already posted document.
 
-        A credit note must reverse the same declarations with the same amounts.
-        A duplicate follows core instead: the split between declarations depends
-        on their remaining amount at invoicing time, so it is not copied.
+        A credit note must reverse the same declarations with the same amounts,
+        and the "modify" reversal builds its replacement invoice with copy_data()
+        as well, so both have to keep the split. A copy of a draft document (a
+        plain duplicate) follows core instead: the split between declarations
+        depends on their remaining amount at invoicing time, so it is not copied.
         Core _reverse_moves builds the credit note with copy(), so the lines are
         created while the move is still draft.
         The lines are copied whatever the current state of the declaration: a
@@ -238,9 +240,10 @@ class AccountMove(models.Model):
         dates are not blocking when the amount is not positive).
         """
         data_list = super().copy_data(default)
-        if not (default and default.get("reversed_entry_id")):
-            return data_list
         for move, data in zip(self, data_list, strict=True):
+            # core copy_data can return None for a record already copied
+            if not data or not (move.posted_before or data.get("reversed_entry_id")):
+                continue
             data["l10n_it_edi_doi_ids"] = [
                 Command.create(
                     {
