@@ -289,7 +289,8 @@ class TestPlafondFixes(TransactionCase):
         order.button_cancel()
         self.assertFalse(order.l10n_it_edi_doi_warning)
 
-    # migrated rows with amount 0 do not hide the invoice and stay editable
+    # migrated rows with amount 0 are inert: ignored by the totals and by the
+    # copies, and locked like any other row of a posted invoice
     def test_13_migrated_zero_amount_row(self):
         invoice = self._create_invoice(self.sale_doi_tax)
         invoice.action_post()
@@ -314,10 +315,11 @@ class TestPlafondFixes(TransactionCase):
         refund = self._reverse(invoice)
         self.assertFalse(refund.l10n_it_edi_doi_ids)
         row = invoice.l10n_it_edi_doi_ids
-        row.amount = 900.0
-        self.assertEqual(self.doi_out.invoiced, 900.0)
+        with self.assertRaises(UserError):
+            row.amount = 900.0
         with self.assertRaises(UserError):
             row.unlink()
+        self.assertEqual(self.doi_out.invoiced, 900.0)
         # and a row cannot be moved onto a posted invoice
         draft_row = self._add_link(
             self._create_invoice(self.sale_doi_tax), self.doi_out, 50.0

@@ -110,10 +110,14 @@ class AccountMoveDoi(models.Model):
                     _("The amount covered by a declaration must be positive.")
                 )
 
-    def _check_move_is_draft(self):
-        # Rows with amount 0 come from the v16 migration (raw SQL, no constraint):
-        # they stay editable so the amount can be fixed or the row removed.
-        if any(record.move_id.state != "draft" and record.amount for record in self):
+    def _check_move_is_draft(self, moves=None):
+        # Bridge rows drive the declaration amounts and the e-invoice data, so a
+        # change after posting would make the invoice disagree with what was
+        # sent. Rows with amount 0 left by the v16 migration (raw SQL, no
+        # constraint) are inert: they are neither counted nor copied, and they
+        # stay as they are like every other row of a posted invoice.
+        moves = self.move_id if moves is None else moves
+        if any(move.state != "draft" for move in moves):
             raise UserError(
                 _("Declarations of Intent can only be changed on draft invoices.")
             )
@@ -152,13 +156,11 @@ class AccountMoveDoi(models.Model):
     def write(self, vals):
         if vals.keys() & {"declaration_id", "amount", "move_id"}:
             self._check_move_is_draft()
-        # A row cannot be moved onto a non draft invoice either
-        if vals.get("move_id") and self.env["account.move"].browse(
-            vals["move_id"]
-        ).filtered(lambda move: move.state != "draft"):
-            raise UserError(
-                _("Declarations of Intent can only be changed on draft invoices.")
-            )
+            if vals.get("move_id"):
+                # A row cannot be moved onto a non draft invoice either
+                self._check_move_is_draft(
+                    self.env["account.move"].browse(vals["move_id"])
+                )
         res = super().write(vals)
         if "declaration_id" in vals:
             self._sync_l10n_it_edi_doi_id()
