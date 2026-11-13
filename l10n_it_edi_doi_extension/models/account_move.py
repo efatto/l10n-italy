@@ -116,6 +116,19 @@ class AccountMove(models.Model):
                 continue
             declaration_lines = move._l10n_it_edi_doi_ext_get_declaration_lines(tax)
             move.l10n_it_edi_doi_amount = sum(declaration_lines.mapped("price_total"))
+
+        # Invoices migrated from the legacy module have no DOI tax on their
+        # lines, so the standard compute gives 0 and would discard the amount
+        # written by post_init_hook at the next invalidation. Restore it for
+        # documents that were posted at some point: a new document cannot be in
+        # that state, because posting refuses a DOI without DOI-taxed lines.
+        for move in self:
+            if (
+                move.l10n_it_edi_doi_id
+                and not move.l10n_it_edi_doi_amount
+                and move.posted_before
+            ):
+                move.l10n_it_edi_doi_amount = abs(move.amount_untaxed)
         return  # W8110
 
     def _compute_l10n_it_edi_doi_id(self):

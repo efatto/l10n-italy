@@ -165,6 +165,21 @@ class TestPlafondFixes(TransactionCase):
         self.assertEqual(doi.invoiced, 0.0)
         self.assertNotIn("exceeded", invoice.l10n_it_edi_doi_warning)
 
+    # 06b: the amount of a migrated invoice survives a recompute, while a new
+    # draft without the DOI tax is not counted through amount_untaxed
+    def test_06b_migrated_amount_survives_recompute(self):
+        invoice = self._create_invoice(self.sale_doi_tax)
+        invoice.action_post()
+        invoice.button_draft()
+        # a v16 invoice: DOI linked, no v18 DOI tax on the lines
+        invoice.invoice_line_ids.tax_ids = False
+        invoice.invoice_line_ids.price_unit = 1000.0
+        self.assertEqual(invoice.l10n_it_edi_doi_amount, 1000.0)
+        # a new draft with a DOI but without the DOI tax keeps 0
+        draft = self._create_invoice(self.sale_doi_tax)
+        draft.invoice_line_ids.tax_ids = False
+        self.assertEqual(draft.l10n_it_edi_doi_amount, 0.0)
+
     # 07: bridge rows are locked once the invoice is posted
     def test_07_posted_invoice_rows_locked(self):
         invoice = self._create_invoice(self.sale_doi_tax)
