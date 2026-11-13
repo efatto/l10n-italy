@@ -282,8 +282,11 @@ class AccountMove(models.Model):
                 if line_errors := move._l10n_it_edi_doi_ext_get_lines_messages(doi_tax):
                     errors.extend(line_errors)
                 currency = move.currency_id
-                doi_amount = move.l10n_it_edi_doi_amount
-                doi_total = move.l10n_it_edi_doi_total_amount
+                # Sale documents carry a signed amount (core), purchase ones do
+                # not, while the bridge rows are always unsigned: compare the
+                # absolute values so that credit notes are checked too.
+                doi_amount = abs(move.l10n_it_edi_doi_amount)
+                doi_total = abs(move.l10n_it_edi_doi_total_amount)
                 if currency.compare_amounts(doi_total, doi_amount) > 0:
                     errors.append(
                         move.env._(
