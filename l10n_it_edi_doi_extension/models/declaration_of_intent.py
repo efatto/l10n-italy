@@ -73,16 +73,22 @@ class L10nItDeclarationOfIntent(models.Model):
         amounts from the bridge model. For invoices without bridge records (single
         declaration via l10n_it_edi_doi_id), use the standard l10n_it_edi_doi_amount.
 
-        Refunds (in_refund, out_refund) reduce the invoiced amount.
+        Only posted documents count, as in core. A document set back to draft
+        does not consume the plafond: the threshold warning already simulates
+        its posting while it is draft, so counting it here too would count it
+        twice in that warning.
+        Bridge amounts are unsigned on both sides, so refunds are negated.
+        l10n_it_edi_doi_amount is signed by core on sale documents, unsigned on
+        purchase documents and on migrated ones, so refunds take the negative
+        absolute value there.
         """
         for declaration in self:
             total_invoiced = 0
 
-            # Get all posted invoices and draft with name linked through the bridge
-            # model
+            # Rows with amount 0 (v16 migration leftovers) carry no split
+            # information: their invoice falls back to l10n_it_edi_doi_amount.
             posted_doi_links = declaration.move_doi_ids.filtered(
-                lambda doi: doi.move_id.state == "posted"
-                or (doi.move_id.state == "draft" and doi.move_id.name)
+                lambda doi: doi.amount and doi.move_id.state == "posted"
             )
             bridge_moves = posted_doi_links.mapped("move_id")
 
@@ -103,7 +109,8 @@ class L10nItDeclarationOfIntent(models.Model):
             for invoice in single_declaration_invoices:
                 amount = invoice.l10n_it_edi_doi_amount
                 if invoice.move_type in ("in_refund", "out_refund"):
-                    amount = -amount
+                    # Signed by core, unsigned on purchases and on migrated rows
+                    amount = -abs(amount)
                 total_invoiced += amount
 
             declaration.invoiced = total_invoiced
