@@ -1,6 +1,8 @@
 # Copyright 2025 Nextev
 # License AGPL-3 - See https://www.gnu.org/licenses/agpl-3.0.html
 
+from dateutil.relativedelta import relativedelta
+
 from odoo import exceptions, fields, tests
 from odoo.tests import Form
 
@@ -577,4 +579,95 @@ class TestDoiIssuedFromCompany(Common):
             "Total Amount for the Declaration of Intent .* "
             "cannot be greater than .* "
             "Declaration of Intent Amount",
+        )
+
+    def test_valid_protocol_17_chars(self):
+        """Test that valid 17-character protocol is accepted."""
+        # Format: AAAANNNNNNNNCCCCC (4 + 8 + 5 = 17 chars)
+        # Using current year
+        part1 = f"{self.current_year}0000"  # 8 chars
+        part2 = "123456789"  # 9 chars -> total 17
+        doi = self._create_declaration(
+            "in",
+            protocol_part1=part1,
+            protocol_part2=part2,
+        )
+        self.assertTrue(doi.id)
+
+    def test_invalid_protocol_length(self):
+        """Test that protocol with wrong length is rejected."""
+        # Too short
+        with self.assertRaises(exceptions.ValidationError) as ve:
+            self._create_declaration(
+                "in",
+                protocol_part1="2025",
+                protocol_part2="123",
+            )  # Only 7 chars
+        exc_message = ve.exception.args[0]
+        self.assertIn("must be exactly 17 characters", exc_message)
+
+    def test_invalid_protocol_format(self):
+        """Test that protocol with invalid format is rejected."""
+        # Invalid format (letters in wrong place)
+        with self.assertRaises(exceptions.ValidationError) as ve:
+            self._create_declaration(
+                "in",
+                protocol_part1="ABCD0000",
+                protocol_part2="123456789",
+            )  # Letters instead of year
+        exc_message = ve.exception.args[0]
+        self.assertIn("does not match AdE format", exc_message)
+
+    def test_protocol_not_validated_for_out(self):
+        """Test that protocol validation is skipped for type 'out'."""
+        # Type 'out' should not validate protocol format
+        doi = self.env["l10n_it_edi_doi.declaration_of_intent"].create(
+            {
+                "partner_id": self.partner.id,
+                "company_id": self.company.id,
+                "state": "draft",
+                "type": "out",
+                "currency_id": self.company.currency_id.id,
+                "issue_date": fields.Date.today(),
+                "start_date": fields.Date.today(),
+                "end_date": fields.Date.today() + relativedelta(months=2),
+                "threshold": 5000,
+                "protocol_number_part1": "ABC",  # Invalid format but OK for 'out'
+                "protocol_number_part2": "123",
+            }
+        )
+        self.assertTrue(doi)
+
+    def test_existing_invalid_protocol_not_blocking_writes(self):
+        """Declarations stored with a non-conforming protocol (e.g. migrated
+        from the old module) can still be written as long as the protocol is
+        not modified."""
+        # Simulate a protocol stored before this validation existed
+        self.env.cr.execute(
+            """
+            UPDATE l10n_it_edi_doi_declaration_of_intent
+               SET protocol_number_part1 = %s, protocol_number_part2 = %s
+             WHERE id = %s
+            """,
+            ("2025", "1234567", self.doi_in.id),
+        )
+        self.env.invalidate_all()
+        # Rewriting the stored values unchanged must not raise
+        self.doi_in.write({"threshold": 6000})
+        self.doi_in.write(
+            {
+                "type": "in",
+                "protocol_number_part1": "2025",
+                "protocol_number_part2": "1234567",
+            }
+        )
+        # Changing the protocol to another non-conforming value must raise
+        with self.assertRaises(exceptions.ValidationError):
+            self.doi_in.write({"protocol_number_part2": "123"})
+        # Fixing it with a conforming value must be allowed
+        self.doi_in.write(
+            {
+                "protocol_number_part1": f"{self.current_year}0000",
+                "protocol_number_part2": "123456789",
+            }
         )

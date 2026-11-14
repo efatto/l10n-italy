@@ -20,8 +20,9 @@ class Common(BaseCommon):
             if not hasattr(cls, "_protocol_counter"):
                 cls._protocol_counter = 0
             cls._protocol_counter += 1
-            protocol_part1 = str(1000 + cls._protocol_counter)
-            protocol_part2 = str(2000 + cls._protocol_counter)
+            # AdE protocol format: AAAANNNNNNNNCCCCC (4 + 8 + 5 characters)
+            protocol_part1 = f"{cls.current_year}{cls._protocol_counter:04d}"
+            protocol_part2 = f"{cls._protocol_counter:09d}"
 
         return cls.env["l10n_it_edi_doi.declaration_of_intent"].create(
             {
