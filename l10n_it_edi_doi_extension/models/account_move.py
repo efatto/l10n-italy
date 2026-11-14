@@ -72,37 +72,149 @@ class AccountMove(models.Model):
             )
         return  # W8110
 
-    @api.depends("l10n_it_edi_doi_total_amount")
+    def _build_threshold_warning(self, declaration, declared_amount):
+        """Threshold warning of ``declaration`` once this move is posted.
+
+        Same computation as core, with the amount of this move that the
+        declaration covers given as a parameter: core uses the DOI amount of
+        the whole invoice, while a declaration only covers the amount of its
+        bridge row.
+        ``declared_amount`` is signed, like the amount that core adds.
+        """
+        self.ensure_one()
+        declaration_invoiced = declaration.invoiced
+        declaration_not_yet_invoiced = declaration.not_yet_invoiced
+        if self.state != "posted":
+            # Here we replicate what would happen when posting the invoice.
+            declaration_invoiced += declared_amount
+            additional_invoiced_qty = {}
+            is_purchase = self.is_purchase_document()
+            linked_orders = (
+                self.env["purchase.order"] if is_purchase else self.env["sale.order"]
+            )
+            for invoice_line in self.invoice_line_ids:
+                order_lines = (
+                    invoice_line.purchase_line_id
+                    if is_purchase
+                    else invoice_line.sale_line_ids
+                )
+                for order_line in order_lines:
+                    order = order_line.order_id
+                    if order.l10n_it_edi_doi_id == declaration:
+                        linked_orders |= order
+                    qty_invoiced = (
+                        invoice_line.product_uom_id._compute_quantity(
+                            invoice_line.quantity, order_line.product_uom
+                        )
+                        * -self.direction_sign
+                    )
+                    order_line_id = order_line.ids[
+                        0
+                    ]  # do not just use `id` in case of NewId
+                    additional_invoiced_qty[order_line_id] = (
+                        additional_invoiced_qty.get(order_line_id, 0) + qty_invoiced
+                    )
+
+            for order in linked_orders:
+                not_yet_invoiced = order.l10n_it_edi_doi_not_yet_invoiced
+                not_yet_invoiced_after_posting = (
+                    order._l10n_it_edi_doi_get_amount_not_yet_invoiced(
+                        declaration,
+                        additional_invoiced_qty=additional_invoiced_qty,
+                    )
+                )
+                declaration_not_yet_invoiced -= (
+                    not_yet_invoiced - not_yet_invoiced_after_posting
+                )
+
+        return declaration._build_threshold_warning_message(
+            declaration_invoiced, declaration_not_yet_invoiced
+        )
+
+    def _build_extended_threshold_warning(self):
+        """Threshold warning of every declaration linked through the bridge rows.
+
+        Bridge rows are always positive; the amount of a refund is not, and a
+        refund lowers what the declaration has invoiced instead of consuming
+        it again.
+        """
+        self.ensure_one()
+        is_refund = self.move_type in ("in_refund", "out_refund")
+        warnings = []
+        for declaration_line in self.l10n_it_edi_doi_ids:
+            declared_amount = declaration_line.amount
+            if is_refund:
+                declared_amount = -declared_amount
+            threshold_warning = self._build_threshold_warning(
+                declaration_line.declaration_id, declared_amount
+            )
+            if threshold_warning:
+                warnings.append(threshold_warning)
+        return "\n".join(warnings)
+
+    def _build_core_threshold_warning(self):
+        """Threshold warning that core builds for ``l10n_it_edi_doi_id``.
+
+        Core reports the first declaration only, checking it against the DOI
+        amount of the whole invoice. That message is replaced by the one built
+        on the bridge rows, so it has to be recognized inside the core string.
+        """
+        self.ensure_one()
+        if not (
+            self.l10n_it_edi_doi_id
+            and self.is_sale_document(include_receipts=False)
+            and self.state != "cancel"
+        ):
+            return ""
+        return self._build_threshold_warning(
+            self.l10n_it_edi_doi_id, self.l10n_it_edi_doi_amount
+        )
+
+    @api.depends("l10n_it_edi_doi_total_amount", "l10n_it_edi_doi_ids.amount")
     def _compute_l10n_it_edi_doi_warning(self):
-        """Append a coverage warning when the bridge rows do not cover the
-        invoice DOI amount. Core warnings (threshold, validity) are kept.
+        """Append the multi-declaration warnings to the core ones.
+
+        Core only knows the first declaration (``l10n_it_edi_doi_id``) and
+        checks it against the DOI amount of the whole invoice: keep its
+        validity warnings, but not that threshold warning, which the bridge
+        rows make inaccurate. Append instead, for every linked declaration,
+        its own threshold warning and, when the declarations do not cover the
+        invoice DOI amount, a coverage warning.
         """
         super()._compute_l10n_it_edi_doi_warning()
         for move in self.filtered("l10n_it_edi_doi_ids"):
             # Sale documents carry a signed amount (core), purchase ones do not
             doi_amount = abs(move.l10n_it_edi_doi_amount)
+            warnings = move.l10n_it_edi_doi_warning.split("\n\n")
+            core_threshold_warning = move._build_core_threshold_warning()
+            if core_threshold_warning:
+                warnings = [
+                    warning for warning in warnings if warning != core_threshold_warning
+                ]
+            if threshold_warning := move._build_extended_threshold_warning():
+                warnings.append(threshold_warning)
             if (
                 move.currency_id.compare_amounts(
                     move.l10n_it_edi_doi_total_amount, doi_amount
                 )
-                >= 0
+                < 0
             ):
-                continue
-            covered = (
-                f"{move.l10n_it_edi_doi_total_amount:.2f} {move.currency_id.symbol}"
-            )
-            total = f"{doi_amount:.2f} {move.currency_id.symbol}"
-            coverage = _(
-                "Warning: The total amount covered by declarations "
-                "(%(covered)s) is less than the invoice DOI amount "
-                "(%(total)s). Please adjust the amounts or add more "
-                "declarations.",
-                covered=covered,
-                total=total,
-            )
-            move.l10n_it_edi_doi_warning = "\n\n".join(
-                filter(None, [move.l10n_it_edi_doi_warning, coverage])
-            )
+                covered = (
+                    f"{move.l10n_it_edi_doi_total_amount:.2f} "
+                    f"{move.currency_id.symbol}"
+                )
+                total = f"{doi_amount:.2f} {move.currency_id.symbol}"
+                warnings.append(
+                    _(
+                        "Warning: The total amount covered by declarations "
+                        "(%(covered)s) is less than the invoice DOI amount "
+                        "(%(total)s). Please adjust the amounts or add more "
+                        "declarations.",
+                        covered=covered,
+                        total=total,
+                    )
+                )
+            move.l10n_it_edi_doi_warning = "\n\n".join(filter(None, warnings))
         return  # W8110
 
     def _compute_l10n_it_edi_doi_amount(self):
