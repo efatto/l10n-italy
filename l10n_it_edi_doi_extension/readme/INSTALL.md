@@ -29,6 +29,8 @@ Steps:
 
    - Creates `account.move.doi` bridge records from the old many2many relations
    - Populates `l10n_it_edi_doi_amount` on invoices that had no DOI tax lines
+   - Creates the annual plafonds (`plafond.year`) from the yearly limits of the
+     company and links the issued declarations of that year to them
    - Cleans up residual metadata from the old module and removes it entirely
      (records, model metadata, and module entry — no manual uninstall is needed
      or possible after this point)
@@ -48,7 +50,6 @@ Steps:
 - `partner_document_number`, `partner_document_date`
 - `taxes_ids`, `fiscal_position_id`
 - Declaration lines (`declaration_line` model)
-- Yearly limits (`yearly_limit` model) — adjust individual declaration thresholds manually
 
 **Troubleshooting:**
 
@@ -68,8 +69,12 @@ Steps:
   open each affected invoice and assign the correct amount in the "Declarations of
   Intent" tab.
 
-- *Yearly limits not migrated*: the concept no longer exists in v18. Review each
-  declaration and set the `threshold` field to the appropriate value.
+- *Yearly limits*: every yearly limit of the old module becomes an annual plafond
+  (`plafond.year`) with the old limit as total, and the issued declarations
+  starting in that year are linked to it. If the old module had more than one
+  limit for the same year only the highest is kept: check the plafond totals in
+  the *Annual Plafond* menu (Accounting > Entries) before working on the
+  declarations.
 
 
 **Italiano**
@@ -103,6 +108,8 @@ Passi:
 
    - Crea i record bridge `account.move.doi` dalle vecchie relazioni many2many
    - Popola `l10n_it_edi_doi_amount` sulle fatture prive di righe con imposta DOI
+   - Crea i plafond annuali (`plafond.year`) dai limiti annuali dell'azienda e
+     collega ad essi le dichiarazioni emesse di quell'anno
    - Pulisce i metadati residui del vecchio modulo e lo rimuove completamente
      (record, metadati del modello e voce del modulo — non è necessaria né
      possibile una disinstallazione manuale)
@@ -122,8 +129,6 @@ Passi:
 - `partner_document_number`, `partner_document_date`
 - `taxes_ids`, `fiscal_position_id`
 - Righe della dichiarazione (modello `declaration_line`)
-- Limiti annuali (modello `yearly_limit`) — aggiustare manualmente la soglia delle
-  singole dichiarazioni
 
 **Risoluzione dei problemi:**
 
@@ -145,5 +150,9 @@ Passi:
   Se si riscontrano importi a zero, aprire le fatture interessate e assegnare l'importo
   corretto nel tab "Dichiarazioni di Intento".
 
-- *Limiti annuali non migrati*: il concetto non esiste in v18. Rivedere ogni
-  dichiarazione e impostare il campo `threshold` con il valore appropriato.
+- *Limiti annuali*: ogni limite annuale del vecchio modulo diventa un plafond
+  annuale (`plafond.year`) con il vecchio limite come totale, e le dichiarazioni
+  emesse che iniziano in quell'anno vengono collegate ad esso. Se il vecchio modulo
+  aveva più di un limite per lo stesso anno viene mantenuto solo il più alto:
+  verificare i totali dei plafond dal menu *Annual Plafond* (Contabilità >
+  Registrazioni) prima di lavorare sulle dichiarazioni.

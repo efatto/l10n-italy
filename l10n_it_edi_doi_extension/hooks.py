@@ -2,9 +2,12 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 import json
+import logging
 
 from openupgradelib import openupgrade
 from psycopg2 import sql
+
+_logger = logging.getLogger(__name__)
 
 _OLD_MODULE = "l10n_it_declaration_of_intent"
 
@@ -14,6 +17,10 @@ _OLD_TABLE = "l10n_it_declaration_of_intent_declaration"
 _NEW_TABLE = "l10n_it_edi_doi_declaration_of_intent"
 _OLD_MODEL = "l10n_it_declaration_of_intent.declaration"
 _NEW_MODEL = "l10n_it_edi_doi.declaration_of_intent"
+# Yearly plafond of the old module (res.company.declaration_yearly_limit_ids)
+_OLD_YEARLY_LIMIT_TABLE = "l10n_it_declaration_of_intent_yearly_limit"
+# Annual plafond of this module
+_PLAFOND_TABLE = "l10n_it_edi_doi_extension_plafond_year"
 
 
 _REL_TABLE = "account_move_l10n_it_declaration_of_intent_declaration_rel"
@@ -290,9 +297,9 @@ def _l10n_it_declaration_of_intent_pre_migration(env):
         )
 
     # Drop old tables that are no longer needed
-    # (lines migrated to account_move_doi in post-migration)
+    # (lines migrated to account_move_doi and yearly limits to the annual
+    # plafond in post-migration)
     tables_to_drop = [
-        "l10n_it_declaration_of_intent_yearly_limit",  # Yearly limits no longer managed
         "move_line_declaration_line_rel",  # Old M2M relation
         "account_tax_l10n_it_declaration_of_intent_declaration_rel",  # Tax↔DOI M2M
         "declaration_select_manually_rel",  # Manually selected DOIs M2M
@@ -418,6 +425,73 @@ def _log_migration_choices(env):
             message_type="comment",
             subtype_xmlid="mail.mt_note",
         )
+
+
+def _migrate_yearly_limits_to_plafond(env):
+    """Create the annual plafonds from the yearly limits of the old module.
+
+    The old module stored the plafond assigned by the Agenzia delle Entrate
+    per company and year in ``l10n_it_declaration_of_intent_yearly_limit``
+    (``res.company.declaration_yearly_limit_ids``): every issued declaration
+    drew its ``limit_amount`` from that yearly limit. In v18 the plafond is a
+    record of its own (``plafond.year``) that groups the declarations of the
+    year, so one plafond is created per company and year with the old limit
+    as total and the issued declarations of that year are linked to it.
+    """
+    if not openupgrade.table_exists(env.cr, _OLD_YEARLY_LIMIT_TABLE):
+        return
+    if not openupgrade.table_exists(env.cr, _PLAFOND_TABLE):
+        return
+    env.cr.execute(
+        sql.SQL("""
+            SELECT company_id, year::integer, MAX(limit_amount)
+            FROM {old_table}
+            WHERE company_id IS NOT NULL
+              AND year ~ '^[0-9]{{4}}$'
+              AND limit_amount > 0
+            GROUP BY company_id, year
+            ORDER BY company_id, year
+        """).format(old_table=sql.Identifier(_OLD_YEARLY_LIMIT_TABLE))
+    )
+    plafond_model = env["l10n_it_edi_doi_extension.plafond.year"]
+    created = 0
+    for company_id, year, limit_amount in env.cr.fetchall():
+        if plafond_model.search_count(
+            [("company_id", "=", company_id), ("year", "=", year)], limit=1
+        ):
+            # A plafond already exists for this year: keep it as it is
+            continue
+        plafond_model.create(
+            {
+                "company_id": company_id,
+                "year": year,
+                "plafond_total": limit_amount,
+                "note": env._("Created from the yearly limit of the previous module"),
+            }
+        )
+        created += 1
+    openupgrade.logged_query(
+        env.cr,
+        sql.SQL("""
+            UPDATE {doi_table} doi
+            SET plafond_id = plafond.id
+            FROM {plafond_table} plafond
+            WHERE doi.type = 'in'
+              AND doi.plafond_id IS NULL
+              AND plafond.company_id = doi.company_id
+              AND plafond.year = EXTRACT(YEAR FROM doi.start_date)
+        """).format(
+            doi_table=sql.Identifier(_NEW_TABLE),
+            plafond_table=sql.Identifier(_PLAFOND_TABLE),
+        ),
+    )
+    openupgrade.logged_query(
+        env.cr,
+        sql.SQL("DROP TABLE IF EXISTS {} CASCADE").format(
+            sql.Identifier(_OLD_YEARLY_LIMIT_TABLE)
+        ),
+    )
+    _logger.info("Yearly limits: %s annual plafond(s) created", created)
 
 
 def _l10n_it_declaration_of_intent_post_migration(env):
@@ -568,6 +642,9 @@ def _l10n_it_declaration_of_intent_post_migration(env):
         AND module = 'l10n_it_declaration_of_intent'
         """,
     )
+
+    # ---- Migrate the yearly limits to the annual plafond ----
+    _migrate_yearly_limits_to_plafond(env)
 
     # ---- Clean up all remnants of the old module ----
     old_module = _OLD_MODULE
