@@ -161,6 +161,40 @@ def _recover_admin_ref(env):
     )
 
 
+def _recover_advance_document_type(env):
+    """Recover the document type of the down payment invoices.
+
+    The legacy ``l10n_it_fatturapa_sale`` module stored the default document
+    type of the down payment invoices in
+    ``account_journal.advance_fiscal_document_type_id``, linked to the
+    ``fiscal_document_type`` model. The new field is linked to
+    ``l10n_it.document.type``, so the old values are mapped by document type
+    code. Journals whose document type code has no 18.0 counterpart are left
+    empty.
+    """
+    cr = env.cr
+    if not openupgrade.column_exists(
+        cr, "account_journal", "advance_fiscal_document_type_id"
+    ):
+        return
+    if not openupgrade.table_exists(cr, "fiscal_document_type"):
+        return
+    if not openupgrade.table_exists(cr, "l10n_it_document_type"):
+        return
+    openupgrade.logged_query(
+        cr,
+        """
+        UPDATE account_journal aj
+        SET l10n_it_advance_document_type_id = lidt.id
+        FROM fiscal_document_type fdt
+        JOIN l10n_it_document_type lidt ON lidt.code = fdt.code
+        WHERE aj.advance_fiscal_document_type_id = fdt.id
+          AND aj.l10n_it_advance_document_type_id IS NULL
+        """,
+    )
+
+
 def _post_init_hook(env):
     _recover_related_documents(env)
     _recover_admin_ref(env)
+    _recover_advance_document_type(env)

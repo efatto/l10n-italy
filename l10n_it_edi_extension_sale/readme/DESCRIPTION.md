@@ -22,6 +22,14 @@ Alla creazione della fattura i documenti correlati vengono copiati
 dall'ordine (e dalle sue righe) alla fattura (e alle sue righe): in caso
 di fatturazione parziale ogni fattura riceve la propria copia.
 
+Nel registro di vendita è possibile impostare il tipo documento da usare
+per le fatture di acconto: viene applicato alle fatture create con
+l'importo o la percentuale di acconto.
+
+Se il termine di pagamento è RiBa (MP12) e il modulo
+`l10n_it_riba_oca` è installato, la banca ricevente viene rimossa dalla
+fattura creata dall'ordine.
+
 Gli utenti commerciali (senza permessi di contabilità) non possono
 modificare i documenti correlati delle fatture già emesse: la modifica è
 riservata agli utenti contabili.
@@ -47,6 +55,14 @@ header (type, number, date, CIG and CUP), this module allows to:
 When the invoice is created, the related documents are copied from the
 sale order (and its lines) to the invoice (and its lines): with partial
 invoicing, each invoice gets its own copy.
+
+The sale journal allows to set the document type used for down payment
+invoices: it is applied to the invoices created with the down payment
+amount or percentage.
+
+If the payment term is RiBa (MP12) and the `l10n_it_riba_oca` module is
+installed, the recipient bank is removed from the invoice created from
+the order.
 
 Sales users (without accounting access rights) cannot change the related
 documents of posted invoices: changing them is reserved to accounting
