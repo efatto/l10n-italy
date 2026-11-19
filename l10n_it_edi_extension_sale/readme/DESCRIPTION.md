@@ -1,5 +1,5 @@
 **Italiano**
-
+ERRRORE PER TEST DI PACCHETTO PIP DISMESSO!!!!!
 Questo modulo permette di impostare i documenti correlati e il
 riferimento amministrazione nell'ordine di vendita (o le sue righe) e
 propagarli alla fattura (o le sue righe) durante la creazione della
