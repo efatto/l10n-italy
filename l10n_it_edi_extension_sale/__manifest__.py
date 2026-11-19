@@ -21,6 +21,7 @@
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
+        "views/journal_view.xml",
         "views/account_move_related_document_view.xml",
         "views/sale_order_view.xml",
         "views/sale_order_line_view.xml",
