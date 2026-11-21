@@ -49,6 +49,13 @@ class TestPlafondFixes(TransactionCase):
                 "l10n_it_edi_doi_bill_tax_id": cls.bill_doi_tax.id,
             }
         )
+        cls.plafond = cls.env["l10n_it_edi_doi_extension.plafond.year"].create(
+            {
+                "year": fields.Date.today().year,
+                "company_id": cls.company.id,
+                "plafond_total": 100000.0,
+            }
+        )
         cls.doi_out = cls._create_declaration("out", "1", threshold=5000)
         cls.doi_out_2 = cls._create_declaration("out", "2", threshold=5000)
         cls.doi_in = cls._create_declaration("in", "3", threshold=5000)
@@ -62,6 +69,7 @@ class TestPlafondFixes(TransactionCase):
                 "company_id": cls.company.id,
                 "state": "active",
                 "type": doi_type,
+                "plafond_id": cls.plafond.id if doi_type == "in" else False,
                 "currency_id": cls.company.currency_id.id,
                 "issue_date": today,
                 "start_date": today,

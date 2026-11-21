@@ -50,6 +50,8 @@ Key features:
   set in the Move
 - In the Company form, only find Purchase/Sale Taxes of the shown
   Company for issued/received Declarations
+- Annual threshold (plafond annuale) management for monitoring DOIs
+  usage across the fiscal year
 
 **Italiano**
 
@@ -70,6 +72,8 @@ Caratteristiche principali:
   DI quando la DI è impostata nella registrazione
 - Nel form dell'azienda, trova solo le imposte di acquisto/vendita
   dell'azienda mostrata per le dichiarazioni emesse/ricevute
+- Gestione del plafond annuale per monitorare l'utilizzo delle DOI
+  durante l'anno fiscale
 
 **Table of contents**
 
