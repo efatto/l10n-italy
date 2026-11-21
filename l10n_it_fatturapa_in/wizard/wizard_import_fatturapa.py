@@ -7,7 +7,7 @@ import re
 import warnings
 from datetime import datetime
 
-from odoo import api, fields, models
+from odoo import api, fields, models, registry
 from odoo.exceptions import UserError
 from odoo.fields import first
 from odoo.osv import expression
@@ -1789,19 +1789,34 @@ class WizardImportFatturapa(models.TransientModel):
         )
         different_precisions = original_precision = None
         if precision:
+            precision.env.clear()
             original_precision = precision.digits
             different_precisions = self[field_name] != original_precision
             if different_precisions:
-                precision.sudo().digits = self[field_name]
-                attachments.update(
-                    {
-                        field_name: self[field_name],
-                    }
-                )
+                with api.Environment.manage():
+                    with registry(self.env.cr.dbname).cursor() as new_cr:
+                        # We need a new env (and cursor) because 'digits' property of Float
+                        # fields is retrieved with a new LazyCursor,
+                        # see class Float at odoo.fields,
+                        # so we need to write (commit) to DB in order to make the new
+                        # precision available
+                        precision.env = precision.env(cr=new_cr)
+                        precision.sudo().write({"digits": self[field_name]})
+                        attachments.update(
+                            {
+                                field_name: self[field_name],
+                            }
+                        )
+                        new_cr.commit()
         return precision, different_precisions, original_precision
 
     def _restore_original_precision(self, precision, original_precision):
-        precision.sudo().digits = original_precision
+        precision.env.clear()
+        with api.Environment.manage():
+            with registry(self.env.cr.dbname).cursor() as new_cr:
+                precision.env = precision.env(cr=new_cr)
+                precision.sudo().write({"digits": original_precision})
+                new_cr.commit()
 
     def _get_invoice_partner_id(self, fatt):
         cedentePrestatore = fatt.FatturaElettronicaHeader.CedentePrestatore
