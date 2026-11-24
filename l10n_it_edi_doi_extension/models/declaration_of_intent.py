@@ -1,7 +1,9 @@
 # Copyright 2025 Nextev Srl
 
+import re
+
 from odoo import _, api, exceptions, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class L10nItDeclarationOfIntent(models.Model):
@@ -117,6 +119,89 @@ class L10nItDeclarationOfIntent(models.Model):
             year = self.plafond_id.year
             self.start_date = fields.Date.today().replace(year=year, month=1, day=1)
             self.end_date = fields.Date.today().replace(year=year, month=12, day=31)
+
+    def write(self, vals):
+        # Validate issued declarations only when their protocol is created or
+        # actually changed. Declarations already stored with a non-conforming
+        # protocol (e.g. migrated from l10n_it_declaration_of_intent, or created
+        # before this check existed) must remain writable: a constraint on the
+        # fields would make any write carrying their current values fail, even
+        # when the protocol is not being modified.
+        to_validate = self.browse()
+        if {"protocol_number_part1", "protocol_number_part2", "type"} & set(vals):
+            to_validate = self.filtered(lambda doi: doi._protocol_is_modified(vals))
+        res = super().write(vals)
+        to_validate._check_protocol_format()
+        return res
+
+    def _protocol_is_modified(self, vals):
+        """Return whether ``vals`` changes the protocol of an issued declaration."""
+        self.ensure_one()
+        new_type = vals.get("type", self.type)
+        if new_type != "in":
+            return False
+        if new_type != self.type:
+            # Issuing a declaration requires a valid protocol
+            return True
+        return (
+            vals.get("protocol_number_part1", self.protocol_number_part1),
+            vals.get("protocol_number_part2", self.protocol_number_part2),
+        ) != (self.protocol_number_part1, self.protocol_number_part2)
+
+    def _check_protocol_format(self):
+        """
+        Validate AdE protocol format for issued declarations.
+        Called on creation and when the protocol of an existing declaration
+        is modified.
+
+        The full protocol (part1 + part2) should be 17 characters:
+        - AAAA: Year (4 digits)
+        - NNNNNNNN: Sequential number (8 digits)
+        - CCCCC: Last 5 chars of company fiscal code (5 alphanumeric)
+
+        Format: AAAANNNNNNNNCCCCC (17 characters total)
+        """
+        # Format RegEx: 4 digits + 8 digits + 5 alphanumeric
+        pattern = r"^(\d{4})(\d{8})([A-Z0-9]{5})$"
+        format_explanation = self.env._(
+            "Format: AAAANNNNNNNNCCCCC\n"
+            "- AAAA: Year (4 digits)\n"
+            "- NNNNNNNN: Sequential (8 digits)\n"
+            "- CCCCC: Last 5 chars of fiscal code\n"
+            "Example: 20250000123456789"
+        )
+        for doi in self:
+            if doi.type != "in":
+                # Skip validation for received declarations
+                continue
+
+            part1 = (doi.protocol_number_part1 or "").strip()
+            part2 = (doi.protocol_number_part2 or "").strip()
+
+            if not part1 or not part2:
+                continue
+
+            full_protocol = part1 + part2
+            if len(full_protocol) != 17:
+                raise ValidationError(
+                    doi.env._(
+                        "The protocol number must be exactly 17 characters.\n"
+                        "Current: %(current)s (%(length)s characters)\n\n",
+                        current=full_protocol,
+                        length=len(full_protocol),
+                    )
+                    + format_explanation
+                )
+
+            match = re.match(pattern, full_protocol.upper())
+            if not match:
+                raise ValidationError(
+                    doi.env._(
+                        "The protocol '%(protocol)s' does not match AdE format.\n\n",
+                        protocol=full_protocol,
+                    )
+                    + format_explanation
+                )
 
     def _fetch_valid_declaration_of_intent(
         self, company, partner, currency, date, doi_type="out"
@@ -242,7 +327,9 @@ class L10nItDeclarationOfIntent(models.Model):
                 values["number"] = self.env["ir.sequence"].next_by_code(
                     "l10n_it_edi_doi.declaration_of_intent"
                 )
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        records._check_protocol_format()
+        return records
 
     @api.ondelete(at_uninstall=False)
     def _unlink_except_linked_to_purchase_document(self):
