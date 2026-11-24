@@ -1,3 +1,4 @@
 from . import test_doi_issued_from_company
 from . import test_plafond_fixes
 from . import test_plafond_year
+from . import test_yearly_limit_migration
